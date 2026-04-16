@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>試作・仕込み管理</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #14161a;
+      --muted: #68707d;
+      --line: #d8dee8;
+      --shadow: 0 12px 30px rgba(20, 22, 26, 0.07);
+      --radius-card: 20px;
+      --radius-field: 14px;
+      --danger: #b42318;
+      --main: #14161a;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      line-height: 1.5;
+    }
+
+    button, input, select, textarea {
+      font: inherit;
+    }
+
+    .app-shell {
+      width: min(100%, 860px);
+      margin: 0 auto;
+      padding:
+        calc(20px + env(safe-area-inset-top))
+        16px
+        calc(32px + env(safe-area-inset-bottom));
+    }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow);
+    }
+
+    .page-header,
+    .section-card {
+      padding: 22px;
+    }
+
+    .page-header {
+      display: grid;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .eyebrow,
+    .section-kicker {
+      margin: 0 0 6px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    h1, h2, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-size: clamp(28px, 5vw, 36px);
+      line-height: 1.2;
+    }
+
+    h2 {
+      margin-bottom: 0;
+      font-size: 22px;
+      line-height: 1.25;
+    }
+
+    .lead {
+      margin-bottom: 0;
+      color: var(--muted);
+    }
+
+    .header-actions,
+    .action-group,
+    .material-form-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #f1f4f8;
+      color: #3f4650;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge-dark {
+      background: #14161a;
+      color: #fff;
+    }
+
+    .stack-form {
+      display: grid;
+      gap: 16px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+    }
+
+    .field-label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-field);
+      background: #fff;
+      padding: 15px 16px;
+      color: var(--text);
+      min-height: 52px;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 112px;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #222;
+      box-shadow: 0 0 0 4px rgba(20, 22, 26, 0.08);
+    }
+
+    .btn {
+      appearance: none;
+      border: 1px solid transparent;
+      border-radius: 16px;
+      min-height: 52px;
+      padding: 0 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    .btn:active {
+      transform: scale(0.99);
+    }
+
+    .btn-primary {
+      background: var(--main);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: var(--main);
+      border-color: #cfd6e0;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .btn-inline {
+      min-height: 42px;
+      padding: 0 14px;
+      border-radius: 14px;
+    }
+
+    .compact-list,
+    .flow-list,
+    .record-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-card,
+    .record-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid #edf1f6;
+      border-radius: 18px;
+      background: #fbfcfe;
+    }
+
+    .mini-card-main {
+      display: grid;
+      gap: 2px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .mini-card-main strong {
+      word-break: break-word;
+    }
+
+    .mini-card-main span,
+    .record-sub,
+    .step-meta,
+    .result-label,
+    .helper-text {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .material-actions {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .record-title {
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .icon-btn {
+      border: 0;
+      background: #eef2f6;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .icon-btn-danger {
+      background: #fdecea;
+      color: #b42318;
+    }
+
+    .toggle-block {
+      margin-top: 16px;
+      border: 1px solid #e8edf4;
+      border-radius: 18px;
+      overflow: hidden;
+      background: #fcfdff;
+    }
+
+    .toggle-block summary,
+    .flow-card summary {
+      list-style: none;
+      cursor: pointer;
+    }
+
+    .toggle-block summary::-webkit-details-marker,
+    .flow-card summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .toggle-block summary {
+      padding: 16px 18px;
+      font-weight: 700;
+    }
+
+    .toggle-content {
+      padding: 0 18px 18px;
+    }
+
+    .flow-card {
+      border: 1px solid #e8edf4;
+      border-radius: 18px;
+      background: #fcfdff;
+      overflow: hidden;
+    }
+
+    .flow-card summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 18px;
+    }
+
+    .flow-card summary p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .flow-body {
+      padding: 0 18px 18px;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 12px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .check-list label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: #f4f7fb;
+    }
+
+    .check-list input[type="checkbox"] {
+      width: 22px;
+      min-width: 22px;
+      height: 22px;
+      min-height: 22px;
+      margin: 1px 0 0;
+      padding: 0;
+      border-radius: 6px;
+    }
+
+    .result-card {
+      border: 1px dashed #d6dde7;
+    }
+
+    .result-empty,
+    .result-note {
+      color: var(--muted);
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .result-item {
+      padding: 16px;
+      border-radius: 16px;
+      background: #f4f7fb;
+    }
+
+    .is-hidden {
+      display: none !important;
+    }
+
+    .material-form-card {
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid #e8edf4;
+      background: #fcfdff;
+    }
+
+    .section-wide,
+    .page-header {
+      grid-column: 1 / -1;
+    }
+
+    @media (min-width: 720px) {
+      .layout-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .header-actions,
+      .action-group,
+      .material-form-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .result-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="page-header card">
+      <div>
+        <p class="eyebrow">Kitchen Workflow UI</p>
+        <h1>試作・仕込み管理</h1>
+        <p class="lead">
+          試作のレシピ、仕込み手順、チェック、結果記録を1つの流れで管理するモバイル優先UIです。
+          一覧は短く、必要な情報だけ開いて使えます。
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" type="button" id="newBtn">新規作成</button>
+        <button class="btn btn-secondary" type="button" id="sampleBtn">サンプル再入力</button>
+      </div>
+    </header>
+
+    <main class="layout-grid">
+      <section class="card section-card">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">1. 入力</p>
+            <h2>基本情報</h2>
+          </div>
+          <span class="badge">よく使う項目のみ</span>
+        </div>
+
+        <form class="stack-form" id="mainForm">
+          <label class="field">
+            <span class="field-label">名称</span>
+            <input type="text" id="recipeName" placeholder="例：苺ムース試作 / 明日の仕込み" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">区分</span>
+            <select id="recipeType">
+              <option>試作</option>
+              <option>仕込み</option>
+              <option>試作＋仕込み</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span class="field-label">日付</span>
+            <input type="date" id="recipeDate" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">担当</span>
+            <input type="text" id="recipeOwner" placeholder="担当者名" />
+          </label>
+
+          <label class="field">
+            <span class="field-label">メモ</span>
+            <textarea id="recipeMemo" rows="4" placeholder="狙い、変更点、注意点など"></textarea>
+          </label>
+        </form>
+      </section>
+
+      <section class="card section-card">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">2. 入力</p>
+            <h2>レシピ構成</h2>
+          </div>
+          <button class="btn btn-secondary btn-inline" type="button" id="addMaterialBtn">材料追加</button>
+        </div>
+
+        <div class="compact-list" id="materialList"></div>
+        <p class="helper-text" id="materialEmpty">まだ材料がありません。「材料追加」から登録できます。</p>
+
+        <div class="material-form-card is-hidden" id="materialFormCard">
+          <div class="stack-form">
+            <label class="field">
+              <span class="field-label">材料名</span>
+              <input type="text" id="materialName" placeholder="例：苺ピューレ" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">分量</span>
+              <input type="text" id="materialAmount" placeholder="例：250g" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">備考</span>
+              <input type="text" id="materialNote" placeholder="例：ボワロン / 冷凍解凍" />
+            </label>
+
+            <div class="material-form-actions">
+              <button class="btn btn-primary" type="button" id="saveMaterialBtn">材料を保存</button>
+              <button class="btn btn-secondary" type="button" id="cancelMaterialBtn">キャンセル</button>
+            </div>
+          </div>
+        </div>
+
+        <details class="toggle-block">
+          <summary>詳細入力を開く</summary>
+          <div class="toggle-content stack-form">
+            <label class="field">
+              <span class="field-label">仕上がり量</span>
+              <input type="text" id="yieldAmount" placeholder="例：10人前 / 1200g" />
+            </label>
+            <label class="field">
+              <span class="field-label">ロス込み計算</span>
+              <input type="text" id="lossRate" placeholder="例：5%" />
+            </label>
+            <label class="field">
+              <span class="field-label">備考</span>
+              <textarea id="detailMemo" rows="3" placeholder="置換材料、前回との差分など"></textarea>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <section class="card section-card section-wide">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">3. 操作</p>
+            <h2>フロー確認</h2>
+          </div>
+          <span class="badge badge-dark">展開式</span>
+        </div>
+
+        <div class="flow-list">
+          <details class="flow-card" open>
+            <summary>
+              <div>
+                <strong>下準備</strong>
+                <p>材料計量、型準備、機材確認</p>
+              </div>
+              <span class="step-meta">5分</span>
+            </summary>
+            <div class="flow-body">
+              <ul class="check-list">
+                <li><label><input type="checkbox" /> 材料を全て計量する</label></li>
+                <li><label><input type="checkbox" /> 型を並べて準備する</label></li>
+                <li><label><input type="checkbox" /> ゼラチンをふやかす</label></li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="flow-card">
+            <summary>
+              <div>
+                <strong>仕込み工程</strong>
+                <p>加熱、合わせ、充填</p>
+              </div>
+              <span class="step-meta">18分</span>
+            </summary>
+            <div class="flow-body">
+              <ul class="check-list">
+                <li><label><input type="checkbox" /> ベースを加熱する</label></li>
+                <li><label><input type="checkbox" /> ゼラチンを溶かす</label></li>
+                <li><label><input type="checkbox" /> クリームを合わせる</label></li>
+                <li><label><input type="checkbox" /> 型に40gずつ流す</label></li>
+              </ul>
+            </div>
+          </details>
+
+          <details class="flow-card">
+            <summary>
+              <div>
+                <strong>仕上げ・確認</strong>
+                <p>冷却、脱型、評価</p>
+              </div>
+              <span class="step-meta">翌日</span>
+            </summary>
+            <div class="flow-body">
+              <ul class="check-list">
+                <li><label><input type="checkbox" /> 冷却状態を確認する</label></li>
+                <li><label><input type="checkbox" /> 脱型状態を確認する</label></li>
+                <li><label><input type="checkbox" /> 食感と見た目を記録する</label></li>
+              </ul>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="card section-card section-wide">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">4. 結果</p>
+            <h2>結果記録</h2>
+          </div>
+          <span class="badge">最後に記入</span>
+        </div>
+
+        <form class="stack-form">
+          <label class="field">
+            <span class="field-label">評価</span>
+            <select id="resultStatus">
+              <option>良好</option>
+              <option>再調整あり</option>
+              <option>要再試作</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span class="field-label">気づき</span>
+            <textarea id="resultNotice" rows="4" placeholder="食感、水分移行、作業性、見た目など"></textarea>
+          </label>
+
+          <label class="field">
+            <span class="field-label">次回修正案</span>
+            <textarea id="resultNext" rows="4" placeholder="ゼラチン量、工程順、比率変更など"></textarea>
+          </label>
+        </form>
+
+        <div class="action-group">
+          <button class="btn btn-primary" type="button" id="saveBtn">保存する</button>
+          <button class="btn btn-secondary" type="button" id="draftBtn">下書き保存</button>
+          <button class="btn btn-danger" type="button" id="deleteBtn">削除</button>
+        </div>
+      </section>
+
+      <section class="card section-card section-wide result-card" id="resultCard">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">出力</p>
+            <h2>保存結果</h2>
+          </div>
+        </div>
+
+        <div class="result-empty" id="resultEmpty">
+          まだ保存していません。入力後に「保存する」を押すと、ここに結果要約が表示されます。
+        </div>
+
+        <div class="result-content is-hidden" id="resultContent">
+          <div class="result-grid">
+            <article class="result-item">
+              <span class="result-label">状態</span>
+              <strong id="resultStateText">保存済み</strong>
+            </article>
+            <article class="result-item">
+              <span class="result-label">対象</span>
+              <strong id="resultNameText">-</strong>
+            </article>
+            <article class="result-item">
+              <span class="result-label">更新</span>
+              <strong id="resultDateText">-</strong>
+            </article>
+          </div>
+          <p class="result-note" id="resultNoteText">
+            保存するとここに要約が出ます。
+          </p>
+        </div>
+      </section>
+
+      <section class="card section-card section-wide">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">一覧</p>
+            <h2>最近の記録</h2>
+          </div>
+        </div>
+        <div class="record-list" id="recordList"></div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const initialSample = {
+      name: "苺ムース試作",
+      type: "試作",
+      date: getTodayString(),
+      owner: "中村",
+      memo: "半球型40g仕上がり確認。脱型性と食感を見たい。",
+      yieldAmount: "10人前 / 400g",
+      lossRate: "5%",
+      detailMemo: "前回よりゼラチンを少し減らす。",
+      resultStatus: "良好",
+      resultNotice: "少ししっかりめ。脱型は安定。",
+      resultNext: "ゼラチンを0.5g下げてもよさそう。",
+      materials: [
+        { name: "苺ピューレ", amount: "250g", note: "ボワロン" },
+        { name: "生クリーム35%", amount: "220g", note: "" },
+        { name: "ゼラチン", amount: "8g", note: "粉ゼラチン" }
+      ]
+    };
+
+    let appState = {
+      materials: [],
+      records: [],
+      editingMaterialIndex: null
+    };
+
+    const recipeName = document.getElementById("recipeName");
+    const recipeType = document.getElementById("recipeType");
+    const recipeDate = document.getElementById("recipeDate");
+    const recipeOwner = document.getElementById("recipeOwner");
+    const recipeMemo = document.getElementById("recipeMemo");
+    const yieldAmount = document.getElementById("yieldAmount");
+    const lossRate = document.getElementById("lossRate");
+    const detailMemo = document.getElementById("detailMemo");
+    const resultStatus = document.getElementById("resultStatus");
+    const resultNotice = document.getElementById("resultNotice");
+    const resultNext = document.getElementById("resultNext");
+
+    const materialList = document.getElementById("materialList");
+    const materialEmpty = document.getElementById("materialEmpty");
+    const materialFormCard = document.getElementById("materialFormCard");
+    const materialName = document.getElementById("materialName");
+    const materialAmount = document.getElementById("materialAmount");
+    const materialNote = document.getElementById("materialNote");
+
+    const resultEmpty = document.getElementById("resultEmpty");
+    const resultContent = document.getElementById("resultContent");
+    const resultStateText = document.getElementById("resultStateText");
+    const resultNameText = document.getElementById("resultNameText");
+    const resultDateText = document.getElementById("resultDateText");
+    const resultNoteText = document.getElementById("resultNoteText");
+
+    const recordList = document.getElementById("recordList");
+
+    document.getElementById("newBtn").addEventListener("click", handleNew);
+    document.getElementById("sampleBtn").addEventListener("click", loadSample);
+    document.getElementById("addMaterialBtn").addEventListener("click", openAddMaterialForm);
+    document.getElementById("saveMaterialBtn").addEventListener("click", saveMaterial);
+    document.getElementById("cancelMaterialBtn").addEventListener("click", closeMaterialForm);
+    document.getElementById("saveBtn").addEventListener("click", handleSave);
+    document.getElementById("draftBtn").addEventListener("click", handleDraftSave);
+    document.getElementById("deleteBtn").addEventListener("click", handleDelete);
+
+    materialList.addEventListener("click", (e) => {
+      const editBtn = e.target.closest(".edit-material-btn");
+      const deleteBtn = e.target.closest(".delete-material-btn");
+
+      if (editBtn) {
+        const index = Number(editBtn.dataset.index);
+        editMaterial(index);
+      }
+
+      if (deleteBtn) {
+        const index = Number(deleteBtn.dataset.index);
+        deleteMaterial(index);
+      }
+    });
+
+    function getTodayString() {
+      const today = new Date();
+      const y = today.getFullYear();
+      const m = String(today.getMonth() + 1).padStart(2, "0");
+      const d = String(today.getDate()).padStart(2, "0");
+      return `${y}-${m}-${d}`;
+    }
+
+    function resetFormValues() {
+      recipeName.value = "";
+      recipeType.value = "試作";
+      recipeDate.value = getTodayString();
+      recipeOwner.value = "";
+      recipeMemo.value = "";
+      yieldAmount.value = "";
+      lossRate.value = "";
+      detailMemo.value = "";
+      resultStatus.value = "良好";
+      resultNotice.value = "";
+      resultNext.value = "";
+    }
+
+    function clearChecks() {
+      document.querySelectorAll('.check-list input[type="checkbox"]').forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+    }
+
+    function clearResultView() {
+      resultEmpty.classList.remove("is-hidden");
+      resultContent.classList.add("is-hidden");
+      resultStateText.textContent = "保存済み";
+      resultNameText.textContent = "-";
+      resultDateText.textContent = "-";
+      resultNoteText.textContent = "保存するとここに要約が出ます。";
+    }
+
+    function handleNew() {
+      resetFormValues();
+      appState.materials = [];
+      appState.editingMaterialIndex = null;
+      renderMaterials();
+      closeMaterialForm();
+      clearChecks();
+      clearResultView();
+    }
+
+    function loadSample() {
+      recipeName.value = initialSample.name;
+      recipeType.value = initialSample.type;
+      recipeDate.value = initialSample.date;
+      recipeOwner.value = initialSample.owner;
+      recipeMemo.value = initialSample.memo;
+      yieldAmount.value = initialSample.yieldAmount;
+      lossRate.value = initialSample.lossRate;
+      detailMemo.value = initialSample.detailMemo;
+      resultStatus.value = initialSample.resultStatus;
+      resultNotice.value = initialSample.resultNotice;
+      resultNext.value = initialSample.resultNext;
+
+      appState.materials = initialSample.materials.map(item => ({ ...item }));
+      appState.editingMaterialIndex = null;
+      renderMaterials();
+      closeMaterialForm();
+      clearChecks();
+      clearResultView();
+    }
+
+    function openAddMaterialForm() {
+      appState.editingMaterialIndex = null;
+      materialName.value = "";
+      materialAmount.value = "";
+      materialNote.value = "";
+      materialFormCard.classList.remove("is-hidden");
+      materialName.focus();
+    }
+
+    function closeMaterialForm() {
+      materialFormCard.classList.add("is-hidden");
+      materialName.value = "";
+      materialAmount.value = "";
+      materialNote.value = "";
+      appState.editingMaterialIndex = null;
+    }
+
+    function saveMaterial() {
+      const name = materialName.value.trim();
+      const amount = materialAmount.value.trim();
+      const note = materialNote.value.trim();
+
+      if (!name || !amount) {
+        alert("材料名と分量を入力してください。");
+        return;
+      }
+
+      const materialData = { name, amount, note };
+
+      if (appState.editingMaterialIndex === null) {
+        appState.materials.push(materialData);
+      } else {
+        appState.materials[appState.editingMaterialIndex] = materialData;
+      }
+
+      renderMaterials();
+      closeMaterialForm();
+    }
+
+    function editMaterial(index) {
+      const item = appState.materials[index];
+      if (!item) return;
+
+      appState.editingMaterialIndex = index;
+      materialName.value = item.name;
+      materialAmount.value = item.amount;
+      materialNote.value = item.note || "";
+      materialFormCard.classList.remove("is-hidden");
+      materialName.focus();
+    }
+
+    function deleteMaterial(index) {
+      appState.materials.splice(index, 1);
+      renderMaterials();
+      if (appState.editingMaterialIndex === index) {
+        closeMaterialForm();
+      }
+    }
+
+    function renderMaterials() {
+      materialList.innerHTML = "";
+
+      if (!appState.materials.length) {
+        materialEmpty.classList.remove("is-hidden");
+        return;
+      }
+
+      materialEmpty.classList.add("is-hidden");
+
+      appState.materials.forEach((item, index) => {
+        const noteText = item.note ? ` / ${escapeHtml(item.note)}` : "";
+        const card = document.createElement("article");
+        card.className = "mini-card";
+        card.innerHTML = `
+          <div class="mini-card-main">
+            <strong>${escapeHtml(item.name)}</strong>
+            <span>${escapeHtml(item.amount)}${noteText}</span>
+          </div>
+          <div class="material-actions">
+            <button class="icon-btn edit-material-btn" type="button" data-index="${index}" aria-label="材料を編集">✎</button>
+            <button class="icon-btn icon-btn-danger delete-material-btn" type="button" data-index="${index}" aria-label="材料を削除">🗑</button>
+          </div>
+        `;
+        materialList.appendChild(card);
+      });
+    }
+
+    function handleSave() {
+      const data = collectFormData();
+      const labelName = data.name || "名称未入力";
+      const labelDate = data.date || getTodayString();
+
+      resultEmpty.classList.add("is-hidden");
+      resultContent.classList.remove("is-hidden");
+      resultStateText.textContent = "保存済み";
+      resultNameText.textContent = labelName;
+      resultDateText.textContent = labelDate;
+      resultNoteText.textContent =
+        `材料 ${data.materials.length}件 / 評価 ${data.resultStatus} / 次回修正: ${data.resultNext || "未入力"}`;
+
+      appState.records.unshift({
+        title: labelName,
+        type: data.type || "未設定",
+        date: labelDate
+      });
+
+      appState.records = appState.records.slice(0, 6);
+      renderRecords();
+      resultContent.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function handleDraftSave() {
+      const data = collectFormData();
+      const labelName = data.name || "名称未入力";
+      const labelDate = data.date || getTodayString();
+
+      resultEmpty.classList.add("is-hidden");
+      resultContent.classList.remove("is-hidden");
+      resultStateText.textContent = "下書き保存";
+      resultNameText.textContent = labelName;
+      resultDateText.textContent = labelDate;
+      resultNoteText.textContent =
+        `下書きとして保持中。材料 ${data.materials.length}件 / メモ: ${data.memo || "未入力"}`;
+    }
+
+    function handleDelete() {
+      const ok = confirm("入力中の内容をクリアしますか？");
+      if (!ok) return;
+      handleNew();
+    }
+
+    function collectFormData() {
+      return {
+        name: recipeName.value.trim(),
+        type: recipeType.value,
+        date: recipeDate.value,
+        owner: recipeOwner.value.trim(),
+        memo: recipeMemo.value.trim(),
+        yieldAmount: yieldAmount.value.trim(),
+        lossRate: lossRate.value.trim(),
+        detailMemo: detailMemo.value.trim(),
+        resultStatus: resultStatus.value,
+        resultNotice: resultNotice.value.trim(),
+        resultNext: resultNext.value.trim(),
+        materials: [...appState.materials]
+      };
+    }
+
+    function renderRecords() {
+      recordList.innerHTML = "";
+
+      if (!appState.records.length) {
+        const empty = document.createElement("p");
+        empty.className = "result-empty";
+        empty.textContent = "まだ記録がありません。保存するとここに表示されます。";
+        recordList.appendChild(empty);
+        return;
+      }
+
+      appState.records.forEach((record) => {
+        const article = document.createElement("article");
+        article.className = "record-card";
+        article.innerHTML = `
+          <div>
+            <p class="record-title">${escapeHtml(record.title)}</p>
+            <p class="record-sub">${escapeHtml(record.type)} / ${escapeHtml(record.date)}</p>
+          </div>
+          <button class="btn btn-secondary btn-inline" type="button">表示のみ</button>
+        `;
+        recordList.appendChild(article);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    handleNew();
+    loadSample();
+    renderRecords();
+  </script>
+</body>
+</html>
