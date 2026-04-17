@@ -31,17 +31,12 @@
       line-height: 1.5;
     }
 
-    button, input, select, textarea {
-      font: inherit;
-    }
+    button, input, select, textarea { font: inherit; }
 
     .app-shell {
       width: min(100%, 860px);
       margin: 0 auto;
-      padding:
-        calc(20px + env(safe-area-inset-top))
-        16px
-        calc(40px + env(safe-area-inset-bottom));
+      padding: calc(20px + env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
     }
 
     .layout-grid {
@@ -52,14 +47,11 @@
 
     .card {
       background: var(--card);
-      border-radius: var(--radius-card);
+      border-radius: 20px;
       box-shadow: var(--shadow);
     }
 
-    .page-header,
-    .section-card {
-      padding: 22px;
-    }
+    .page-header, .section-card { padding: 22px; }
 
     .page-header {
       display: grid;
@@ -67,8 +59,7 @@
       margin-bottom: 18px;
     }
 
-    .eyebrow,
-    .section-kicker {
+    .eyebrow, .section-kicker {
       margin: 0 0 6px;
       font-size: 12px;
       font-weight: 700;
@@ -77,9 +68,7 @@
       color: var(--muted);
     }
 
-    h1, h2, h3, p {
-      margin-top: 0;
-    }
+    h1, h2, h3, p { margin-top: 0; }
 
     h1 {
       margin-bottom: 10px;
@@ -96,7 +85,6 @@
     h3 {
       margin-bottom: 8px;
       font-size: 18px;
-      line-height: 1.3;
     }
 
     .lead {
@@ -136,11 +124,6 @@
       white-space: nowrap;
     }
 
-    .badge-dark {
-      background: #14161a;
-      color: #fff;
-    }
-
     .badge-success {
       background: #eaf7f0;
       color: var(--success);
@@ -172,12 +155,10 @@
       font-size: 14px;
     }
 
-    input,
-    select,
-    textarea {
+    input, select, textarea {
       width: 100%;
       border: 1px solid var(--line);
-      border-radius: var(--radius-field);
+      border-radius: 14px;
       background: #fff;
       padding: 15px 16px;
       color: var(--text);
@@ -190,9 +171,7 @@
       min-height: 112px;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
+    input:focus, select:focus, textarea:focus {
       border-color: #222;
       box-shadow: 0 0 0 4px rgba(20, 22, 26, 0.08);
     }
@@ -208,9 +187,7 @@
       transition: 0.15s ease;
     }
 
-    .btn:active {
-      transform: scale(0.99);
-    }
+    .btn:active { transform: scale(0.99); }
 
     .btn-primary {
       background: var(--main);
@@ -241,26 +218,18 @@
       font-size: 14px;
     }
 
-    .compact-list,
-    .flow-list,
-    .record-list,
-    .template-list {
+    .compact-list, .flow-list, .record-list, .template-list {
       display: grid;
       gap: 12px;
     }
 
-    .mini-card,
-    .flow-card,
-    .record-card,
-    .template-card {
+    .mini-card, .flow-card, .record-card, .template-card {
       border: 1px solid #edf1f6;
       border-radius: 18px;
       background: var(--subtle-2);
     }
 
-    .mini-card,
-    .record-card,
-    .template-card {
+    .mini-card, .record-card, .template-card {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
@@ -268,24 +237,14 @@
       padding: 16px;
     }
 
-    .mini-card-main,
-    .record-main,
-    .template-main {
+    .mini-card-main, .record-main, .template-main {
       display: grid;
       gap: 2px;
       min-width: 0;
       flex: 1;
     }
 
-    .mini-card-main strong,
-    .record-title,
-    .template-title,
-    .flow-summary-title {
-      word-break: break-word;
-    }
-
-    .record-title,
-    .template-title {
+    .record-title, .template-title {
       margin-bottom: 4px;
       font-weight: 700;
     }
@@ -348,12 +307,19 @@
     .material-form-card,
     .flow-form-card,
     .template-save-card,
-    .json-card {
+    .json-card,
+    .inline-check-form {
       margin-top: 14px;
       padding: 16px;
       border-radius: 18px;
       border: 1px solid #e8edf4;
       background: #fcfdff;
+    }
+
+    .amount-row {
+      display: grid;
+      grid-template-columns: 1fr 110px;
+      gap: 10px;
     }
 
     .flow-card {
@@ -379,6 +345,7 @@
     .flow-summary-title {
       font-weight: 700;
       margin-bottom: 4px;
+      word-break: break-word;
     }
 
     .check-list {
@@ -426,8 +393,7 @@
       border: 1px dashed #d6dde7;
     }
 
-    .result-empty,
-    .result-note {
+    .result-empty, .result-note {
       color: var(--muted);
     }
 
@@ -464,10 +430,6 @@
       color: #3f4650;
     }
 
-    .is-hidden {
-      display: none !important;
-    }
-
     .divider {
       height: 1px;
       background: #edf1f6;
@@ -480,6 +442,10 @@
       border: 0;
       box-shadow: none;
       background: transparent;
+    }
+
+    .is-hidden {
+      display: none !important;
     }
 
     @media (min-width: 720px) {
@@ -509,9 +475,7 @@
       <div>
         <p class="eyebrow">Kitchen Workflow UI</p>
         <h1>試作・仕込み管理</h1>
-        <p class="lead">
-          レシピ・材料・工程・結果を1画面で管理し、保存した記録をあとから再編集できる現場向けUIです。
-        </p>
+        <p class="lead">材料・工程・結果を1画面で管理して、保存した記録をあとから再編集できます。</p>
         <div class="status-line">
           <span class="badge badge-success" id="storageStatus">自動保存対応</span>
           <span class="current-editing" id="currentEditingLabel">新規作成中</span>
@@ -573,7 +537,7 @@
           <span class="badge">1列入力</span>
         </div>
 
-        <form class="stack-form" id="mainForm">
+        <form class="stack-form">
           <label class="field">
             <span class="field-label">名称</span>
             <input type="text" id="recipeName" placeholder="例：苺ムース試作 / 明日の仕込み" />
@@ -624,10 +588,24 @@
               <input type="text" id="materialName" placeholder="例：苺ピューレ" />
             </label>
 
-            <label class="field">
-              <span class="field-label">分量</span>
-              <input type="text" id="materialAmount" placeholder="例：250g" />
-            </label>
+            <div class="amount-row">
+              <label class="field">
+                <span class="field-label">数値</span>
+                <input type="number" id="materialAmountValue" inputmode="decimal" step="0.01" min="0" placeholder="250" />
+              </label>
+
+              <label class="field">
+                <span class="field-label">単位</span>
+                <select id="materialAmountUnit">
+                  <option value="g">g</option>
+                  <option value="kg">kg</option>
+                  <option value="ml">ml</option>
+                  <option value="L">L</option>
+                  <option value="個">個</option>
+                  <option value="%">%</option>
+                </select>
+              </label>
+            </div>
 
             <label class="field">
               <span class="field-label">備考</span>
@@ -747,9 +725,7 @@
           </div>
         </div>
 
-        <div class="result-empty" id="resultEmpty">
-          まだ保存していません。入力後に「保存する」を押すと、ここに結果要約が表示されます。
-        </div>
+        <div class="result-empty" id="resultEmpty">まだ保存していません。</div>
 
         <div class="result-content is-hidden" id="resultContent">
           <div class="result-grid">
@@ -776,7 +752,6 @@
             <p class="section-kicker">JSON</p>
             <h2>バックアップ / 復元</h2>
           </div>
-          <span class="badge">持ち運び用</span>
         </div>
 
         <div class="json-card">
@@ -787,7 +762,6 @@
               <input class="file-input" type="file" id="importJsonInput" accept="application/json" />
             </label>
           </div>
-          <p class="helper-text" style="margin-top:12px;">iPhoneではJSONを共有・保存しておくと、機種変更時や別環境への移行に使えます。</p>
         </div>
       </section>
 
@@ -805,7 +779,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "recipe_workflow_app_v2";
+    const STORAGE_KEY = "recipe_workflow_app_v3";
     const MAX_RECENT_RECORDS = 200;
 
     const defaultSample = {
@@ -822,9 +796,9 @@
       resultNotice: "少ししっかりめ。脱型は安定。",
       resultNext: "ゼラチンを0.5g下げてもよさそう。",
       materials: [
-        { name: "苺ピューレ", amount: "250g", note: "ボワロン" },
-        { name: "生クリーム35%", amount: "220g", note: "" },
-        { name: "ゼラチン", amount: "8g", note: "粉ゼラチン" }
+        { name: "苺ピューレ", amountValue: 250, amountUnit: "g", note: "ボワロン" },
+        { name: "生クリーム35%", amountValue: 220, amountUnit: "g", note: "" },
+        { name: "ゼラチン", amountValue: 8, amountUnit: "g", note: "粉ゼラチン" }
       ],
       flows: [
         {
@@ -847,25 +821,11 @@
             { text: "クリームを合わせる", done: false },
             { text: "型に40gずつ流す", done: false }
           ]
-        },
-        {
-          title: "仕上げ・確認",
-          description: "冷却、脱型、評価",
-          duration: "翌日",
-          checks: [
-            { text: "冷却状態を確認する", done: false },
-            { text: "脱型状態を確認する", done: false },
-            { text: "食感と見た目を記録する", done: false }
-          ]
         }
       ]
     };
 
-    let db = {
-      records: [],
-      templates: []
-    };
-
+    let db = { records: [], templates: [] };
     let appState = {
       currentRecordId: null,
       materials: [],
@@ -891,7 +851,8 @@
       materialEmpty: document.getElementById("materialEmpty"),
       materialFormCard: document.getElementById("materialFormCard"),
       materialName: document.getElementById("materialName"),
-      materialAmount: document.getElementById("materialAmount"),
+      materialAmountValue: document.getElementById("materialAmountValue"),
+      materialAmountUnit: document.getElementById("materialAmountUnit"),
       materialNote: document.getElementById("materialNote"),
 
       flowList: document.getElementById("flowList"),
@@ -964,6 +925,7 @@
       renderTemplates();
       renderRecords();
       handleNew();
+
       if (!db.templates.length) {
         db.templates.push({
           id: createId(),
@@ -998,11 +960,6 @@
       const sample = deepCopy(defaultSample);
       sample.id = null;
       sample.date = getTodayString();
-      sample.flows.forEach(flow => {
-        flow.checks.forEach(check => {
-          check.done = false;
-        });
-      });
       return sample;
     }
 
@@ -1153,9 +1110,7 @@
       }
 
       appState.currentRecordId = savedId;
-      db.records = db.records
-        .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
-        .slice(0, MAX_RECENT_RECORDS);
+      db.records = db.records.sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0)).slice(0, MAX_RECENT_RECORDS);
 
       persistDb();
       renderRecords();
@@ -1172,7 +1127,6 @@
       els.resultNameText.textContent = name || "-";
       els.resultDateText.textContent = date || "-";
       els.resultNoteText.textContent = note || "";
-      els.resultContent.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
     function handleDeleteCurrentInput() {
@@ -1184,7 +1138,8 @@
     function openAddMaterialForm() {
       appState.editingMaterialIndex = null;
       els.materialName.value = "";
-      els.materialAmount.value = "";
+      els.materialAmountValue.value = "";
+      els.materialAmountUnit.value = "g";
       els.materialNote.value = "";
       els.materialFormCard.classList.remove("is-hidden");
       els.materialName.focus();
@@ -1193,25 +1148,31 @@
     function closeMaterialForm() {
       els.materialFormCard.classList.add("is-hidden");
       els.materialName.value = "";
-      els.materialAmount.value = "";
+      els.materialAmountValue.value = "";
+      els.materialAmountUnit.value = "g";
       els.materialNote.value = "";
       appState.editingMaterialIndex = null;
     }
 
     function saveMaterial() {
       const name = els.materialName.value.trim();
-      const amount = els.materialAmount.value.trim();
+      const amountValue = Number(els.materialAmountValue.value);
+      const amountUnit = els.materialAmountUnit.value;
       const note = els.materialNote.value.trim();
 
-      if (!name || !amount) {
-        alert("材料名と分量を入力してください。");
+      if (!name) {
+        alert("材料名を入力してください。");
+        return;
+      }
+      if (els.materialAmountValue.value === "" || Number.isNaN(amountValue)) {
+        alert("数値を入力してください。");
         return;
       }
 
-      const materialData = { name, amount, note };
+      const materialData = { name, amountValue, amountUnit, note };
 
       if (appState.editingMaterialIndex === null) {
-        appState.materials.push(materialData);
+        appState.materials.unshift(materialData);
       } else {
         appState.materials[appState.editingMaterialIndex] = materialData;
       }
@@ -1226,8 +1187,9 @@
       if (!item) return;
 
       appState.editingMaterialIndex = index;
-      els.materialName.value = item.name;
-      els.materialAmount.value = item.amount;
+      els.materialName.value = item.name || "";
+      els.materialAmountValue.value = item.amountValue ?? "";
+      els.materialAmountUnit.value = item.amountUnit || "g";
       els.materialNote.value = item.note || "";
       els.materialFormCard.classList.remove("is-hidden");
       els.materialName.focus();
@@ -1251,12 +1213,13 @@
       els.materialEmpty.classList.add("is-hidden");
 
       appState.materials.forEach((item, index) => {
+        const amountText = `${item.amountValue}${item.amountUnit || ""}`;
         const card = document.createElement("article");
         card.className = "mini-card";
         card.innerHTML = `
           <div class="mini-card-main">
             <strong>${escapeHtml(item.name)}</strong>
-            <span class="material-subtext">${escapeHtml(item.amount)}${item.note ? " / " + escapeHtml(item.note) : ""}</span>
+            <span class="material-subtext">${escapeHtml(amountText)}${item.note ? " / " + escapeHtml(item.note) : ""}</span>
           </div>
           <div class="material-actions">
             <button class="icon-btn edit-material-btn" type="button" data-index="${index}" aria-label="材料を編集">✎</button>
@@ -1270,7 +1233,6 @@
     function handleMaterialListClick(e) {
       const editBtn = e.target.closest(".edit-material-btn");
       const deleteBtn = e.target.closest(".delete-material-btn");
-
       if (editBtn) editMaterial(Number(editBtn.dataset.index));
       if (deleteBtn) deleteMaterial(Number(deleteBtn.dataset.index));
     }
@@ -1313,15 +1275,10 @@
         return;
       }
 
-      const flowData = {
-        title,
-        description,
-        duration,
-        checks
-      };
+      const flowData = { title, description, duration, checks };
 
       if (appState.editingFlowIndex === null) {
-        appState.flows.push(flowData);
+        appState.flows.unshift(flowData);
       } else {
         const oldChecks = appState.flows[appState.editingFlowIndex]?.checks || [];
         flowData.checks = flowData.checks.map((check, i) => ({
@@ -1356,12 +1313,11 @@
       autoSaveDraft();
     }
 
-    function addCheckToFlow(index) {
-      const text = prompt("追加するチェック項目を入力してください。");
-      if (!text || !text.trim()) return;
-      appState.flows[index].checks.push({ text: text.trim(), done: false });
-      renderFlows();
-      autoSaveDraft();
+    function addCheckToFlow(flowIndex, text) {
+      const trimmed = text.trim();
+      if (!trimmed) return false;
+      appState.flows[flowIndex].checks.unshift({ text: trimmed, done: false });
+      return true;
     }
 
     function toggleCheck(flowIndex, checkIndex, checked) {
@@ -1431,13 +1387,23 @@
               <div class="step-meta">${escapeHtml(flow.duration || "時間未設定")}</div>
             </div>
             <div class="flow-summary-actions">
-              <button class="btn btn-secondary btn-small add-check-btn" type="button" data-index="${flowIndex}">項目追加</button>
               <button class="icon-btn edit-flow-btn" type="button" data-index="${flowIndex}" aria-label="工程を編集">✎</button>
               <button class="icon-btn icon-btn-danger delete-flow-btn" type="button" data-index="${flowIndex}" aria-label="工程を削除">🗑</button>
             </div>
           </div>
           <div class="flow-card-body">
             ${checksHtml}
+            <div class="inline-check-form">
+              <div class="stack-form">
+                <label class="field">
+                  <span class="field-label">チェック項目追加</span>
+                  <input type="text" class="new-check-input" data-flow-index="${flowIndex}" placeholder="例：温度を確認する" />
+                </label>
+                <div class="inline-actions">
+                  <button class="btn btn-secondary btn-small save-check-btn" type="button" data-flow-index="${flowIndex}">項目追加</button>
+                </div>
+              </div>
+            </div>
           </div>
         `;
         els.flowList.appendChild(card);
@@ -1447,16 +1413,31 @@
     function handleFlowListClick(e) {
       const editBtn = e.target.closest(".edit-flow-btn");
       const deleteBtn = e.target.closest(".delete-flow-btn");
-      const addCheckBtn = e.target.closest(".add-check-btn");
       const deleteCheckBtn = e.target.closest(".delete-check-btn");
+      const saveCheckBtn = e.target.closest(".save-check-btn");
       const checkbox = e.target.closest(".flow-check-toggle");
 
       if (editBtn) editFlow(Number(editBtn.dataset.index));
       if (deleteBtn) deleteFlow(Number(deleteBtn.dataset.index));
-      if (addCheckBtn) addCheckToFlow(Number(addCheckBtn.dataset.index));
+
       if (deleteCheckBtn) {
         deleteCheck(Number(deleteCheckBtn.dataset.flowIndex), Number(deleteCheckBtn.dataset.checkIndex));
       }
+
+      if (saveCheckBtn) {
+        const flowIndex = Number(saveCheckBtn.dataset.flowIndex);
+        const input = els.flowList.querySelector(`.new-check-input[data-flow-index="${flowIndex}"]`);
+        if (!input) return;
+        const ok = addCheckToFlow(flowIndex, input.value);
+        if (!ok) {
+          alert("追加する項目を入力してください。");
+          return;
+        }
+        input.value = "";
+        renderFlows();
+        autoSaveDraft();
+      }
+
       if (checkbox) {
         toggleCheck(Number(checkbox.dataset.flowIndex), Number(checkbox.dataset.checkIndex), checkbox.checked);
       }
@@ -1524,9 +1505,7 @@
         const ok = confirm("この保存済み記録を削除しますか？");
         if (!ok) return;
         db.records = db.records.filter(item => item.id !== deleteBtn.dataset.id);
-        if (appState.currentRecordId === deleteBtn.dataset.id) {
-          handleNew();
-        }
+        if (appState.currentRecordId === deleteBtn.dataset.id) handleNew();
         persistDb();
         renderRecords();
       }
@@ -1605,9 +1584,7 @@
         article.innerHTML = `
           <div class="template-main">
             <p class="template-title">${escapeHtml(template.name)}</p>
-            <p class="template-meta">
-              材料 ${template.data?.materials?.length || 0}件 / 工程 ${template.data?.flows?.length || 0}件
-            </p>
+            <p class="template-meta">材料 ${template.data?.materials?.length || 0}件 / 工程 ${template.data?.flows?.length || 0}件</p>
             <p class="template-meta">更新: ${formatDateTime(template.updatedAt)}</p>
           </div>
           <div class="template-actions">
@@ -1689,9 +1666,8 @@
       const blob = new Blob([payload], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      const today = getTodayString();
       a.href = url;
-      a.download = `recipe-workflow-backup-${today}.json`;
+      a.download = `recipe-workflow-backup-${getTodayString()}.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -1706,10 +1682,6 @@
       reader.onload = () => {
         try {
           const parsed = JSON.parse(reader.result);
-          if (!parsed || typeof parsed !== "object") {
-            throw new Error("invalid json");
-          }
-
           db.records = Array.isArray(parsed.records) ? parsed.records : [];
           db.templates = Array.isArray(parsed.templates) ? parsed.templates : [];
           persistDb();
