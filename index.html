@@ -16,6 +16,9 @@
       --radius-field: 14px;
       --danger: #b42318;
       --main: #14161a;
+      --subtle: #f4f7fb;
+      --subtle-2: #fbfcfe;
+      --success: #0f7b4d;
     }
 
     * { box-sizing: border-box; }
@@ -38,7 +41,7 @@
       padding:
         calc(20px + env(safe-area-inset-top))
         16px
-        calc(32px + env(safe-area-inset-bottom));
+        calc(40px + env(safe-area-inset-bottom));
     }
 
     .layout-grid {
@@ -74,7 +77,7 @@
       color: var(--muted);
     }
 
-    h1, h2, p {
+    h1, h2, h3, p {
       margin-top: 0;
     }
 
@@ -90,6 +93,12 @@
       line-height: 1.25;
     }
 
+    h3 {
+      margin-bottom: 8px;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
     .lead {
       margin-bottom: 0;
       color: var(--muted);
@@ -97,7 +106,10 @@
 
     .header-actions,
     .action-group,
-    .material-form-actions {
+    .inline-actions,
+    .material-form-actions,
+    .flow-form-actions,
+    .json-actions {
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -129,6 +141,11 @@
       color: #fff;
     }
 
+    .badge-success {
+      background: #eaf7f0;
+      color: var(--success);
+    }
+
     .stack-form {
       display: grid;
       gap: 16px;
@@ -142,6 +159,17 @@
     .field-label {
       font-size: 14px;
       font-weight: 700;
+    }
+
+    .helper-text,
+    .muted-text,
+    .step-meta,
+    .result-label,
+    .material-subtext,
+    .record-sub,
+    .template-meta {
+      color: var(--muted);
+      font-size: 14px;
     }
 
     input,
@@ -206,54 +234,71 @@
       border-radius: 14px;
     }
 
+    .btn-small {
+      min-height: 40px;
+      padding: 0 12px;
+      border-radius: 12px;
+      font-size: 14px;
+    }
+
     .compact-list,
     .flow-list,
-    .record-list {
+    .record-list,
+    .template-list {
       display: grid;
       gap: 12px;
     }
 
     .mini-card,
-    .record-card {
+    .flow-card,
+    .record-card,
+    .template-card {
+      border: 1px solid #edf1f6;
+      border-radius: 18px;
+      background: var(--subtle-2);
+    }
+
+    .mini-card,
+    .record-card,
+    .template-card {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
       gap: 12px;
       padding: 16px;
-      border: 1px solid #edf1f6;
-      border-radius: 18px;
-      background: #fbfcfe;
     }
 
-    .mini-card-main {
+    .mini-card-main,
+    .record-main,
+    .template-main {
       display: grid;
       gap: 2px;
       min-width: 0;
       flex: 1;
     }
 
-    .mini-card-main strong {
+    .mini-card-main strong,
+    .record-title,
+    .template-title,
+    .flow-summary-title {
       word-break: break-word;
     }
 
-    .mini-card-main span,
-    .record-sub,
-    .step-meta,
-    .result-label,
-    .helper-text {
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .material-actions {
-      display: flex;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .record-title {
+    .record-title,
+    .template-title {
       margin-bottom: 4px;
       font-weight: 700;
+    }
+
+    .material-actions,
+    .record-actions,
+    .template-actions,
+    .flow-summary-actions,
+    .check-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
     }
 
     .icon-btn {
@@ -269,7 +314,12 @@
 
     .icon-btn-danger {
       background: #fdecea;
-      color: #b42318;
+      color: var(--danger);
+    }
+
+    .section-wide,
+    .page-header {
+      grid-column: 1 / -1;
     }
 
     .toggle-block {
@@ -280,69 +330,84 @@
       background: #fcfdff;
     }
 
-    .toggle-block summary,
-    .flow-card summary {
+    .toggle-block summary {
       list-style: none;
       cursor: pointer;
-    }
-
-    .toggle-block summary::-webkit-details-marker,
-    .flow-card summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .toggle-block summary {
       padding: 16px 18px;
       font-weight: 700;
+    }
+
+    .toggle-block summary::-webkit-details-marker {
+      display: none;
     }
 
     .toggle-content {
       padding: 0 18px 18px;
     }
 
-    .flow-card {
-      border: 1px solid #e8edf4;
+    .material-form-card,
+    .flow-form-card,
+    .template-save-card,
+    .json-card {
+      margin-top: 14px;
+      padding: 16px;
       border-radius: 18px;
+      border: 1px solid #e8edf4;
       background: #fcfdff;
+    }
+
+    .flow-card {
       overflow: hidden;
+      background: #fcfdff;
     }
 
-    .flow-card summary {
+    .flow-card-header {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
-      gap: 14px;
+      gap: 12px;
       padding: 18px;
+      border-bottom: 1px solid #edf1f6;
     }
 
-    .flow-card summary p {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 14px;
+    .flow-card-body {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
     }
 
-    .flow-body {
-      padding: 0 18px 18px;
+    .flow-summary-title {
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
     .check-list {
       display: grid;
-      gap: 12px;
+      gap: 10px;
       padding: 0;
       margin: 0;
       list-style: none;
     }
 
-    .check-list label {
+    .check-item {
       display: flex;
       align-items: flex-start;
+      justify-content: space-between;
       gap: 12px;
       padding: 12px 14px;
       border-radius: 16px;
-      background: #f4f7fb;
+      background: var(--subtle);
     }
 
-    .check-list input[type="checkbox"] {
+    .check-item-left {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .check-item-left input[type="checkbox"] {
       width: 22px;
       min-width: 22px;
       height: 22px;
@@ -350,6 +415,11 @@
       margin: 1px 0 0;
       padding: 0;
       border-radius: 6px;
+    }
+
+    .check-item-text {
+      word-break: break-word;
+      padding-top: 1px;
     }
 
     .result-card {
@@ -371,24 +441,45 @@
     .result-item {
       padding: 16px;
       border-radius: 16px;
-      background: #f4f7fb;
+      background: var(--subtle);
+    }
+
+    .status-line {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    .current-editing {
+      display: inline-flex;
+      align-items: center;
+      min-height: 36px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #eef2f6;
+      font-size: 13px;
+      font-weight: 700;
+      color: #3f4650;
     }
 
     .is-hidden {
       display: none !important;
     }
 
-    .material-form-card {
-      margin-top: 14px;
-      padding: 16px;
-      border-radius: 18px;
-      border: 1px solid #e8edf4;
-      background: #fcfdff;
+    .divider {
+      height: 1px;
+      background: #edf1f6;
+      margin: 8px 0 2px;
     }
 
-    .section-wide,
-    .page-header {
-      grid-column: 1 / -1;
+    .file-input {
+      padding: 10px 0;
+      min-height: auto;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
     }
 
     @media (min-width: 720px) {
@@ -398,7 +489,10 @@
 
       .header-actions,
       .action-group,
-      .material-form-actions {
+      .inline-actions,
+      .material-form-actions,
+      .flow-form-actions,
+      .json-actions {
         flex-direction: row;
         flex-wrap: wrap;
       }
@@ -416,24 +510,67 @@
         <p class="eyebrow">Kitchen Workflow UI</p>
         <h1>試作・仕込み管理</h1>
         <p class="lead">
-          試作のレシピ、仕込み手順、チェック、結果記録を1つの流れで管理するモバイル優先UIです。
-          一覧は短く、必要な情報だけ開いて使えます。
+          レシピ・材料・工程・結果を1画面で管理し、保存した記録をあとから再編集できる現場向けUIです。
         </p>
+        <div class="status-line">
+          <span class="badge badge-success" id="storageStatus">自動保存対応</span>
+          <span class="current-editing" id="currentEditingLabel">新規作成中</span>
+        </div>
       </div>
+
       <div class="header-actions">
         <button class="btn btn-primary" type="button" id="newBtn">新規作成</button>
-        <button class="btn btn-secondary" type="button" id="sampleBtn">サンプル再入力</button>
+        <button class="btn btn-secondary" type="button" id="duplicateBtn">複製して新規</button>
       </div>
     </header>
 
     <main class="layout-grid">
+      <section class="card section-card section-wide">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">テンプレート</p>
+            <h2>サンプルパターン</h2>
+          </div>
+          <span class="badge">使い回し用</span>
+        </div>
+
+        <div class="stack-form">
+          <label class="field">
+            <span class="field-label">保存済みテンプレートを読み込む</span>
+            <select id="templateSelect">
+              <option value="">選択してください</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="inline-actions" style="margin-top:12px;">
+          <button class="btn btn-secondary btn-inline" type="button" id="loadTemplateBtn">テンプレート読込</button>
+          <button class="btn btn-secondary btn-inline" type="button" id="loadSampleBtn">初期サンプル読込</button>
+        </div>
+
+        <div class="template-save-card">
+          <div class="stack-form">
+            <label class="field">
+              <span class="field-label">今の内容をテンプレート保存</span>
+              <input type="text" id="templateNameInput" placeholder="例：苺ムース基本 / ババロア共通 / 仕込み朝番用" />
+            </label>
+            <div class="inline-actions">
+              <button class="btn btn-primary btn-inline" type="button" id="saveTemplateBtn">テンプレート保存</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div class="template-list" id="templateList"></div>
+      </section>
+
       <section class="card section-card">
         <div class="section-heading">
           <div>
             <p class="section-kicker">1. 入力</p>
             <h2>基本情報</h2>
           </div>
-          <span class="badge">よく使う項目のみ</span>
+          <span class="badge">1列入力</span>
         </div>
 
         <form class="stack-form" id="mainForm">
@@ -527,63 +664,41 @@
         <div class="section-heading">
           <div>
             <p class="section-kicker">3. 操作</p>
-            <h2>フロー確認</h2>
+            <h2>フロー編集</h2>
           </div>
-          <span class="badge badge-dark">展開式</span>
+          <button class="btn btn-secondary btn-inline" type="button" id="addFlowBtn">工程追加</button>
         </div>
 
-        <div class="flow-list">
-          <details class="flow-card" open>
-            <summary>
-              <div>
-                <strong>下準備</strong>
-                <p>材料計量、型準備、機材確認</p>
-              </div>
-              <span class="step-meta">5分</span>
-            </summary>
-            <div class="flow-body">
-              <ul class="check-list">
-                <li><label><input type="checkbox" /> 材料を全て計量する</label></li>
-                <li><label><input type="checkbox" /> 型を並べて準備する</label></li>
-                <li><label><input type="checkbox" /> ゼラチンをふやかす</label></li>
-              </ul>
-            </div>
-          </details>
+        <div class="flow-list" id="flowList"></div>
+        <p class="helper-text" id="flowEmpty">まだ工程がありません。「工程追加」から登録できます。</p>
 
-          <details class="flow-card">
-            <summary>
-              <div>
-                <strong>仕込み工程</strong>
-                <p>加熱、合わせ、充填</p>
-              </div>
-              <span class="step-meta">18分</span>
-            </summary>
-            <div class="flow-body">
-              <ul class="check-list">
-                <li><label><input type="checkbox" /> ベースを加熱する</label></li>
-                <li><label><input type="checkbox" /> ゼラチンを溶かす</label></li>
-                <li><label><input type="checkbox" /> クリームを合わせる</label></li>
-                <li><label><input type="checkbox" /> 型に40gずつ流す</label></li>
-              </ul>
-            </div>
-          </details>
+        <div class="flow-form-card is-hidden" id="flowFormCard">
+          <div class="stack-form">
+            <label class="field">
+              <span class="field-label">工程名</span>
+              <input type="text" id="flowTitle" placeholder="例：下準備 / 焼成 / 冷却 / 仕上げ" />
+            </label>
 
-          <details class="flow-card">
-            <summary>
-              <div>
-                <strong>仕上げ・確認</strong>
-                <p>冷却、脱型、評価</p>
-              </div>
-              <span class="step-meta">翌日</span>
-            </summary>
-            <div class="flow-body">
-              <ul class="check-list">
-                <li><label><input type="checkbox" /> 冷却状態を確認する</label></li>
-                <li><label><input type="checkbox" /> 脱型状態を確認する</label></li>
-                <li><label><input type="checkbox" /> 食感と見た目を記録する</label></li>
-              </ul>
+            <label class="field">
+              <span class="field-label">説明</span>
+              <input type="text" id="flowDescription" placeholder="例：材料計量、型準備、機材確認" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">目安時間</span>
+              <input type="text" id="flowDuration" placeholder="例：10分 / 180℃ 12分 / 翌日" />
+            </label>
+
+            <label class="field">
+              <span class="field-label">チェック項目（1行に1つ）</span>
+              <textarea id="flowChecks" rows="5" placeholder="材料を計量する&#10;型を準備する&#10;ゼラチンをふやかす"></textarea>
+            </label>
+
+            <div class="flow-form-actions">
+              <button class="btn btn-primary" type="button" id="saveFlowBtn">工程を保存</button>
+              <button class="btn btn-secondary" type="button" id="cancelFlowBtn">キャンセル</button>
             </div>
-          </details>
+          </div>
         </div>
       </section>
 
@@ -620,11 +735,11 @@
         <div class="action-group">
           <button class="btn btn-primary" type="button" id="saveBtn">保存する</button>
           <button class="btn btn-secondary" type="button" id="draftBtn">下書き保存</button>
-          <button class="btn btn-danger" type="button" id="deleteBtn">削除</button>
+          <button class="btn btn-danger" type="button" id="deleteBtn">入力中を削除</button>
         </div>
       </section>
 
-      <section class="card section-card section-wide result-card" id="resultCard">
+      <section class="card section-card section-wide result-card">
         <div class="section-heading">
           <div>
             <p class="section-kicker">出力</p>
@@ -651,9 +766,28 @@
               <strong id="resultDateText">-</strong>
             </article>
           </div>
-          <p class="result-note" id="resultNoteText">
-            保存するとここに要約が出ます。
-          </p>
+          <p class="result-note" id="resultNoteText">保存するとここに要約が出ます。</p>
+        </div>
+      </section>
+
+      <section class="card section-card section-wide">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">JSON</p>
+            <h2>バックアップ / 復元</h2>
+          </div>
+          <span class="badge">持ち運び用</span>
+        </div>
+
+        <div class="json-card">
+          <div class="json-actions">
+            <button class="btn btn-secondary" type="button" id="exportJsonBtn">全記録をJSON出力</button>
+            <label class="field" style="margin:0;">
+              <span class="field-label">JSON読込</span>
+              <input class="file-input" type="file" id="importJsonInput" accept="application/json" />
+            </label>
+          </div>
+          <p class="helper-text" style="margin-top:12px;">iPhoneではJSONを共有・保存しておくと、機種変更時や別環境への移行に使えます。</p>
         </div>
       </section>
 
@@ -661,8 +795,9 @@
         <div class="section-heading">
           <div>
             <p class="section-kicker">一覧</p>
-            <h2>最近の記録</h2>
+            <h2>保存済み記録</h2>
           </div>
+          <span class="badge" id="recordCountBadge">0件</span>
         </div>
         <div class="record-list" id="recordList"></div>
       </section>
@@ -670,7 +805,11 @@
   </div>
 
   <script>
-    const initialSample = {
+    const STORAGE_KEY = "recipe_workflow_app_v2";
+    const MAX_RECENT_RECORDS = 200;
+
+    const defaultSample = {
+      id: null,
       name: "苺ムース試作",
       type: "試作",
       date: getTodayString(),
@@ -686,66 +825,158 @@
         { name: "苺ピューレ", amount: "250g", note: "ボワロン" },
         { name: "生クリーム35%", amount: "220g", note: "" },
         { name: "ゼラチン", amount: "8g", note: "粉ゼラチン" }
+      ],
+      flows: [
+        {
+          title: "下準備",
+          description: "材料計量、型準備、機材確認",
+          duration: "5分",
+          checks: [
+            { text: "材料を全て計量する", done: false },
+            { text: "型を並べて準備する", done: false },
+            { text: "ゼラチンをふやかす", done: false }
+          ]
+        },
+        {
+          title: "仕込み工程",
+          description: "加熱、合わせ、充填",
+          duration: "18分",
+          checks: [
+            { text: "ベースを加熱する", done: false },
+            { text: "ゼラチンを溶かす", done: false },
+            { text: "クリームを合わせる", done: false },
+            { text: "型に40gずつ流す", done: false }
+          ]
+        },
+        {
+          title: "仕上げ・確認",
+          description: "冷却、脱型、評価",
+          duration: "翌日",
+          checks: [
+            { text: "冷却状態を確認する", done: false },
+            { text: "脱型状態を確認する", done: false },
+            { text: "食感と見た目を記録する", done: false }
+          ]
+        }
       ]
     };
 
-    let appState = {
-      materials: [],
+    let db = {
       records: [],
-      editingMaterialIndex: null
+      templates: []
     };
 
-    const recipeName = document.getElementById("recipeName");
-    const recipeType = document.getElementById("recipeType");
-    const recipeDate = document.getElementById("recipeDate");
-    const recipeOwner = document.getElementById("recipeOwner");
-    const recipeMemo = document.getElementById("recipeMemo");
-    const yieldAmount = document.getElementById("yieldAmount");
-    const lossRate = document.getElementById("lossRate");
-    const detailMemo = document.getElementById("detailMemo");
-    const resultStatus = document.getElementById("resultStatus");
-    const resultNotice = document.getElementById("resultNotice");
-    const resultNext = document.getElementById("resultNext");
+    let appState = {
+      currentRecordId: null,
+      materials: [],
+      flows: [],
+      editingMaterialIndex: null,
+      editingFlowIndex: null
+    };
 
-    const materialList = document.getElementById("materialList");
-    const materialEmpty = document.getElementById("materialEmpty");
-    const materialFormCard = document.getElementById("materialFormCard");
-    const materialName = document.getElementById("materialName");
-    const materialAmount = document.getElementById("materialAmount");
-    const materialNote = document.getElementById("materialNote");
+    const els = {
+      recipeName: document.getElementById("recipeName"),
+      recipeType: document.getElementById("recipeType"),
+      recipeDate: document.getElementById("recipeDate"),
+      recipeOwner: document.getElementById("recipeOwner"),
+      recipeMemo: document.getElementById("recipeMemo"),
+      yieldAmount: document.getElementById("yieldAmount"),
+      lossRate: document.getElementById("lossRate"),
+      detailMemo: document.getElementById("detailMemo"),
+      resultStatus: document.getElementById("resultStatus"),
+      resultNotice: document.getElementById("resultNotice"),
+      resultNext: document.getElementById("resultNext"),
 
-    const resultEmpty = document.getElementById("resultEmpty");
-    const resultContent = document.getElementById("resultContent");
-    const resultStateText = document.getElementById("resultStateText");
-    const resultNameText = document.getElementById("resultNameText");
-    const resultDateText = document.getElementById("resultDateText");
-    const resultNoteText = document.getElementById("resultNoteText");
+      materialList: document.getElementById("materialList"),
+      materialEmpty: document.getElementById("materialEmpty"),
+      materialFormCard: document.getElementById("materialFormCard"),
+      materialName: document.getElementById("materialName"),
+      materialAmount: document.getElementById("materialAmount"),
+      materialNote: document.getElementById("materialNote"),
 
-    const recordList = document.getElementById("recordList");
+      flowList: document.getElementById("flowList"),
+      flowEmpty: document.getElementById("flowEmpty"),
+      flowFormCard: document.getElementById("flowFormCard"),
+      flowTitle: document.getElementById("flowTitle"),
+      flowDescription: document.getElementById("flowDescription"),
+      flowDuration: document.getElementById("flowDuration"),
+      flowChecks: document.getElementById("flowChecks"),
 
-    document.getElementById("newBtn").addEventListener("click", handleNew);
-    document.getElementById("sampleBtn").addEventListener("click", loadSample);
-    document.getElementById("addMaterialBtn").addEventListener("click", openAddMaterialForm);
-    document.getElementById("saveMaterialBtn").addEventListener("click", saveMaterial);
-    document.getElementById("cancelMaterialBtn").addEventListener("click", closeMaterialForm);
-    document.getElementById("saveBtn").addEventListener("click", handleSave);
-    document.getElementById("draftBtn").addEventListener("click", handleDraftSave);
-    document.getElementById("deleteBtn").addEventListener("click", handleDelete);
+      resultEmpty: document.getElementById("resultEmpty"),
+      resultContent: document.getElementById("resultContent"),
+      resultStateText: document.getElementById("resultStateText"),
+      resultNameText: document.getElementById("resultNameText"),
+      resultDateText: document.getElementById("resultDateText"),
+      resultNoteText: document.getElementById("resultNoteText"),
 
-    materialList.addEventListener("click", (e) => {
-      const editBtn = e.target.closest(".edit-material-btn");
-      const deleteBtn = e.target.closest(".delete-material-btn");
+      recordList: document.getElementById("recordList"),
+      recordCountBadge: document.getElementById("recordCountBadge"),
+      currentEditingLabel: document.getElementById("currentEditingLabel"),
+      storageStatus: document.getElementById("storageStatus"),
 
-      if (editBtn) {
-        const index = Number(editBtn.dataset.index);
-        editMaterial(index);
+      templateSelect: document.getElementById("templateSelect"),
+      templateNameInput: document.getElementById("templateNameInput"),
+      templateList: document.getElementById("templateList"),
+
+      importJsonInput: document.getElementById("importJsonInput")
+    };
+
+    bindEvents();
+    initialize();
+
+    function bindEvents() {
+      document.getElementById("newBtn").addEventListener("click", handleNew);
+      document.getElementById("duplicateBtn").addEventListener("click", handleDuplicateAsNew);
+
+      document.getElementById("loadSampleBtn").addEventListener("click", () => loadRecordIntoForm(createSampleRecord()));
+      document.getElementById("loadTemplateBtn").addEventListener("click", handleLoadTemplate);
+      document.getElementById("saveTemplateBtn").addEventListener("click", handleSaveTemplate);
+
+      document.getElementById("addMaterialBtn").addEventListener("click", openAddMaterialForm);
+      document.getElementById("saveMaterialBtn").addEventListener("click", saveMaterial);
+      document.getElementById("cancelMaterialBtn").addEventListener("click", closeMaterialForm);
+
+      document.getElementById("addFlowBtn").addEventListener("click", openAddFlowForm);
+      document.getElementById("saveFlowBtn").addEventListener("click", saveFlow);
+      document.getElementById("cancelFlowBtn").addEventListener("click", closeFlowForm);
+
+      document.getElementById("saveBtn").addEventListener("click", () => handleSave("保存済み"));
+      document.getElementById("draftBtn").addEventListener("click", () => handleSave("下書き保存"));
+      document.getElementById("deleteBtn").addEventListener("click", handleDeleteCurrentInput);
+
+      document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
+      els.importJsonInput.addEventListener("change", importJson);
+
+      els.materialList.addEventListener("click", handleMaterialListClick);
+      els.flowList.addEventListener("click", handleFlowListClick);
+      els.recordList.addEventListener("click", handleRecordListClick);
+      els.templateList.addEventListener("click", handleTemplateListClick);
+
+      document.querySelectorAll("input, select, textarea").forEach(el => {
+        el.addEventListener("input", debouncedAutoSaveDraft);
+        el.addEventListener("change", debouncedAutoSaveDraft);
+      });
+    }
+
+    function initialize() {
+      loadDbFromStorage();
+      refreshTemplateSelect();
+      renderTemplates();
+      renderRecords();
+      handleNew();
+      if (!db.templates.length) {
+        db.templates.push({
+          id: createId(),
+          name: "基本サンプル",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          data: createSampleRecord()
+        });
+        persistDb();
+        refreshTemplateSelect();
+        renderTemplates();
       }
-
-      if (deleteBtn) {
-        const index = Number(deleteBtn.dataset.index);
-        deleteMaterial(index);
-      }
-    });
+    }
 
     function getTodayString() {
       const today = new Date();
@@ -755,87 +986,222 @@
       return `${y}-${m}-${d}`;
     }
 
-    function resetFormValues() {
-      recipeName.value = "";
-      recipeType.value = "試作";
-      recipeDate.value = getTodayString();
-      recipeOwner.value = "";
-      recipeMemo.value = "";
-      yieldAmount.value = "";
-      lossRate.value = "";
-      detailMemo.value = "";
-      resultStatus.value = "良好";
-      resultNotice.value = "";
-      resultNext.value = "";
+    function createId() {
+      return `id_${Date.now()}_${Math.random().toString(16).slice(2, 10)}`;
     }
 
-    function clearChecks() {
-      document.querySelectorAll('.check-list input[type="checkbox"]').forEach((checkbox) => {
-        checkbox.checked = false;
+    function deepCopy(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function createSampleRecord() {
+      const sample = deepCopy(defaultSample);
+      sample.id = null;
+      sample.date = getTodayString();
+      sample.flows.forEach(flow => {
+        flow.checks.forEach(check => {
+          check.done = false;
+        });
       });
+      return sample;
+    }
+
+    function resetFormValues() {
+      els.recipeName.value = "";
+      els.recipeType.value = "試作";
+      els.recipeDate.value = getTodayString();
+      els.recipeOwner.value = "";
+      els.recipeMemo.value = "";
+      els.yieldAmount.value = "";
+      els.lossRate.value = "";
+      els.detailMemo.value = "";
+      els.resultStatus.value = "良好";
+      els.resultNotice.value = "";
+      els.resultNext.value = "";
     }
 
     function clearResultView() {
-      resultEmpty.classList.remove("is-hidden");
-      resultContent.classList.add("is-hidden");
-      resultStateText.textContent = "保存済み";
-      resultNameText.textContent = "-";
-      resultDateText.textContent = "-";
-      resultNoteText.textContent = "保存するとここに要約が出ます。";
+      els.resultEmpty.classList.remove("is-hidden");
+      els.resultContent.classList.add("is-hidden");
+      els.resultStateText.textContent = "保存済み";
+      els.resultNameText.textContent = "-";
+      els.resultDateText.textContent = "-";
+      els.resultNoteText.textContent = "保存するとここに要約が出ます。";
+    }
+
+    function updateCurrentEditingLabel() {
+      const name = els.recipeName.value.trim();
+      if (appState.currentRecordId) {
+        els.currentEditingLabel.textContent = `編集中: ${name || "名称未入力"}`;
+      } else {
+        els.currentEditingLabel.textContent = `新規作成中${name ? `: ${name}` : ""}`;
+      }
     }
 
     function handleNew() {
-      resetFormValues();
+      appState.currentRecordId = null;
       appState.materials = [];
+      appState.flows = [];
       appState.editingMaterialIndex = null;
+      appState.editingFlowIndex = null;
+      resetFormValues();
       renderMaterials();
+      renderFlows();
       closeMaterialForm();
-      clearChecks();
+      closeFlowForm();
       clearResultView();
+      updateCurrentEditingLabel();
+      autoSaveDraft();
     }
 
-    function loadSample() {
-      recipeName.value = initialSample.name;
-      recipeType.value = initialSample.type;
-      recipeDate.value = initialSample.date;
-      recipeOwner.value = initialSample.owner;
-      recipeMemo.value = initialSample.memo;
-      yieldAmount.value = initialSample.yieldAmount;
-      lossRate.value = initialSample.lossRate;
-      detailMemo.value = initialSample.detailMemo;
-      resultStatus.value = initialSample.resultStatus;
-      resultNotice.value = initialSample.resultNotice;
-      resultNext.value = initialSample.resultNext;
+    function handleDuplicateAsNew() {
+      const data = collectFormData();
+      appState.currentRecordId = null;
+      appState.materials = deepCopy(data.materials);
+      appState.flows = deepCopy(data.flows);
+      els.recipeName.value = data.name ? `${data.name}（複製）` : "";
+      updateCurrentEditingLabel();
+      showResultSummary("複製作成", els.recipeName.value || "名称未入力", els.recipeDate.value || getTodayString(), "今の内容を新規用に複製しました。");
+      autoSaveDraft();
+    }
 
-      appState.materials = initialSample.materials.map(item => ({ ...item }));
-      appState.editingMaterialIndex = null;
+    function loadRecordIntoForm(record) {
+      const data = deepCopy(record);
+      appState.currentRecordId = data.id || null;
+
+      els.recipeName.value = data.name || "";
+      els.recipeType.value = data.type || "試作";
+      els.recipeDate.value = data.date || getTodayString();
+      els.recipeOwner.value = data.owner || "";
+      els.recipeMemo.value = data.memo || "";
+      els.yieldAmount.value = data.yieldAmount || "";
+      els.lossRate.value = data.lossRate || "";
+      els.detailMemo.value = data.detailMemo || "";
+      els.resultStatus.value = data.resultStatus || "良好";
+      els.resultNotice.value = data.resultNotice || "";
+      els.resultNext.value = data.resultNext || "";
+
+      appState.materials = Array.isArray(data.materials) ? deepCopy(data.materials) : [];
+      appState.flows = Array.isArray(data.flows) ? deepCopy(data.flows) : [];
+
       renderMaterials();
+      renderFlows();
       closeMaterialForm();
-      clearChecks();
+      closeFlowForm();
       clearResultView();
+      updateCurrentEditingLabel();
+      autoSaveDraft();
+    }
+
+    function collectFormData() {
+      return {
+        id: appState.currentRecordId,
+        name: els.recipeName.value.trim(),
+        type: els.recipeType.value,
+        date: els.recipeDate.value,
+        owner: els.recipeOwner.value.trim(),
+        memo: els.recipeMemo.value.trim(),
+        yieldAmount: els.yieldAmount.value.trim(),
+        lossRate: els.lossRate.value.trim(),
+        detailMemo: els.detailMemo.value.trim(),
+        resultStatus: els.resultStatus.value,
+        resultNotice: els.resultNotice.value.trim(),
+        resultNext: els.resultNext.value.trim(),
+        materials: deepCopy(appState.materials),
+        flows: deepCopy(appState.flows),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function validateRecordData(data) {
+      if (!data.name) {
+        alert("名称を入力してください。");
+        return false;
+      }
+      if (!data.date) {
+        alert("日付を入力してください。");
+        return false;
+      }
+      return true;
+    }
+
+    function handleSave(stateLabel) {
+      const data = collectFormData();
+      if (!validateRecordData(data)) return;
+
+      let savedId = appState.currentRecordId;
+      const now = new Date().toISOString();
+
+      if (!savedId) {
+        savedId = createId();
+        data.id = savedId;
+        data.createdAt = now;
+        data.updatedAt = now;
+        db.records.unshift(data);
+      } else {
+        const index = db.records.findIndex(record => record.id === savedId);
+        if (index === -1) {
+          data.id = savedId;
+          data.createdAt = now;
+          data.updatedAt = now;
+          db.records.unshift(data);
+        } else {
+          data.createdAt = db.records[index].createdAt || now;
+          data.updatedAt = now;
+          db.records[index] = data;
+        }
+      }
+
+      appState.currentRecordId = savedId;
+      db.records = db.records
+        .sort((a, b) => new Date(b.updatedAt || 0) - new Date(a.updatedAt || 0))
+        .slice(0, MAX_RECENT_RECORDS);
+
+      persistDb();
+      renderRecords();
+      updateCurrentEditingLabel();
+
+      const note = `材料 ${data.materials.length}件 / 工程 ${data.flows.length}件 / 評価 ${data.resultStatus}`;
+      showResultSummary(stateLabel, data.name, data.date, note);
+    }
+
+    function showResultSummary(stateLabel, name, date, note) {
+      els.resultEmpty.classList.add("is-hidden");
+      els.resultContent.classList.remove("is-hidden");
+      els.resultStateText.textContent = stateLabel;
+      els.resultNameText.textContent = name || "-";
+      els.resultDateText.textContent = date || "-";
+      els.resultNoteText.textContent = note || "";
+      els.resultContent.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function handleDeleteCurrentInput() {
+      const ok = confirm("入力中の内容をクリアしますか？保存済み記録自体は削除されません。");
+      if (!ok) return;
+      handleNew();
     }
 
     function openAddMaterialForm() {
       appState.editingMaterialIndex = null;
-      materialName.value = "";
-      materialAmount.value = "";
-      materialNote.value = "";
-      materialFormCard.classList.remove("is-hidden");
-      materialName.focus();
+      els.materialName.value = "";
+      els.materialAmount.value = "";
+      els.materialNote.value = "";
+      els.materialFormCard.classList.remove("is-hidden");
+      els.materialName.focus();
     }
 
     function closeMaterialForm() {
-      materialFormCard.classList.add("is-hidden");
-      materialName.value = "";
-      materialAmount.value = "";
-      materialNote.value = "";
+      els.materialFormCard.classList.add("is-hidden");
+      els.materialName.value = "";
+      els.materialAmount.value = "";
+      els.materialNote.value = "";
       appState.editingMaterialIndex = null;
     }
 
     function saveMaterial() {
-      const name = materialName.value.trim();
-      const amount = materialAmount.value.trim();
-      const note = materialNote.value.trim();
+      const name = els.materialName.value.trim();
+      const amount = els.materialAmount.value.trim();
+      const note = els.materialNote.value.trim();
 
       if (!name || !amount) {
         alert("材料名と分量を入力してください。");
@@ -852,6 +1218,7 @@
 
       renderMaterials();
       closeMaterialForm();
+      autoSaveDraft();
     }
 
     function editMaterial(index) {
@@ -859,133 +1226,517 @@
       if (!item) return;
 
       appState.editingMaterialIndex = index;
-      materialName.value = item.name;
-      materialAmount.value = item.amount;
-      materialNote.value = item.note || "";
-      materialFormCard.classList.remove("is-hidden");
-      materialName.focus();
+      els.materialName.value = item.name;
+      els.materialAmount.value = item.amount;
+      els.materialNote.value = item.note || "";
+      els.materialFormCard.classList.remove("is-hidden");
+      els.materialName.focus();
     }
 
     function deleteMaterial(index) {
       appState.materials.splice(index, 1);
       renderMaterials();
-      if (appState.editingMaterialIndex === index) {
-        closeMaterialForm();
-      }
+      if (appState.editingMaterialIndex === index) closeMaterialForm();
+      autoSaveDraft();
     }
 
     function renderMaterials() {
-      materialList.innerHTML = "";
+      els.materialList.innerHTML = "";
 
       if (!appState.materials.length) {
-        materialEmpty.classList.remove("is-hidden");
+        els.materialEmpty.classList.remove("is-hidden");
         return;
       }
 
-      materialEmpty.classList.add("is-hidden");
+      els.materialEmpty.classList.add("is-hidden");
 
       appState.materials.forEach((item, index) => {
-        const noteText = item.note ? ` / ${escapeHtml(item.note)}` : "";
         const card = document.createElement("article");
         card.className = "mini-card";
         card.innerHTML = `
           <div class="mini-card-main">
             <strong>${escapeHtml(item.name)}</strong>
-            <span>${escapeHtml(item.amount)}${noteText}</span>
+            <span class="material-subtext">${escapeHtml(item.amount)}${item.note ? " / " + escapeHtml(item.note) : ""}</span>
           </div>
           <div class="material-actions">
             <button class="icon-btn edit-material-btn" type="button" data-index="${index}" aria-label="材料を編集">✎</button>
             <button class="icon-btn icon-btn-danger delete-material-btn" type="button" data-index="${index}" aria-label="材料を削除">🗑</button>
           </div>
         `;
-        materialList.appendChild(card);
+        els.materialList.appendChild(card);
       });
     }
 
-    function handleSave() {
-      const data = collectFormData();
-      const labelName = data.name || "名称未入力";
-      const labelDate = data.date || getTodayString();
+    function handleMaterialListClick(e) {
+      const editBtn = e.target.closest(".edit-material-btn");
+      const deleteBtn = e.target.closest(".delete-material-btn");
 
-      resultEmpty.classList.add("is-hidden");
-      resultContent.classList.remove("is-hidden");
-      resultStateText.textContent = "保存済み";
-      resultNameText.textContent = labelName;
-      resultDateText.textContent = labelDate;
-      resultNoteText.textContent =
-        `材料 ${data.materials.length}件 / 評価 ${data.resultStatus} / 次回修正: ${data.resultNext || "未入力"}`;
-
-      appState.records.unshift({
-        title: labelName,
-        type: data.type || "未設定",
-        date: labelDate
-      });
-
-      appState.records = appState.records.slice(0, 6);
-      renderRecords();
-      resultContent.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      if (editBtn) editMaterial(Number(editBtn.dataset.index));
+      if (deleteBtn) deleteMaterial(Number(deleteBtn.dataset.index));
     }
 
-    function handleDraftSave() {
-      const data = collectFormData();
-      const labelName = data.name || "名称未入力";
-      const labelDate = data.date || getTodayString();
-
-      resultEmpty.classList.add("is-hidden");
-      resultContent.classList.remove("is-hidden");
-      resultStateText.textContent = "下書き保存";
-      resultNameText.textContent = labelName;
-      resultDateText.textContent = labelDate;
-      resultNoteText.textContent =
-        `下書きとして保持中。材料 ${data.materials.length}件 / メモ: ${data.memo || "未入力"}`;
+    function openAddFlowForm() {
+      appState.editingFlowIndex = null;
+      els.flowTitle.value = "";
+      els.flowDescription.value = "";
+      els.flowDuration.value = "";
+      els.flowChecks.value = "";
+      els.flowFormCard.classList.remove("is-hidden");
+      els.flowTitle.focus();
     }
 
-    function handleDelete() {
-      const ok = confirm("入力中の内容をクリアしますか？");
-      if (!ok) return;
-      handleNew();
+    function closeFlowForm() {
+      els.flowFormCard.classList.add("is-hidden");
+      els.flowTitle.value = "";
+      els.flowDescription.value = "";
+      els.flowDuration.value = "";
+      els.flowChecks.value = "";
+      appState.editingFlowIndex = null;
     }
 
-    function collectFormData() {
-      return {
-        name: recipeName.value.trim(),
-        type: recipeType.value,
-        date: recipeDate.value,
-        owner: recipeOwner.value.trim(),
-        memo: recipeMemo.value.trim(),
-        yieldAmount: yieldAmount.value.trim(),
-        lossRate: lossRate.value.trim(),
-        detailMemo: detailMemo.value.trim(),
-        resultStatus: resultStatus.value,
-        resultNotice: resultNotice.value.trim(),
-        resultNext: resultNext.value.trim(),
-        materials: [...appState.materials]
-      };
+    function parseChecksFromTextarea(text) {
+      return text
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean)
+        .map(line => ({ text: line, done: false }));
     }
 
-    function renderRecords() {
-      recordList.innerHTML = "";
+    function saveFlow() {
+      const title = els.flowTitle.value.trim();
+      const description = els.flowDescription.value.trim();
+      const duration = els.flowDuration.value.trim();
+      const checks = parseChecksFromTextarea(els.flowChecks.value);
 
-      if (!appState.records.length) {
-        const empty = document.createElement("p");
-        empty.className = "result-empty";
-        empty.textContent = "まだ記録がありません。保存するとここに表示されます。";
-        recordList.appendChild(empty);
+      if (!title) {
+        alert("工程名を入力してください。");
         return;
       }
 
-      appState.records.forEach((record) => {
+      const flowData = {
+        title,
+        description,
+        duration,
+        checks
+      };
+
+      if (appState.editingFlowIndex === null) {
+        appState.flows.push(flowData);
+      } else {
+        const oldChecks = appState.flows[appState.editingFlowIndex]?.checks || [];
+        flowData.checks = flowData.checks.map((check, i) => ({
+          text: check.text,
+          done: oldChecks[i]?.text === check.text ? !!oldChecks[i]?.done : false
+        }));
+        appState.flows[appState.editingFlowIndex] = flowData;
+      }
+
+      renderFlows();
+      closeFlowForm();
+      autoSaveDraft();
+    }
+
+    function editFlow(index) {
+      const flow = appState.flows[index];
+      if (!flow) return;
+
+      appState.editingFlowIndex = index;
+      els.flowTitle.value = flow.title || "";
+      els.flowDescription.value = flow.description || "";
+      els.flowDuration.value = flow.duration || "";
+      els.flowChecks.value = (flow.checks || []).map(check => check.text).join("\n");
+      els.flowFormCard.classList.remove("is-hidden");
+      els.flowTitle.focus();
+    }
+
+    function deleteFlow(index) {
+      appState.flows.splice(index, 1);
+      renderFlows();
+      if (appState.editingFlowIndex === index) closeFlowForm();
+      autoSaveDraft();
+    }
+
+    function addCheckToFlow(index) {
+      const text = prompt("追加するチェック項目を入力してください。");
+      if (!text || !text.trim()) return;
+      appState.flows[index].checks.push({ text: text.trim(), done: false });
+      renderFlows();
+      autoSaveDraft();
+    }
+
+    function toggleCheck(flowIndex, checkIndex, checked) {
+      const flow = appState.flows[flowIndex];
+      if (!flow || !flow.checks[checkIndex]) return;
+      flow.checks[checkIndex].done = checked;
+      autoSaveDraft();
+    }
+
+    function deleteCheck(flowIndex, checkIndex) {
+      const flow = appState.flows[flowIndex];
+      if (!flow) return;
+      flow.checks.splice(checkIndex, 1);
+      renderFlows();
+      autoSaveDraft();
+    }
+
+    function renderFlows() {
+      els.flowList.innerHTML = "";
+
+      if (!appState.flows.length) {
+        els.flowEmpty.classList.remove("is-hidden");
+        return;
+      }
+
+      els.flowEmpty.classList.add("is-hidden");
+
+      appState.flows.forEach((flow, flowIndex) => {
+        const card = document.createElement("article");
+        card.className = "flow-card";
+
+        const checksHtml = (flow.checks || []).length
+          ? `
+            <ul class="check-list">
+              ${(flow.checks || []).map((check, checkIndex) => `
+                <li class="check-item">
+                  <div class="check-item-left">
+                    <input
+                      type="checkbox"
+                      ${check.done ? "checked" : ""}
+                      data-flow-index="${flowIndex}"
+                      data-check-index="${checkIndex}"
+                      class="flow-check-toggle"
+                    />
+                    <div class="check-item-text">${escapeHtml(check.text)}</div>
+                  </div>
+                  <div class="check-actions">
+                    <button
+                      class="icon-btn icon-btn-danger delete-check-btn"
+                      type="button"
+                      data-flow-index="${flowIndex}"
+                      data-check-index="${checkIndex}"
+                      aria-label="チェック項目を削除"
+                    >🗑</button>
+                  </div>
+                </li>
+              `).join("")}
+            </ul>
+          `
+          : `<p class="helper-text">チェック項目はまだありません。</p>`;
+
+        card.innerHTML = `
+          <div class="flow-card-header">
+            <div>
+              <div class="flow-summary-title">${escapeHtml(flow.title)}</div>
+              <div class="step-meta">${escapeHtml(flow.description || "説明なし")}</div>
+              <div class="step-meta">${escapeHtml(flow.duration || "時間未設定")}</div>
+            </div>
+            <div class="flow-summary-actions">
+              <button class="btn btn-secondary btn-small add-check-btn" type="button" data-index="${flowIndex}">項目追加</button>
+              <button class="icon-btn edit-flow-btn" type="button" data-index="${flowIndex}" aria-label="工程を編集">✎</button>
+              <button class="icon-btn icon-btn-danger delete-flow-btn" type="button" data-index="${flowIndex}" aria-label="工程を削除">🗑</button>
+            </div>
+          </div>
+          <div class="flow-card-body">
+            ${checksHtml}
+          </div>
+        `;
+        els.flowList.appendChild(card);
+      });
+    }
+
+    function handleFlowListClick(e) {
+      const editBtn = e.target.closest(".edit-flow-btn");
+      const deleteBtn = e.target.closest(".delete-flow-btn");
+      const addCheckBtn = e.target.closest(".add-check-btn");
+      const deleteCheckBtn = e.target.closest(".delete-check-btn");
+      const checkbox = e.target.closest(".flow-check-toggle");
+
+      if (editBtn) editFlow(Number(editBtn.dataset.index));
+      if (deleteBtn) deleteFlow(Number(deleteBtn.dataset.index));
+      if (addCheckBtn) addCheckToFlow(Number(addCheckBtn.dataset.index));
+      if (deleteCheckBtn) {
+        deleteCheck(Number(deleteCheckBtn.dataset.flowIndex), Number(deleteCheckBtn.dataset.checkIndex));
+      }
+      if (checkbox) {
+        toggleCheck(Number(checkbox.dataset.flowIndex), Number(checkbox.dataset.checkIndex), checkbox.checked);
+      }
+    }
+
+    function renderRecords() {
+      els.recordList.innerHTML = "";
+      els.recordCountBadge.textContent = `${db.records.length}件`;
+
+      if (!db.records.length) {
+        const empty = document.createElement("p");
+        empty.className = "result-empty";
+        empty.textContent = "まだ保存済み記録がありません。";
+        els.recordList.appendChild(empty);
+        return;
+      }
+
+      db.records.forEach(record => {
         const article = document.createElement("article");
         article.className = "record-card";
         article.innerHTML = `
-          <div>
-            <p class="record-title">${escapeHtml(record.title)}</p>
-            <p class="record-sub">${escapeHtml(record.type)} / ${escapeHtml(record.date)}</p>
+          <div class="record-main">
+            <p class="record-title">${escapeHtml(record.name || "名称未入力")}</p>
+            <p class="record-sub">
+              ${escapeHtml(record.type || "-")} / ${escapeHtml(record.date || "-")}
+              / 材料 ${record.materials?.length || 0}件 / 工程 ${record.flows?.length || 0}件
+            </p>
+            <p class="record-sub">更新: ${formatDateTime(record.updatedAt)}</p>
           </div>
-          <button class="btn btn-secondary btn-inline" type="button">表示のみ</button>
+          <div class="record-actions">
+            <button class="btn btn-secondary btn-inline load-record-btn" type="button" data-id="${record.id}">開く</button>
+            <button class="btn btn-secondary btn-inline clone-record-btn" type="button" data-id="${record.id}">複製</button>
+            <button class="btn btn-danger btn-inline delete-record-btn" type="button" data-id="${record.id}">削除</button>
+          </div>
         `;
-        recordList.appendChild(article);
+        els.recordList.appendChild(article);
       });
+    }
+
+    function handleRecordListClick(e) {
+      const loadBtn = e.target.closest(".load-record-btn");
+      const cloneBtn = e.target.closest(".clone-record-btn");
+      const deleteBtn = e.target.closest(".delete-record-btn");
+
+      if (loadBtn) {
+        const record = db.records.find(item => item.id === loadBtn.dataset.id);
+        if (!record) return;
+        loadRecordIntoForm(record);
+        showResultSummary("読込完了", record.name || "名称未入力", record.date || "-", "保存済み記録を編集用に読み込みました。");
+      }
+
+      if (cloneBtn) {
+        const record = db.records.find(item => item.id === cloneBtn.dataset.id);
+        if (!record) return;
+        const copy = deepCopy(record);
+        copy.id = null;
+        copy.name = copy.name ? `${copy.name}（複製）` : "";
+        loadRecordIntoForm(copy);
+        appState.currentRecordId = null;
+        updateCurrentEditingLabel();
+        showResultSummary("複製読込", copy.name || "名称未入力", copy.date || "-", "保存済み記録を複製して新規編集状態にしました。");
+      }
+
+      if (deleteBtn) {
+        const ok = confirm("この保存済み記録を削除しますか？");
+        if (!ok) return;
+        db.records = db.records.filter(item => item.id !== deleteBtn.dataset.id);
+        if (appState.currentRecordId === deleteBtn.dataset.id) {
+          handleNew();
+        }
+        persistDb();
+        renderRecords();
+      }
+    }
+
+    function handleSaveTemplate() {
+      const name = els.templateNameInput.value.trim();
+      if (!name) {
+        alert("テンプレート名を入力してください。");
+        return;
+      }
+
+      const data = collectFormData();
+      const existing = db.templates.find(template => template.name === name);
+      const now = new Date().toISOString();
+
+      if (existing) {
+        existing.data = deepCopy(data);
+        existing.updatedAt = now;
+      } else {
+        db.templates.unshift({
+          id: createId(),
+          name,
+          createdAt: now,
+          updatedAt: now,
+          data: deepCopy(data)
+        });
+      }
+
+      persistDb();
+      els.templateNameInput.value = "";
+      refreshTemplateSelect();
+      renderTemplates();
+      showResultSummary("テンプレート保存", data.name || "名称未入力", data.date || "-", `テンプレート「${name}」を保存しました。`);
+    }
+
+    function handleLoadTemplate() {
+      const id = els.templateSelect.value;
+      if (!id) {
+        alert("読み込むテンプレートを選択してください。");
+        return;
+      }
+      const template = db.templates.find(item => item.id === id);
+      if (!template) return;
+
+      const record = deepCopy(template.data);
+      record.id = null;
+      loadRecordIntoForm(record);
+      showResultSummary("テンプレート読込", record.name || "名称未入力", record.date || "-", `テンプレート「${template.name}」を読み込みました。`);
+    }
+
+    function refreshTemplateSelect() {
+      els.templateSelect.innerHTML = `<option value="">選択してください</option>`;
+      db.templates.forEach(template => {
+        const option = document.createElement("option");
+        option.value = template.id;
+        option.textContent = template.name;
+        els.templateSelect.appendChild(option);
+      });
+    }
+
+    function renderTemplates() {
+      els.templateList.innerHTML = "";
+
+      if (!db.templates.length) {
+        const empty = document.createElement("p");
+        empty.className = "result-empty";
+        empty.textContent = "保存済みテンプレートはまだありません。";
+        els.templateList.appendChild(empty);
+        return;
+      }
+
+      db.templates.forEach(template => {
+        const article = document.createElement("article");
+        article.className = "template-card";
+        article.innerHTML = `
+          <div class="template-main">
+            <p class="template-title">${escapeHtml(template.name)}</p>
+            <p class="template-meta">
+              材料 ${template.data?.materials?.length || 0}件 / 工程 ${template.data?.flows?.length || 0}件
+            </p>
+            <p class="template-meta">更新: ${formatDateTime(template.updatedAt)}</p>
+          </div>
+          <div class="template-actions">
+            <button class="btn btn-secondary btn-inline use-template-btn" type="button" data-id="${template.id}">使う</button>
+            <button class="btn btn-danger btn-inline delete-template-btn" type="button" data-id="${template.id}">削除</button>
+          </div>
+        `;
+        els.templateList.appendChild(article);
+      });
+    }
+
+    function handleTemplateListClick(e) {
+      const useBtn = e.target.closest(".use-template-btn");
+      const deleteBtn = e.target.closest(".delete-template-btn");
+
+      if (useBtn) {
+        els.templateSelect.value = useBtn.dataset.id;
+        handleLoadTemplate();
+      }
+
+      if (deleteBtn) {
+        const ok = confirm("このテンプレートを削除しますか？");
+        if (!ok) return;
+        db.templates = db.templates.filter(item => item.id !== deleteBtn.dataset.id);
+        persistDb();
+        refreshTemplateSelect();
+        renderTemplates();
+      }
+    }
+
+    function loadDbFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          db = { records: [], templates: [] };
+          return;
+        }
+        const parsed = JSON.parse(raw);
+        db.records = Array.isArray(parsed.records) ? parsed.records : [];
+        db.templates = Array.isArray(parsed.templates) ? parsed.templates : [];
+      } catch (error) {
+        console.error(error);
+        db = { records: [], templates: [] };
+        els.storageStatus.textContent = "保存読込エラー";
+      }
+    }
+
+    function persistDb() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        els.storageStatus.textContent = "端末内保存中";
+      } catch (error) {
+        console.error(error);
+        els.storageStatus.textContent = "保存失敗";
+      }
+    }
+
+    function autoSaveDraft() {
+      updateCurrentEditingLabel();
+      const draft = {
+        data: collectFormData(),
+        currentRecordId: appState.currentRecordId
+      };
+      try {
+        localStorage.setItem(`${STORAGE_KEY}_draft`, JSON.stringify(draft));
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    let autoSaveTimer = null;
+    function debouncedAutoSaveDraft() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(autoSaveDraft, 250);
+    }
+
+    function exportJson() {
+      const payload = JSON.stringify(db, null, 2);
+      const blob = new Blob([payload], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const today = getTodayString();
+      a.href = url;
+      a.download = `recipe-workflow-backup-${today}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function importJson(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          if (!parsed || typeof parsed !== "object") {
+            throw new Error("invalid json");
+          }
+
+          db.records = Array.isArray(parsed.records) ? parsed.records : [];
+          db.templates = Array.isArray(parsed.templates) ? parsed.templates : [];
+          persistDb();
+          refreshTemplateSelect();
+          renderTemplates();
+          renderRecords();
+          alert("JSONを読み込みました。");
+        } catch (error) {
+          console.error(error);
+          alert("JSONの読み込みに失敗しました。");
+        } finally {
+          event.target.value = "";
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "-";
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
+      const hh = String(date.getHours()).padStart(2, "0");
+      const mm = String(date.getMinutes()).padStart(2, "0");
+      return `${y}-${m}-${d} ${hh}:${mm}`;
     }
 
     function escapeHtml(str) {
@@ -996,10 +1747,6 @@
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
     }
-
-    handleNew();
-    loadSample();
-    renderRecords();
   </script>
 </body>
 </html>
