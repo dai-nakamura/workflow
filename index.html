@@ -35,12 +35,12 @@
     button, input, select, textarea { font: inherit; }
 
     .app-shell {
-      width: min(100%, 960px);
+      width: min(100%, 980px);
       margin: 0 auto;
       padding:
         calc(18px + env(safe-area-inset-top))
         16px
-        calc(var(--tabbar-h) + 24px + env(safe-area-inset-bottom));
+        calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom));
     }
 
     .page-header {
@@ -53,7 +53,8 @@
       gap: 14px;
     }
 
-    .eyebrow {
+    .eyebrow,
+    .section-kicker {
       margin: 0 0 6px;
       font-size: 12px;
       font-weight: 700;
@@ -63,16 +64,19 @@
     }
 
     h1, h2, h3, p { margin-top: 0; }
+
     h1 {
       margin-bottom: 8px;
       font-size: clamp(28px, 5vw, 36px);
       line-height: 1.2;
     }
+
     h2 {
       margin-bottom: 0;
       font-size: 22px;
       line-height: 1.25;
     }
+
     h3 {
       margin-bottom: 8px;
       font-size: 18px;
@@ -121,13 +125,8 @@
       color: #3f4650;
     }
 
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.is-active {
-      display: block;
-    }
+    .tab-panel { display: none; }
+    .tab-panel.is-active { display: block; }
 
     .layout-grid {
       display: grid;
@@ -150,19 +149,7 @@
       margin-bottom: 18px;
     }
 
-    .section-kicker {
-      margin: 0 0 6px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .stack-form {
-      display: grid;
-      gap: 16px;
-    }
+    .stack-form { display: grid; gap: 16px; }
 
     .field {
       display: grid;
@@ -175,7 +162,6 @@
     }
 
     .helper-text,
-    .muted-text,
     .record-sub,
     .meta-text {
       color: var(--muted);
@@ -236,22 +222,21 @@
     }
 
     .btn-small {
-      min-height: 40px;
+      min-height: 38px;
       padding: 0 12px;
       border-radius: 12px;
       font-size: 14px;
     }
 
-    .inline-actions,
-    .action-group,
-    .header-actions {
+    .inline-actions {
       display: flex;
       flex-direction: column;
       gap: 12px;
     }
 
     .amount-row,
-    .scale-row {
+    .scale-row,
+    .planner-toolbar {
       display: grid;
       grid-template-columns: 1fr 110px;
       gap: 10px;
@@ -314,12 +299,6 @@
       border-radius: 18px;
       border: 1px solid #e8edf4;
       background: #fcfdff;
-    }
-
-    .divider {
-      height: 1px;
-      background: #edf1f6;
-      margin: 8px 0 2px;
     }
 
     .flow-card {
@@ -385,6 +364,42 @@
       padding-top: 1px;
     }
 
+    .planner-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .day-card {
+      border: 1px solid #edf1f6;
+      border-radius: 18px;
+      background: #fcfdff;
+      overflow: hidden;
+    }
+
+    .day-card-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid #edf1f6;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      background: #fafcff;
+    }
+
+    .day-card-body {
+      padding: 14px 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .plan-mini-item {
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--subtle);
+      font-size: 14px;
+    }
+
     .tabbar {
       position: fixed;
       left: 0;
@@ -393,18 +408,15 @@
       background: rgba(255,255,255,0.96);
       backdrop-filter: blur(10px);
       border-top: 1px solid #e6ebf2;
-      padding:
-        8px
-        10px
-        calc(8px + env(safe-area-inset-bottom));
+      padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
       z-index: 20;
     }
 
     .tabbar-inner {
-      width: min(100%, 960px);
+      width: min(100%, 980px);
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 8px;
     }
 
@@ -433,28 +445,33 @@
     }
 
     .tab-label {
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1.2;
+      text-align: center;
     }
 
     .json-card textarea {
       min-height: 180px;
     }
 
-    .is-hidden {
-      display: none !important;
-    }
+    .is-hidden { display: none !important; }
 
     @media (min-width: 820px) {
       .layout-grid.two-cols {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .inline-actions,
-      .action-group,
-      .header-actions {
+      .inline-actions {
         flex-direction: row;
         flex-wrap: wrap;
+      }
+
+      .planner-grid.week {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .planner-grid.month {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
   </style>
@@ -465,7 +482,7 @@
       <div>
         <p class="eyebrow">Production Design App</p>
         <h1>製造設計アプリ</h1>
-        <p class="lead">レシピを作り、倍率で製造バッチを作り、工程を抜き出して段取りを組むための土台版です。</p>
+        <p class="lead">レシピ、倍率変更、段取り項目、週・月の計画表までつなげるための土台版です。</p>
       </div>
       <div class="status-line">
         <span class="badge badge-success" id="storageStatus">端末内保存対応</span>
@@ -565,7 +582,7 @@
 
               <label class="field">
                 <span class="field-label">備考</span>
-                <input type="text" id="materialNote" placeholder="例：バターは常温" />
+                <input type="text" id="materialNote" placeholder="例：常温 / ふるう / ボワロン" />
               </label>
 
               <div class="inline-actions">
@@ -759,7 +776,7 @@
         <section class="card">
           <div class="section-heading">
             <div>
-              <p class="section-kicker">段取りボード</p>
+              <p class="section-kicker">段取り項目</p>
               <h2>本日の並び</h2>
             </div>
             <div class="inline-actions">
@@ -797,6 +814,44 @@
       </div>
     </section>
 
+    <!-- 計画表 -->
+    <section class="tab-panel" data-tab="planner">
+      <div class="layout-grid">
+        <section class="card">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">計画表</p>
+              <h2>週 / 月 表示</h2>
+            </div>
+            <span class="badge" id="planItemCountBadge">0件</span>
+          </div>
+
+          <div class="planner-toolbar">
+            <label class="field">
+              <span class="field-label">表示モード</span>
+              <select id="plannerMode">
+                <option value="week">1週間</option>
+                <option value="month">1ヶ月</option>
+              </select>
+            </label>
+
+            <label class="field">
+              <span class="field-label">開始日</span>
+              <input type="date" id="plannerStartDate" />
+            </label>
+          </div>
+
+          <div class="sub-card">
+            <div class="inline-actions">
+              <button class="btn btn-secondary" type="button" id="renderPlannerBtn">計画表を表示</button>
+            </div>
+          </div>
+
+          <div class="planner-grid week" id="plannerGrid"></div>
+        </section>
+      </div>
+    </section>
+
     <!-- 一覧 -->
     <section class="tab-panel" data-tab="library">
       <div class="layout-grid">
@@ -819,7 +874,7 @@
             </div>
           </div>
 
-          <div class="stack-form">
+          <div class="stack-form json-card">
             <div class="inline-actions">
               <button class="btn btn-secondary" type="button" id="exportJsonBtn">全体JSON出力</button>
               <label class="field" style="margin:0;">
@@ -854,8 +909,12 @@
         <span class="tab-label">製造</span>
       </button>
       <button class="tab-btn" type="button" data-tab-target="schedule">
-        <span class="tab-icon">🗓️</span>
+        <span class="tab-icon">🗂️</span>
         <span class="tab-label">段取り</span>
+      </button>
+      <button class="tab-btn" type="button" data-tab-target="planner">
+        <span class="tab-icon">🗓️</span>
+        <span class="tab-label">計画表</span>
       </button>
       <button class="tab-btn" type="button" data-tab-target="library">
         <span class="tab-icon">📚</span>
@@ -865,13 +924,13 @@
   </nav>
 
   <script>
-    const STORAGE_KEY = "production_design_app_v1";
+    const STORAGE_KEY = "production_design_app_v2";
 
     let db = {
       recipeMasters: [],
       productionBatches: [],
       schedulePlans: [],
-      templates: []
+      planItems: []
     };
 
     let appState = {
@@ -936,6 +995,11 @@
       planList: document.getElementById("planList"),
       planCountBadge: document.getElementById("planCountBadge"),
 
+      plannerMode: document.getElementById("plannerMode"),
+      plannerStartDate: document.getElementById("plannerStartDate"),
+      plannerGrid: document.getElementById("plannerGrid"),
+      planItemCountBadge: document.getElementById("planItemCountBadge"),
+
       recipeMasterList: document.getElementById("recipeMasterList"),
       recipeCountBadge: document.getElementById("recipeCountBadge"),
 
@@ -978,6 +1042,9 @@
 
       els.recipeMasterList.addEventListener("click", handleRecipeMasterListClick);
 
+      document.getElementById("renderPlannerBtn").addEventListener("click", renderPlanner);
+      els.plannerGrid.addEventListener("click", handlePlannerGridClick);
+
       document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
       els.importJsonInput.addEventListener("change", importJsonFile);
       document.getElementById("importJsonTextBtn").addEventListener("click", importJsonFromText);
@@ -991,6 +1058,7 @@
       resetRecipeEditor();
       resetBatchEditor();
       resetPlanEditor();
+      els.plannerStartDate.value = getTodayString();
       refreshAll();
     }
 
@@ -1001,14 +1069,32 @@
       document.querySelectorAll(".tab-btn").forEach(btn => {
         btn.classList.toggle("is-active", btn.dataset.tabTarget === tabName);
       });
+      if (tabName === "planner") {
+        renderPlanner();
+      }
     }
 
     function getTodayString() {
       const today = new Date();
-      const y = today.getFullYear();
-      const m = String(today.getMonth() + 1).padStart(2, "0");
-      const d = String(today.getDate()).padStart(2, "0");
+      return toDateInput(today);
+    }
+
+    function toDateInput(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0");
+      const d = String(date.getDate()).padStart(2, "0");
       return `${y}-${m}-${d}`;
+    }
+
+    function parseDate(dateStr) {
+      const [y, m, d] = dateStr.split("-").map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function addDays(dateStr, days) {
+      const date = parseDate(dateStr);
+      date.setDate(date.getDate() + days);
+      return toDateInput(date);
     }
 
     function createId(prefix = "id") {
@@ -1034,6 +1120,12 @@
       return Math.round(value * 10) / 10;
     }
 
+    function formatDateLabel(dateStr) {
+      if (!dateStr) return "-";
+      const date = parseDate(dateStr);
+      return `${date.getMonth() + 1}/${date.getDate()}`;
+    }
+
     function loadDb() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -1042,7 +1134,7 @@
         db.recipeMasters = Array.isArray(parsed.recipeMasters) ? parsed.recipeMasters : [];
         db.productionBatches = Array.isArray(parsed.productionBatches) ? parsed.productionBatches : [];
         db.schedulePlans = Array.isArray(parsed.schedulePlans) ? parsed.schedulePlans : [];
-        db.templates = Array.isArray(parsed.templates) ? parsed.templates : [];
+        db.planItems = Array.isArray(parsed.planItems) ? parsed.planItems : [];
       } catch (error) {
         console.error(error);
         els.storageStatus.textContent = "保存読込エラー";
@@ -1070,12 +1162,11 @@
       renderPlanSteps();
       renderPlanList();
       updateRecipeEditingLabel();
+      renderPlanner();
       persistDb();
     }
 
-    // =====================
-    // レシピ
-    // =====================
+    // ===== レシピ =====
     function resetRecipeEditor() {
       appState.currentRecipeId = null;
       appState.currentRecipeMaterials = [];
@@ -1127,7 +1218,6 @@
 
     function saveRecipeMaster() {
       const recipe = collectRecipeMaster();
-
       if (!recipe.name) {
         alert("レシピ名を入力してください。");
         return;
@@ -1208,9 +1298,7 @@
         card.innerHTML = `
           <div class="item-main">
             <div class="item-title">${escapeHtml(recipe.name || "名称未入力")}</div>
-            <div class="record-sub">
-              ${escapeHtml(recipe.type || "-")} / 材料 ${recipe.materials?.length || 0}件 / 工程 ${recipe.flows?.length || 0}件
-            </div>
+            <div class="record-sub">${escapeHtml(recipe.type || "-")} / 材料 ${recipe.materials?.length || 0}件 / 工程 ${recipe.flows?.length || 0}件</div>
           </div>
           <div class="item-actions">
             <button class="btn btn-secondary btn-inline load-recipe-btn" type="button" data-id="${recipe.id}">開く</button>
@@ -1224,14 +1312,11 @@
     function handleRecipeMasterListClick(e) {
       const loadBtn = e.target.closest(".load-recipe-btn");
       const deleteBtn = e.target.closest(".delete-recipe-btn");
-
       if (loadBtn) loadRecipeMaster(loadBtn.dataset.id);
       if (deleteBtn) deleteRecipeMaster(deleteBtn.dataset.id);
     }
 
-    // =====================
-    // 材料
-    // =====================
+    // ===== 材料 =====
     function openAddMaterialForm() {
       appState.editingMaterialIndex = null;
       els.materialName.value = "";
@@ -1281,7 +1366,6 @@
     function editMaterial(index) {
       const item = appState.currentRecipeMaterials[index];
       if (!item) return;
-
       appState.editingMaterialIndex = index;
       els.materialName.value = item.name || "";
       els.materialAmountValue.value = item.amountValue ?? "";
@@ -1330,9 +1414,7 @@
       if (deleteBtn) deleteMaterial(Number(deleteBtn.dataset.index));
     }
 
-    // =====================
-    // 工程
-    // =====================
+    // ===== 工程 =====
     function openAddFlowForm() {
       appState.editingFlowIndex = null;
       els.flowTitle.value = "";
@@ -1534,9 +1616,7 @@
       }
     }
 
-    // =====================
-    // 製造バッチ
-    // =====================
+    // ===== 製造 =====
     function resetBatchEditor() {
       els.batchRecipeSelect.value = "";
       els.batchName.value = "";
@@ -1640,8 +1720,9 @@
         scale,
         memo: els.batchMemo.value.trim(),
         materials: deepCopy(appState.currentScaledMaterials),
-        flows: deepCopy(recipe.flows || []).map(flow => ({
+        flows: deepCopy(recipe.flows || []).map((flow, index) => ({
           ...flow,
+          flowOrder: index,
           batchName: els.batchName.value.trim() || `${recipe.name} ${scale}倍`,
           recipeName: recipe.name
         })),
@@ -1674,6 +1755,7 @@
           <div class="item-main">
             <div class="item-title">${escapeHtml(batch.name || "名称未入力")}</div>
             <div class="record-sub">${escapeHtml(batch.recipeName || "-")} / 倍率 ${batch.scale} / 材料 ${batch.materials?.length || 0}件 / 工程 ${batch.flows?.length || 0}件</div>
+            <div class="record-sub">${escapeHtml(batch.date || "-")}</div>
           </div>
           <div class="item-actions">
             <button class="btn btn-secondary btn-inline use-batch-btn" type="button" data-id="${batch.id}">段取りへ</button>
@@ -1697,14 +1779,14 @@
       if (deleteBtn) {
         const ok = confirm("この製造バッチを削除しますか？");
         if (!ok) return;
-        db.productionBatches = db.productionBatches.filter(item => item.id !== deleteBtn.dataset.id);
+        const batchId = deleteBtn.dataset.id;
+        db.productionBatches = db.productionBatches.filter(item => item.id !== batchId);
+        db.planItems = db.planItems.filter(item => item.batchId !== batchId);
         refreshAll();
       }
     }
 
-    // =====================
-    // 段取り
-    // =====================
+    // ===== 段取り =====
     function resetPlanEditor() {
       appState.currentPlanId = null;
       appState.currentPlanSteps = [];
@@ -1729,15 +1811,19 @@
         id: createId("candidate"),
         batchId: batch.id,
         batchName: batch.name,
+        recipeId: batch.recipeId,
         recipeName: batch.recipeName,
         order: index,
         title: flow.title,
         description: flow.description,
         durationMinutes: flow.durationMinutes || 0,
-        type: flow.type || "other",
+        taskType: flow.type || "other",
         canParallel: !!flow.canParallel,
         equipment: flow.equipment || "",
-        checks: deepCopy(flow.checks || [])
+        checks: deepCopy(flow.checks || []),
+        scheduledDate: batch.date || getTodayString(),
+        status: "planned",
+        note: ""
       }));
 
       renderScheduleCandidates();
@@ -1759,7 +1845,7 @@
         card.innerHTML = `
           <div class="item-main">
             <div class="item-title">${escapeHtml(item.title)}</div>
-            <div class="record-sub">${escapeHtml(item.batchName)} / ${item.durationMinutes}分 / ${escapeHtml(item.type)}</div>
+            <div class="record-sub">${escapeHtml(item.batchName)} / ${item.durationMinutes}分 / ${escapeHtml(item.taskType)}</div>
             <div class="record-sub">設備: ${escapeHtml(item.equipment || "未設定")} / 並行: ${item.canParallel ? "しやすい" : "しにくい"}</div>
           </div>
           <div class="item-actions">
@@ -1779,16 +1865,18 @@
 
       appState.currentPlanSteps.push({
         id: createId("planstep"),
+        title: candidate.title,
+        recipeId: candidate.recipeId,
+        recipeName: candidate.recipeName,
         batchId: candidate.batchId,
         batchName: candidate.batchName,
-        recipeName: candidate.recipeName,
-        title: candidate.title,
-        description: candidate.description,
         durationMinutes: candidate.durationMinutes,
-        type: candidate.type,
-        canParallel: candidate.canParallel,
+        taskType: candidate.taskType,
         equipment: candidate.equipment,
-        checks: deepCopy(candidate.checks || [])
+        canParallel: candidate.canParallel,
+        scheduledDate: candidate.scheduledDate,
+        status: "planned",
+        note: candidate.note || ""
       });
 
       renderPlanSteps();
@@ -1810,12 +1898,13 @@
         card.innerHTML = `
           <div class="item-main">
             <div class="item-title">${index + 1}. ${escapeHtml(step.title)}</div>
-            <div class="record-sub">${escapeHtml(step.batchName)} / ${step.durationMinutes}分 / ${escapeHtml(step.type)}</div>
-            <div class="record-sub">設備: ${escapeHtml(step.equipment || "未設定")} / 並行: ${step.canParallel ? "しやすい" : "しにくい"}</div>
+            <div class="record-sub">${escapeHtml(step.batchName)} / ${step.durationMinutes}分 / ${escapeHtml(step.taskType)}</div>
+            <div class="record-sub">予定日: ${escapeHtml(step.scheduledDate || "-")} / 設備: ${escapeHtml(step.equipment || "未設定")}</div>
           </div>
           <div class="item-actions">
             <button class="btn btn-secondary btn-inline move-up-plan-step-btn" type="button" data-index="${index}">↑</button>
             <button class="btn btn-secondary btn-inline move-down-plan-step-btn" type="button" data-index="${index}">↓</button>
+            <button class="btn btn-secondary btn-inline send-to-planner-btn" type="button" data-index="${index}">計画へ</button>
             <button class="btn btn-danger btn-inline delete-plan-step-btn" type="button" data-index="${index}">削除</button>
           </div>
         `;
@@ -1826,6 +1915,7 @@
     function handlePlanStepClick(e) {
       const upBtn = e.target.closest(".move-up-plan-step-btn");
       const downBtn = e.target.closest(".move-down-plan-step-btn");
+      const sendBtn = e.target.closest(".send-to-planner-btn");
       const deleteBtn = e.target.closest(".delete-plan-step-btn");
 
       if (upBtn) {
@@ -1844,6 +1934,11 @@
             [appState.currentPlanSteps[index], appState.currentPlanSteps[index + 1]];
           renderPlanSteps();
         }
+      }
+
+      if (sendBtn) {
+        const index = Number(sendBtn.dataset.index);
+        sendPlanStepToPlanner(index);
       }
 
       if (deleteBtn) {
@@ -1933,14 +2028,132 @@
       if (deleteBtn) {
         const ok = confirm("この段取りを削除しますか？");
         if (!ok) return;
-        db.schedulePlans = db.schedulePlans.filter(item => item.id !== deleteBtn.dataset.id);
+        const planId = deleteBtn.dataset.id;
+        db.schedulePlans = db.schedulePlans.filter(item => item.id !== planId);
+        db.planItems = db.planItems.filter(item => item.schedulePlanId !== planId);
         refreshAll();
       }
     }
 
-    // =====================
-    // JSON
-    // =====================
+    function sendPlanStepToPlanner(index) {
+      const step = appState.currentPlanSteps[index];
+      if (!step) return;
+
+      const item = {
+        id: createId("planitem"),
+        schedulePlanId: appState.currentPlanId || null,
+        title: step.title,
+        recipeId: step.recipeId || null,
+        recipeName: step.recipeName || "",
+        batchId: step.batchId || null,
+        batchName: step.batchName || "",
+        durationMinutes: step.durationMinutes || 0,
+        taskType: step.taskType || "other",
+        equipment: step.equipment || "",
+        canParallel: !!step.canParallel,
+        scheduledDate: step.scheduledDate || getTodayString(),
+        status: step.status || "planned",
+        note: step.note || "",
+        createdAt: new Date().toISOString()
+      };
+
+      db.planItems.unshift(item);
+      refreshAll();
+      alert("計画表に追加しました。");
+    }
+
+    // ===== 計画表 =====
+    function renderPlanner() {
+      const mode = els.plannerMode.value;
+      const startDate = els.plannerStartDate.value || getTodayString();
+      const days = mode === "week" ? 7 : 31;
+
+      els.plannerGrid.innerHTML = "";
+      els.plannerGrid.className = `planner-grid ${mode}`;
+      els.planItemCountBadge.textContent = `${db.planItems.length}件`;
+
+      for (let i = 0; i < days; i++) {
+        const dateStr = addDays(startDate, i);
+        const items = db.planItems.filter(item => item.scheduledDate === dateStr);
+
+        const dayCard = document.createElement("article");
+        dayCard.className = "day-card";
+        dayCard.innerHTML = `
+          <div class="day-card-header">
+            <div>
+              <div class="item-title">${escapeHtml(dateStr)}</div>
+              <div class="meta-text">${formatDateLabel(dateStr)} / ${items.length}件</div>
+            </div>
+            <button class="btn btn-secondary btn-small add-empty-plan-item-btn" type="button" data-date="${dateStr}">追加</button>
+          </div>
+          <div class="day-card-body">
+            ${items.length ? items.map(item => `
+              <div class="plan-mini-item">
+                <div><strong>${escapeHtml(item.title)}</strong></div>
+                <div class="meta-text">${escapeHtml(item.batchName || item.recipeName || "")} / ${item.durationMinutes || 0}分 / ${escapeHtml(item.taskType || "other")}</div>
+                <div class="meta-text">設備: ${escapeHtml(item.equipment || "未設定")}</div>
+                <div class="inline-actions" style="margin-top:8px;">
+                  <button class="btn btn-secondary btn-small shift-plan-item-btn" type="button" data-id="${item.id}" data-days="-1">前日へ</button>
+                  <button class="btn btn-secondary btn-small shift-plan-item-btn" type="button" data-id="${item.id}" data-days="1">翌日へ</button>
+                  <button class="btn btn-danger btn-small delete-plan-item-btn" type="button" data-id="${item.id}">削除</button>
+                </div>
+              </div>
+            `).join("") : `<p class="helper-text">予定なし</p>`}
+          </div>
+        `;
+        els.plannerGrid.appendChild(dayCard);
+      }
+    }
+
+    function handlePlannerGridClick(e) {
+      const addBtn = e.target.closest(".add-empty-plan-item-btn");
+      const shiftBtn = e.target.closest(".shift-plan-item-btn");
+      const deleteBtn = e.target.closest(".delete-plan-item-btn");
+
+      if (addBtn) {
+        createManualPlanItem(addBtn.dataset.date);
+      }
+
+      if (shiftBtn) {
+        const item = db.planItems.find(p => p.id === shiftBtn.dataset.id);
+        if (!item) return;
+        item.scheduledDate = addDays(item.scheduledDate, Number(shiftBtn.dataset.days));
+        refreshAll();
+      }
+
+      if (deleteBtn) {
+        db.planItems = db.planItems.filter(item => item.id !== deleteBtn.dataset.id);
+        refreshAll();
+      }
+    }
+
+    function createManualPlanItem(dateStr) {
+      const title = prompt("追加する項目名");
+      if (!title || !title.trim()) return;
+
+      const item = {
+        id: createId("planitem"),
+        schedulePlanId: null,
+        title: title.trim(),
+        recipeId: null,
+        recipeName: "",
+        batchId: null,
+        batchName: "",
+        durationMinutes: 0,
+        taskType: "other",
+        equipment: "",
+        canParallel: true,
+        scheduledDate: dateStr,
+        status: "planned",
+        note: "",
+        createdAt: new Date().toISOString()
+      };
+
+      db.planItems.unshift(item);
+      refreshAll();
+    }
+
+    // ===== JSON =====
     function exportJson() {
       const payload = JSON.stringify(db, null, 2);
       const blob = new Blob([payload], { type: "application/json" });
@@ -1957,7 +2170,6 @@
     function importJsonFile(event) {
       const file = event.target.files?.[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = () => {
         try {
@@ -1996,17 +2208,21 @@
         return;
       }
 
-      if (Array.isArray(parsed.recipeMasters) || Array.isArray(parsed.productionBatches) || Array.isArray(parsed.schedulePlans)) {
+      if (
+        Array.isArray(parsed.recipeMasters) ||
+        Array.isArray(parsed.productionBatches) ||
+        Array.isArray(parsed.schedulePlans) ||
+        Array.isArray(parsed.planItems)
+      ) {
         db.recipeMasters = Array.isArray(parsed.recipeMasters) ? parsed.recipeMasters : [];
         db.productionBatches = Array.isArray(parsed.productionBatches) ? parsed.productionBatches : [];
         db.schedulePlans = Array.isArray(parsed.schedulePlans) ? parsed.schedulePlans : [];
-        db.templates = Array.isArray(parsed.templates) ? parsed.templates : [];
+        db.planItems = Array.isArray(parsed.planItems) ? parsed.planItems : [];
         refreshAll();
         alert("全体JSONを読み込みました。");
         return;
       }
 
-      // 単体レシピJSON
       if (parsed.name && (Array.isArray(parsed.materials) || Array.isArray(parsed.flows))) {
         const recipe = normalizeImportedRecipe(parsed);
         appState.currentRecipeId = null;
