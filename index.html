@@ -750,18 +750,42 @@
         <div class="section-heading">
           <div>
             <p class="section-kicker">JSON</p>
-            <h2>バックアップ / 復元</h2>
+            <h2>バックアップ / 復元 / 貼り付け読込</h2>
           </div>
         </div>
 
         <div class="json-card">
           <div class="json-actions">
             <button class="btn btn-secondary" type="button" id="exportJsonBtn">全記録をJSON出力</button>
+
             <label class="field" style="margin:0;">
-              <span class="field-label">JSON読込</span>
+              <span class="field-label">JSONファイル読込</span>
               <input class="file-input" type="file" id="importJsonInput" accept="application/json" />
             </label>
           </div>
+
+          <div class="divider"></div>
+
+          <div class="stack-form">
+            <label class="field">
+              <span class="field-label">ChatGPT出力JSONを貼り付け</span>
+              <textarea
+                id="jsonPasteArea"
+                rows="10"
+                placeholder='ここにChatGPTが出したJSONを貼ってください。単体レコードJSONでも、records/templatesを含む全体JSONでも読み込めます。'
+              ></textarea>
+            </label>
+
+            <div class="inline-actions">
+              <button class="btn btn-primary" type="button" id="importJsonTextBtn">貼り付けJSONを読み込む</button>
+              <button class="btn btn-secondary" type="button" id="clearJsonPasteBtn">貼り付け欄を空にする</button>
+            </div>
+          </div>
+
+          <p class="helper-text" style="margin-top:12px;">
+            ChatGPTから受け取ったJSONをそのまま貼って読み込めます。
+            単体レコードなら編集画面に読込、records付きなら保存一覧に取り込みます。
+          </p>
         </div>
       </section>
 
@@ -779,7 +803,7 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "recipe_workflow_app_v3";
+    const STORAGE_KEY = "recipe_workflow_app_v4";
     const MAX_RECENT_RECORDS = 200;
 
     const defaultSample = {
@@ -879,7 +903,8 @@
       templateNameInput: document.getElementById("templateNameInput"),
       templateList: document.getElementById("templateList"),
 
-      importJsonInput: document.getElementById("importJsonInput")
+      importJsonInput: document.getElementById("importJsonInput"),
+      jsonPasteArea: document.getElementById("jsonPasteArea")
     };
 
     bindEvents();
@@ -906,6 +931,10 @@
       document.getElementById("deleteBtn").addEventListener("click", handleDeleteCurrentInput);
 
       document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
+      document.getElementById("importJsonTextBtn").addEventListener("click", importJsonFromText);
+      document.getElementById("clearJsonPasteBtn").addEventListener("click", () => {
+        els.jsonPasteArea.value = "";
+      });
       els.importJsonInput.addEventListener("change", importJson);
 
       els.materialList.addEventListener("click", handleMaterialListClick);
@@ -1682,13 +1711,7 @@
       reader.onload = () => {
         try {
           const parsed = JSON.parse(reader.result);
-          db.records = Array.isArray(parsed.records) ? parsed.records : [];
-          db.templates = Array.isArray(parsed.templates) ? parsed.templates : [];
-          persistDb();
-          refreshTemplateSelect();
-          renderTemplates();
-          renderRecords();
-          alert("JSONを読み込みました。");
+          importParsedJson(parsed);
         } catch (error) {
           console.error(error);
           alert("JSONの読み込みに失敗しました。");
@@ -1697,6 +1720,104 @@
         }
       };
       reader.readAsText(file, "utf-8");
+    }
+
+    function importJsonFromText() {
+      const raw = els.jsonPasteArea.value.trim();
+
+      if (!raw) {
+        alert("貼り付け欄にJSONを入れてください。");
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(raw);
+        importParsedJson(parsed);
+        els.jsonPasteArea.value = "";
+      } catch (error) {
+        console.error(error);
+        alert("JSON形式が正しくありません。");
+      }
+    }
+
+    function importParsedJson(parsed) {
+      if (!parsed || typeof parsed !== "object") {
+        alert("読み込めるJSONではありません。");
+        return;
+      }
+
+      if (Array.isArray(parsed.records) || Array.isArray(parsed.templates)) {
+        db.records = Array.isArray(parsed.records) ? parsed.records : [];
+        db.templates = Array.isArray(parsed.templates) ? parsed.templates : [];
+        persistDb();
+        refreshTemplateSelect();
+        renderTemplates();
+        renderRecords();
+        alert("records / templates を読み込みました。");
+        return;
+      }
+
+      if (parsed.name || parsed.materials || parsed.flows) {
+        const record = normalizeImportedRecord(parsed);
+        loadRecordIntoForm(record);
+        showResultSummary(
+          "JSON読込",
+          record.name || "名称未入力",
+          record.date || "-",
+          "単体レコードを編集画面に読み込みました。"
+        );
+        return;
+      }
+
+      alert("対応していないJSON形式です。");
+    }
+
+    function normalizeImportedRecord(data) {
+      const record = deepCopy(data);
+
+      if (!Array.isArray(record.materials)) {
+        record.materials = [];
+      }
+
+      record.materials = record.materials.map(item => ({
+        name: item.name || "",
+        amountValue:
+          item.amountValue !== undefined && item.amountValue !== null && item.amountValue !== ""
+            ? Number(item.amountValue)
+            : 0,
+        amountUnit: item.amountUnit || "g",
+        note: item.note || ""
+      }));
+
+      if (!Array.isArray(record.flows)) {
+        record.flows = [];
+      }
+
+      record.flows = record.flows.map(flow => ({
+        title: flow.title || "",
+        description: flow.description || "",
+        duration: flow.duration || "",
+        checks: Array.isArray(flow.checks)
+          ? flow.checks.map(check => ({
+              text: check.text || "",
+              done: !!check.done
+            }))
+          : []
+      }));
+
+      record.id = record.id || null;
+      record.type = record.type || "試作";
+      record.date = record.date || getTodayString();
+      record.owner = record.owner || "";
+      record.memo = record.memo || "";
+      record.yieldAmount = record.yieldAmount || "";
+      record.lossRate = record.lossRate || "";
+      record.detailMemo = record.detailMemo || "";
+      record.resultStatus = record.resultStatus || "良好";
+      record.resultNotice = record.resultNotice || "";
+      record.resultNext = record.resultNext || "";
+
+      return record;
     }
 
     function formatDateTime(value) {
