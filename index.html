@@ -2470,11 +2470,9 @@ function formatPrintDate(dateStr) {
   const week = ["日","月","火","水","木","金","土"][date.getDay()];
   return `${m}/${d}(${week})`;
 }
-    function buildPrintPlannerView() {
-  const mode = els.plannerMode.value;
+function buildPrintPlannerView() {
   const startDate = els.plannerStartDate.value || getTodayString();
-  const days = mode === "week" ? 7 : 8; // 月表示でも印刷は8日幅で分割しやすくする
-  const columns = days;
+  const days = 7;
 
   const rangeDates = [];
   for (let i = 0; i < days; i++) {
@@ -2483,26 +2481,25 @@ function formatPrintDate(dateStr) {
 
   const html = `
     <div class="print-sheet">
-      <div class="print-grid cols-${columns}">
+      <div class="print-grid cols-7">
         ${rangeDates.map(dateStr => {
           const items = db.planItems.filter(item => item.scheduledDate === dateStr);
 
           return `
             <section class="print-day">
-              <div class="print-day-head">${escapeHtml(formatPrintDate(dateStr))}</div>
+              <div class="print-day-head">
+                ${formatPrintDate(dateStr)}
+              </div>
+
               <div class="print-day-list">
                 ${
                   items.length
                     ? items.map(item => `
                         <div class="print-day-item">
-                          <div class="print-item-main">${escapeHtml(item.title || "")}</div>
-                          <div class="print-item-sub">
-                            ${escapeHtml(item.batchName || item.recipeName || "")}
-                            ${item.durationMinutes ? ` / ${escapeHtml(String(item.durationMinutes))}分` : ""}
-                          </div>
+                          <div class="print-item-main">${item.title}</div>
                         </div>
                       `).join("")
-                    : `<div class="print-day-item"><div class="print-item-sub">　</div></div>`
+                    : `<div class="print-day-item">　</div>`
                 }
               </div>
             </section>
