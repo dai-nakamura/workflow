@@ -511,13 +511,14 @@
 
 .print-day-head {
   font-weight: 700;
-  font-size: 15px;
-  line-height: 1.3;
+  font-size: 12px;     /* ← 小さく */
+  line-height: 1.2;
   text-align: center;
-  padding: 0 0 8px;
-  border-bottom: 1px solid #cfd6e0; /* ← 日付見出しの下線 */
-}
+  padding: 0 0 6px;
+  border-bottom: 1px solid #cfd6e0;
 
+  white-space: nowrap; /* ← 折り返さない */
+}
 .print-day-list {
   display: grid;
   gap: 8px;
@@ -539,7 +540,11 @@
   font-size: 10.5px;
   line-height: 1.35;
 }
-
+@media (max-width: 480px) {
+  .print-day-head {
+    font-size: 10px;
+  }
+}
 @media print {
   @page {
     size: A4 landscape;
