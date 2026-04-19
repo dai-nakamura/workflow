@@ -2469,8 +2469,7 @@ function formatPrintDate(dateStr) {
   const d = date.getDate();
   const week = ["日","月","火","水","木","金","土"][date.getDay()];
   return `${m}/${d}(${week})`;
-}
-function buildPrintPlannerView() {
+}function buildPrintPlannerView() {
   const startDate = els.plannerStartDate.value || getTodayString();
   const days = 7;
 
@@ -2481,28 +2480,32 @@ function buildPrintPlannerView() {
 
   const html = `
     <div class="print-sheet">
-      <div class="print-grid cols-7">
+      <div class="print-grid">
         ${rangeDates.map(dateStr => {
           const items = db.planItems.filter(item => item.scheduledDate === dateStr);
 
           return `
-            <section class="print-day">
+            <div class="print-day">
+              
+              <!-- 日付（ここが重要） -->
               <div class="print-day-head">
                 ${formatPrintDate(dateStr)}
               </div>
 
+              <!-- 中身 -->
               <div class="print-day-list">
                 ${
                   items.length
                     ? items.map(item => `
                         <div class="print-day-item">
-                          <div class="print-item-main">${item.title}</div>
+                          ${item.title}
                         </div>
                       `).join("")
                     : `<div class="print-day-item">　</div>`
                 }
               </div>
-            </section>
+
+            </div>
           `;
         }).join("")}
       </div>
