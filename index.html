@@ -2457,6 +2457,14 @@ els.printPlannerBtn.addEventListener("click", () => {
           : []
       };
     }
+function formatPrintDate(dateStr) {
+  if (!dateStr) return "";
+  const date = parseDate(dateStr);
+  const m = date.getMonth() + 1;
+  const d = date.getDate();
+  const week = ["日","月","火","水","木","金","土"][date.getDay()];
+  return `${m}/${d}(${week})`;
+}
     function buildPrintPlannerView() {
   const mode = els.plannerMode.value;
   const startDate = els.plannerStartDate.value || getTodayString();
@@ -2476,7 +2484,7 @@ els.printPlannerBtn.addEventListener("click", () => {
 
           return `
             <section class="print-day">
-              <div class="print-day-head">${escapeHtml(dateStr)}</div>
+              <div class="print-day-head">${escapeHtml(formatPrintDate(dateStr))}</div>
               <div class="print-day-list">
                 ${
                   items.length
