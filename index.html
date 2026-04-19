@@ -476,10 +476,13 @@
     }
 .print-planner-view {
   background: #fff;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .print-sheet {
   width: 100%;
+  min-width: 1120px;
 }
 
 .print-grid {
@@ -974,60 +977,63 @@
     </section>
 
     <!-- 計画表 -->
-    <section class="tab-panel" data-tab="planner">
-      <div class="layout-grid">
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">計画表</p>
-              <h2>週 / 月 表示</h2>
-            </div>
-            <span class="badge" id="planItemCountBadge">0件</span>
-          </div>
+<!-- 計画表 -->
+<section class="tab-panel" data-tab="planner">
+  <div class="layout-grid">
+    <section class="card">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">計画表</p>
+          <h2>週 / 月 表示</h2>
+        </div>
+        <span class="badge" id="planItemCountBadge">0件</span>
+      </div>
 
-          <div class="planner-toolbar">
-            <label class="field">
-              <span class="field-label">表示モード</span>
-              <select id="plannerMode">
-                <option value="week">1週間</option>
-                <option value="month">1ヶ月</option>
-              </select>
-            </label>
+      <div class="planner-toolbar">
+        <label class="field">
+          <span class="field-label">表示モード</span>
+          <select id="plannerMode">
+            <option value="week">1週間</option>
+            <option value="month">1ヶ月</option>
+          </select>
+        </label>
 
-            <label class="field">
-              <span class="field-label">開始日</span>
-              <input type="date" id="plannerStartDate" />
-            </label>
-          </div>
+        <label class="field">
+          <span class="field-label">開始日</span>
+          <input type="date" id="plannerStartDate" />
+        </label>
+      </div>
 
-          <div class="sub-card">
-            <div class="inline-actions">
-              <button class="btn btn-secondary" type="button" id="renderPlannerBtn">計画表を表示</button>
-            </div>
-          </div>
+      <div class="sub-card">
+        <div class="inline-actions">
+          <button class="btn btn-secondary" type="button" id="renderPlannerBtn">計画表を表示</button>
+        </div>
+      </div>
 
-          <div class="planner-grid week" id="plannerGrid"></div>
-          <div class="sub-card" style="margin-top:16px;">
-  <div class="inline-actions">
-    <button class="btn btn-secondary" type="button" id="buildPrintViewBtn">印刷用レイアウト作成</button>
-    <button class="btn btn-primary" type="button" id="printPlannerBtn">印刷する</button>
-  </div>
-  <p class="helper-text" style="margin-top:10px;">
-    A4横向きで、上に日付、下に項目を縦に並べる簡易レイアウトを作成します。
-  </p>
-</div>
-        </section>
+      <div class="planner-grid week" id="plannerGrid"></div>
+
+      <div class="sub-card" style="margin-top:16px;">
+        <div class="inline-actions">
+          <button class="btn btn-secondary" type="button" id="buildPrintViewBtn">印刷用レイアウト作成</button>
+          <button class="btn btn-primary" type="button" id="printPlannerBtn">印刷する</button>
+        </div>
+        <p class="helper-text" style="margin-top:10px;">
+          A4横向きで、上に日付、下に項目を縦に並べる簡易レイアウトを作成します。
+        </p>
       </div>
     </section>
-<section class="card" id="printPlannerSection" style="margin-top:18px;">
-  <div class="section-heading">
-    <div>
-      <p class="section-kicker">印刷プレビュー</p>
-      <h2>週間 / 月間 印刷レイアウト</h2>
-    </div>
-  </div>
-  <div id="printPlannerView" class="print-planner-view">
-    <p class="helper-text">「印刷用レイアウト作成」を押すとここに表示されます。</p>
+
+    <section class="card" id="printPlannerSection">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">印刷プレビュー</p>
+          <h2>週間 / 月間 印刷レイアウト</h2>
+        </div>
+      </div>
+      <div id="printPlannerView" class="print-planner-view">
+        <p class="helper-text">「印刷用レイアウト作成」を押すとここに表示されます。</p>
+      </div>
+    </section>
   </div>
 </section>
     <!-- 一覧 -->
