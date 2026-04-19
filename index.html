@@ -474,6 +474,144 @@
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
     }
+    .print-planner-view {
+  background: #fff;
+}
+
+.print-sheet {
+  width: 100%;
+}
+
+.print-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.print-grid.cols-7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.print-grid.cols-8 {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.print-day {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 240px;
+}
+
+.print-day-head {
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.3;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #cfd6e0;
+}
+
+.print-day-list {
+  display: grid;
+  gap: 8px;
+}
+
+.print-day-item {
+  font-size: 12px;
+  line-height: 1.45;
+  padding-left: 2px;
+  word-break: break-word;
+}
+
+.print-day-item .print-item-main {
+  font-weight: 600;
+}
+
+.print-day-item .print-item-sub {
+  color: #5f6875;
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm 10mm 10mm 10mm;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  .page-header,
+  .tabbar,
+  .tab-panel:not([data-tab="planner"]),
+  .planner-toolbar,
+  #plannerGrid,
+  #renderPlannerBtn,
+  #buildPrintViewBtn,
+  #printPlannerBtn {
+    display: none !important;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .tab-panel[data-tab="planner"] {
+    display: block !important;
+  }
+
+  .tab-panel[data-tab="planner"] > .layout-grid > .card:not(#printPlannerSection) {
+    display: none !important;
+  }
+
+  #printPlannerSection {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+  }
+
+  #printPlannerSection .section-heading {
+    margin-bottom: 10px;
+  }
+
+  .print-planner-view {
+    padding: 0;
+  }
+
+  .print-grid {
+    gap: 12px;
+  }
+
+  .print-day {
+    gap: 6px;
+    min-height: 0;
+  }
+
+  .print-day-head {
+    font-size: 12px;
+    padding-bottom: 4px;
+  }
+
+  .print-day-list {
+    gap: 4px;
+  }
+
+  .print-day-item {
+    font-size: 9.5px;
+    line-height: 1.35;
+  }
+
+  .print-day-item .print-item-sub {
+    font-size: 8px;
+    line-height: 1.2;
+  }
+}
   </style>
 </head>
 <body>
@@ -1014,7 +1152,9 @@
       planStepEmpty: document.getElementById("planStepEmpty"),
       planList: document.getElementById("planList"),
       planCountBadge: document.getElementById("planCountBadge"),
-
+buildPrintViewBtn: document.getElementById("buildPrintViewBtn"),
+printPlannerBtn: document.getElementById("printPlannerBtn"),
+printPlannerView: document.getElementById("printPlannerView"),
       plannerMode: document.getElementById("plannerMode"),
       plannerStartDate: document.getElementById("plannerStartDate"),
       plannerGrid: document.getElementById("plannerGrid"),
@@ -1064,7 +1204,11 @@
 
       document.getElementById("renderPlannerBtn").addEventListener("click", renderPlanner);
       els.plannerGrid.addEventListener("click", handlePlannerGridClick);
-
+els.buildPrintViewBtn.addEventListener("click", buildPrintPlannerView);
+els.printPlannerBtn.addEventListener("click", () => {
+  buildPrintPlannerView();
+  window.print();
+});
       document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
       els.importJsonInput.addEventListener("change", importJsonFile);
       document.getElementById("importJsonTextBtn").addEventListener("click", importJsonFromText);
@@ -2297,6 +2441,50 @@
           : []
       };
     }
+    function buildPrintPlannerView() {
+  const mode = els.plannerMode.value;
+  const startDate = els.plannerStartDate.value || getTodayString();
+  const days = mode === "week" ? 7 : 8; // 月表示でも印刷は8日幅で分割しやすくする
+  const columns = days;
+
+  const rangeDates = [];
+  for (let i = 0; i < days; i++) {
+    rangeDates.push(addDays(startDate, i));
+  }
+
+  const html = `
+    <div class="print-sheet">
+      <div class="print-grid cols-${columns}">
+        ${rangeDates.map(dateStr => {
+          const items = db.planItems.filter(item => item.scheduledDate === dateStr);
+
+          return `
+            <section class="print-day">
+              <div class="print-day-head">${escapeHtml(dateStr)}</div>
+              <div class="print-day-list">
+                ${
+                  items.length
+                    ? items.map(item => `
+                        <div class="print-day-item">
+                          <div class="print-item-main">${escapeHtml(item.title || "")}</div>
+                          <div class="print-item-sub">
+                            ${escapeHtml(item.batchName || item.recipeName || "")}
+                            ${item.durationMinutes ? ` / ${escapeHtml(String(item.durationMinutes))}分` : ""}
+                          </div>
+                        </div>
+                      `).join("")
+                    : `<div class="print-day-item"><div class="print-item-sub">　</div></div>`
+                }
+              </div>
+            </section>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `;
+
+  els.printPlannerView.innerHTML = html;
+}
   </script>
 </body>
 </html>
