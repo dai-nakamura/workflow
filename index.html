@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -22,8 +23,14 @@
       --tabbar-h: 84px;
     }
 
-    * { box-sizing: border-box; }
-    html { -webkit-text-size-adjust: 100%; }
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
     body {
       margin: 0;
       background: var(--bg);
@@ -32,15 +39,18 @@
       line-height: 1.5;
     }
 
-    button, input, select, textarea { font: inherit; }
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
 
     .app-shell {
       width: min(100%, 980px);
       margin: 0 auto;
       padding:
-        calc(18px + env(safe-area-inset-top))
-        16px
-        calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom));
+        calc(18px + env(safe-area-inset-top)) 16px calc(var(--tabbar-h) + 28px + env(safe-area-inset-bottom));
     }
 
     .page-header {
@@ -63,17 +73,25 @@
       color: var(--muted);
     }
 
-    h1, h2, h3, p { margin-top: 0; }
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
     h1 {
       margin-bottom: 8px;
       font-size: clamp(28px, 5vw, 36px);
       line-height: 1.2;
     }
+
     h2 {
       margin-bottom: 0;
       font-size: 22px;
       line-height: 1.25;
     }
+
     h3 {
       margin-bottom: 8px;
       font-size: 18px;
@@ -122,8 +140,13 @@
       color: #3f4650;
     }
 
-    .tab-panel { display: none; }
-    .tab-panel.is-active { display: block; }
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.is-active {
+      display: block;
+    }
 
     .layout-grid {
       display: grid;
@@ -146,7 +169,10 @@
       margin-bottom: 18px;
     }
 
-    .stack-form { display: grid; gap: 16px; }
+    .stack-form {
+      display: grid;
+      gap: 16px;
+    }
 
     .field {
       display: grid;
@@ -165,7 +191,9 @@
       font-size: 14px;
     }
 
-    input, select, textarea {
+    input,
+    select,
+    textarea {
       width: 100%;
       border: 1px solid var(--line);
       border-radius: var(--radius-field);
@@ -181,7 +209,9 @@
       min-height: 112px;
     }
 
-    input:focus, select:focus, textarea:focus {
+    input:focus,
+    select:focus,
+    textarea:focus {
       border-color: #222;
       box-shadow: 0 0 0 4px rgba(20, 22, 26, 0.08);
     }
@@ -339,7 +369,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(255,255,255,0.96);
+      background: rgba(255, 255, 255, 0.96);
       backdrop-filter: blur(10px);
       border-top: 1px solid #e6ebf2;
       padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
@@ -388,7 +418,9 @@
       min-height: 180px;
     }
 
-    .is-hidden { display: none !important; }
+    .is-hidden {
+      display: none !important;
+    }
 
     @media (min-width: 820px) {
       .layout-grid.two-cols {
@@ -439,7 +471,7 @@
       border-left: 1px solid #cfd6e0;
     }
 
-    .print-grid > .print-day:last-child {
+    .print-grid>.print-day:last-child {
       border-right: 1px solid #cfd6e0;
     }
 
@@ -513,7 +545,7 @@
         display: block !important;
       }
 
-      .tab-panel[data-tab="planner"] > .layout-grid > .card:not(#printPlannerSection) {
+      .tab-panel[data-tab="planner"]>.layout-grid>.card:not(#printPlannerSection) {
         display: none !important;
       }
 
@@ -541,7 +573,7 @@
         border-left: 0.5px solid #aaa;
       }
 
-      .print-grid > .print-day:last-child {
+      .print-grid>.print-day:last-child {
         border-right: 0.5px solid #aaa;
       }
 
@@ -566,8 +598,140 @@
         line-height: 1.2;
       }
     }
+    /* =========================
+   段取りUI 完全版
+========================= */
+
+.schedule-card,
+.plan-step-card,
+.plan-list-card,
+.candidate-card {
+  background: #fcfdff;
+  border: 1px solid #e8edf4;
+  border-radius: 20px;
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.schedule-card-head,
+.plan-step-card-head,
+.plan-list-card-head,
+.candidate-card-head {
+  display: grid;
+  gap: 6px;
+}
+
+.schedule-card-title,
+.plan-step-card-title,
+.plan-list-card-title,
+.candidate-card-title {
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 800;
+  color: #14161a;
+  word-break: break-word;
+}
+
+.schedule-card-meta,
+.plan-step-card-meta,
+.plan-list-card-meta,
+.candidate-card-meta {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #68707d;
+  word-break: break-word;
+}
+
+.schedule-card-body,
+.plan-step-card-body,
+.candidate-card-body {
+  display: grid;
+  gap: 8px;
+}
+
+.schedule-info-list,
+.plan-step-info-list,
+.candidate-info-list {
+  display: grid;
+  gap: 6px;
+}
+
+.schedule-info-item,
+.plan-step-info-item,
+.candidate-info-item {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #3f4650;
+  word-break: break-word;
+}
+
+.schedule-card-actions,
+.plan-step-card-actions,
+.plan-list-card-actions,
+.candidate-card-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.schedule-card-actions .btn,
+.plan-step-card-actions .btn,
+.plan-list-card-actions .btn,
+.candidate-card-actions .btn {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  font-size: 15px;
+}
+
+.plan-step-order {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #eef2f6;
+  color: #14161a;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.plan-step-topline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.plan-step-note {
+  font-size: 13px;
+  line-height: 1.45;
+  color: #68707d;
+}
+
+.plan-empty-box {
+  border: 1px dashed #d8dee8;
+  border-radius: 18px;
+  padding: 18px;
+  background: #fafcff;
+  color: #68707d;
+  font-size: 14px;
+}
+
+@media (min-width: 820px) {
+  .schedule-card-actions,
+  .plan-step-card-actions,
+  .plan-list-card-actions,
+  .candidate-card-actions {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
   </style>
 </head>
+
 <body>
   <div class="app-shell">
     <header class="page-header">
@@ -652,7 +816,8 @@
               <div class="amount-row">
                 <label class="field">
                   <span class="field-label">数値</span>
-                  <input type="number" id="materialAmountValue" inputmode="decimal" step="0.01" min="0" placeholder="250" />
+                  <input type="number" id="materialAmountValue" inputmode="decimal" step="0.01" min="0"
+                    placeholder="250" />
                 </label>
 
                 <label class="field">
@@ -1238,7 +1403,7 @@
       const date = parseDate(dateStr);
       const m = date.getMonth() + 1;
       const d = date.getDate();
-      const week = ["日","月","火","水","木","金","土"][date.getDay()];
+      const week = ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
       return `${m}/${d}(${week})`;
     }
 
@@ -1830,31 +1995,43 @@
       renderScheduleCandidates();
     }
 
-    function renderScheduleCandidates() {
-      els.scheduleCandidateList.innerHTML = "";
+function renderScheduleCandidates() {
+  els.scheduleCandidateList.innerHTML = "";
 
-      if (!appState.currentScheduleCandidates.length) {
-        els.scheduleCandidateEmpty.classList.remove("is-hidden");
-        return;
-      }
-      els.scheduleCandidateEmpty.classList.add("is-hidden");
+  if (!appState.currentScheduleCandidates.length) {
+    els.scheduleCandidateEmpty.classList.remove("is-hidden");
+    return;
+  }
+  els.scheduleCandidateEmpty.classList.add("is-hidden");
 
-      appState.currentScheduleCandidates.forEach(item => {
-        const card = document.createElement("article");
-        card.className = "item-card";
-        card.innerHTML = `
-          <div class="item-main">
-            <div class="item-title">${escapeHtml(item.title)}</div>
-            <div class="record-sub">${escapeHtml(item.batchName)} / ${item.durationMinutes}分 / ${escapeHtml(item.taskType)}</div>
-            <div class="record-sub">設備: ${escapeHtml(item.equipment || "未設定")} / 並行: ${item.canParallel ? "しやすい" : "しにくい"}</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-secondary btn-inline add-plan-step-btn" type="button" data-id="${item.id}">追加</button>
-          </div>
-        `;
-        els.scheduleCandidateList.appendChild(card);
-      });
-    }
+  appState.currentScheduleCandidates.forEach(item => {
+    const card = document.createElement("article");
+    card.className = "candidate-card";
+    card.innerHTML = `
+      <div class="candidate-card-head">
+        <div class="candidate-card-title">${escapeHtml(item.title)}</div>
+        <div class="candidate-card-meta">${escapeHtml(item.batchName)}</div>
+      </div>
+
+      <div class="candidate-card-body">
+        <div class="candidate-info-list">
+          <div class="candidate-info-item">所要時間: ${item.durationMinutes}分</div>
+          <div class="candidate-info-item">工程タイプ: ${escapeHtml(item.taskType)}</div>
+          <div class="candidate-info-item">設備: ${escapeHtml(item.equipment || "未設定")}</div>
+          <div class="candidate-info-item">並行作業: ${item.canParallel ? "しやすい" : "しにくい"}</div>
+          <div class="candidate-info-item">予定日: ${escapeHtml(item.scheduledDate || "-")}</div>
+        </div>
+      </div>
+
+      <div class="candidate-card-actions">
+        <button class="btn btn-secondary add-plan-step-btn" type="button" data-id="${item.id}">
+          段取りに追加
+        </button>
+      </div>
+    `;
+    els.scheduleCandidateList.appendChild(card);
+  });
+}
 
     function handleScheduleCandidateClick(e) {
       const addBtn = e.target.closest(".add-plan-step-btn");
@@ -1882,34 +2059,62 @@
       renderPlanSteps();
     }
 
-    function renderPlanSteps() {
-      els.planStepList.innerHTML = "";
+function renderPlanSteps() {
+  els.planStepList.innerHTML = "";
 
-      if (!appState.currentPlanSteps.length) {
-        els.planStepEmpty.classList.remove("is-hidden");
-        return;
-      }
-      els.planStepEmpty.classList.add("is-hidden");
+  if (!appState.currentPlanSteps.length) {
+    els.planStepEmpty.classList.add("is-hidden");
+    els.planStepList.innerHTML = `
+      <div class="plan-empty-box">
+        候補から工程を追加すると、ここに見やすく並びます。
+      </div>
+    `;
+    return;
+  }
 
-      appState.currentPlanSteps.forEach((step, index) => {
-        const card = document.createElement("article");
-        card.className = "item-card";
-        card.innerHTML = `
-          <div class="item-main">
-            <div class="item-title">${index + 1}. ${escapeHtml(step.title)}</div>
-            <div class="record-sub">${escapeHtml(step.batchName)} / ${step.durationMinutes}分 / ${escapeHtml(step.taskType)}</div>
-            <div class="record-sub">予定日: ${escapeHtml(step.scheduledDate || "-")} / 設備: ${escapeHtml(step.equipment || "未設定")}</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-secondary btn-inline move-up-plan-step-btn" type="button" data-index="${index}">↑</button>
-            <button class="btn btn-secondary btn-inline move-down-plan-step-btn" type="button" data-index="${index}">↓</button>
-            <button class="btn btn-secondary btn-inline send-to-planner-btn" type="button" data-index="${index}">計画へ</button>
-            <button class="btn btn-danger btn-inline delete-plan-step-btn" type="button" data-index="${index}">削除</button>
-          </div>
-        `;
-        els.planStepList.appendChild(card);
-      });
-    }
+  els.planStepEmpty.classList.add("is-hidden");
+
+  appState.currentPlanSteps.forEach((step, index) => {
+    const card = document.createElement("article");
+    card.className = "plan-step-card";
+    card.innerHTML = `
+      <div class="plan-step-card-head">
+        <div class="plan-step-topline">
+          <span class="plan-step-order">${index + 1}</span>
+          <div class="plan-step-card-title">${escapeHtml(step.title)}</div>
+        </div>
+        <div class="plan-step-card-meta">${escapeHtml(step.batchName || "")}</div>
+      </div>
+
+      <div class="plan-step-card-body">
+        <div class="plan-step-info-list">
+          <div class="plan-step-info-item">所要時間: ${step.durationMinutes || 0}分</div>
+          <div class="plan-step-info-item">工程タイプ: ${escapeHtml(step.taskType || "other")}</div>
+          <div class="plan-step-info-item">予定日: ${escapeHtml(step.scheduledDate || "-")}</div>
+          <div class="plan-step-info-item">設備: ${escapeHtml(step.equipment || "未設定")}</div>
+          <div class="plan-step-info-item">並行作業: ${step.canParallel ? "しやすい" : "しにくい"}</div>
+        </div>
+        ${step.note ? `<div class="plan-step-note">${escapeHtml(step.note)}</div>` : ""}
+      </div>
+
+      <div class="plan-step-card-actions">
+        <button class="btn btn-secondary move-up-plan-step-btn" type="button" data-index="${index}">
+          上へ
+        </button>
+        <button class="btn btn-secondary move-down-plan-step-btn" type="button" data-index="${index}">
+          下へ
+        </button>
+        <button class="btn btn-secondary send-to-planner-btn" type="button" data-index="${index}">
+          計画へ
+        </button>
+        <button class="btn btn-danger delete-plan-step-btn" type="button" data-index="${index}">
+          削除
+        </button>
+      </div>
+    `;
+    els.planStepList.appendChild(card);
+  });
+}
 
     function handlePlanStepClick(e) {
       const upBtn = e.target.closest(".move-up-plan-step-btn");
@@ -1978,31 +2183,36 @@
       alert("段取りを保存しました。");
     }
 
-    function renderPlanList() {
-      els.planList.innerHTML = "";
-      els.planCountBadge.textContent = `${db.schedulePlans.length}件`;
+ function renderPlanList() {
+  els.planList.innerHTML = "";
+  els.planCountBadge.textContent = `${db.schedulePlans.length}件`;
 
-      if (!db.schedulePlans.length) {
-        els.planList.innerHTML = `<p class="helper-text">まだ段取りがありません。</p>`;
-        return;
-      }
+  if (!db.schedulePlans.length) {
+    els.planList.innerHTML = `<div class="plan-empty-box">まだ段取りがありません。</div>`;
+    return;
+  }
 
-      db.schedulePlans.forEach(plan => {
-        const card = document.createElement("article");
-        card.className = "item-card";
-        card.innerHTML = `
-          <div class="item-main">
-            <div class="item-title">${escapeHtml(plan.name)}</div>
-            <div class="record-sub">工程 ${plan.steps?.length || 0}件</div>
-          </div>
-          <div class="item-actions">
-            <button class="btn btn-secondary btn-inline load-plan-btn" type="button" data-id="${plan.id}">開く</button>
-            <button class="btn btn-danger btn-inline delete-plan-btn" type="button" data-id="${plan.id}">削除</button>
-          </div>
-        `;
-        els.planList.appendChild(card);
-      });
-    }
+  db.schedulePlans.forEach(plan => {
+    const card = document.createElement("article");
+    card.className = "plan-list-card";
+    card.innerHTML = `
+      <div class="plan-list-card-head">
+        <div class="plan-list-card-title">${escapeHtml(plan.name)}</div>
+        <div class="plan-list-card-meta">工程 ${plan.steps?.length || 0}件</div>
+      </div>
+
+      <div class="plan-list-card-actions">
+        <button class="btn btn-secondary load-plan-btn" type="button" data-id="${plan.id}">
+          開く
+        </button>
+        <button class="btn btn-danger delete-plan-btn" type="button" data-id="${plan.id}">
+          削除
+        </button>
+      </div>
+    `;
+    els.planList.appendChild(card);
+  });
+}
 
     function handlePlanListClick(e) {
       const loadBtn = e.target.closest(".load-plan-btn");
@@ -2156,15 +2366,14 @@
         <div class="print-sheet">
           <div class="print-grid cols-7">
             ${rangeDates.map(dateStr => {
-              const items = db.planItems.filter(item => item.scheduledDate === dateStr);
+        const items = db.planItems.filter(item => item.scheduledDate === dateStr);
 
-              return `
+        return `
                 <div class="print-day">
                   <div class="print-day-head">${escapeHtml(formatPrintDate(dateStr))}</div>
                   <div class="print-day-list">
-                    ${
-                      items.length
-                        ? items.map(item => `
+                    ${items.length
+            ? items.map(item => `
                             <div class="print-day-item">
                               <div class="print-item-main">${escapeHtml(item.title || "")}</div>
                               <div class="print-item-sub">
@@ -2173,12 +2382,12 @@
                               </div>
                             </div>
                           `).join("")
-                        : `<div class="print-day-item">　</div>`
-                    }
+            : `<div class="print-day-item">　</div>`
+          }
                   </div>
                 </div>
               `;
-            }).join("")}
+      }).join("")}
           </div>
         </div>
       `;
@@ -2285,30 +2494,31 @@
         memo: data.memo || "",
         materials: Array.isArray(data.materials)
           ? data.materials.map(item => ({
-              name: item.name || "",
-              amountValue: Number(item.amountValue || 0),
-              amountUnit: item.amountUnit || "g",
-              note: item.note || ""
-            }))
+            name: item.name || "",
+            amountValue: Number(item.amountValue || 0),
+            amountUnit: item.amountUnit || "g",
+            note: item.note || ""
+          }))
           : [],
         flows: Array.isArray(data.flows)
           ? data.flows.map(flow => ({
-              title: flow.title || "",
-              description: flow.description || "",
-              durationMinutes: Number(flow.durationMinutes || 0),
-              type: flow.type || "other",
-              canParallel: !!flow.canParallel,
-              equipment: flow.equipment || "",
-              checks: Array.isArray(flow.checks)
-                ? flow.checks.map(check => ({
-                    text: check.text || "",
-                    done: !!check.done
-                  }))
-                : []
-            }))
+            title: flow.title || "",
+            description: flow.description || "",
+            durationMinutes: Number(flow.durationMinutes || 0),
+            type: flow.type || "other",
+            canParallel: !!flow.canParallel,
+            equipment: flow.equipment || "",
+            checks: Array.isArray(flow.checks)
+              ? flow.checks.map(check => ({
+                text: check.text || "",
+                done: !!check.done
+              }))
+              : []
+          }))
           : []
       };
     }
   </script>
 </body>
+
 </html>
