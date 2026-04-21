@@ -78,7 +78,16 @@
         <section class="card">
           <div class="section-heading"><div><p class="section-kicker">材料マスター</p><h2>材料登録</h2></div></div>
           <div class="stack-form">
-            <label class="field"><span class="field-label">材料名</span><input type="text" id="matName"></label>
+            <label class="field"><span class="field-label">材料名</span>
+            <select id="materialNameSelect">
+  <option value="">選択してください</option>
+</select></label>
+            <label class="field">
+  <span class="field-label">カテゴリで絞り込み</span>
+  <select id="materialFilterCategory">
+    <option value="">すべて</option>
+  </select>
+</label>
             <div class="micro-row">
               <label class="field"><span class="field-label">規格量</span><input type="number" id="matBaseAmount" step="0.01" min="0"></label>
               <label class="field"><span class="field-label">単位</span><select id="matBaseUnit"><option>g</option><option>kg</option><option>ml</option><option>L</option><option>個</option><option>枚</option><option>本</option><option>pc</option><option>袋</option></select></label>
@@ -431,9 +440,14 @@
       els.importJsonInput.addEventListener('change', importJsonFile);
       document.getElementById('importJsonTextBtn').addEventListener('click', importJsonFromText);
       document.getElementById('clearJsonPasteBtn').addEventListener('click', ()=>els.jsonPasteArea.value='');
+      document.getElementById("materialNameSelect")
+  .addEventListener("change", e => {
+    document.getElementById("materialName").value = e.target.value;
+});
     }
 
-    function initialize(){ loadDb(); bindEvents(); resetMaterialMasterEditor(); resetRecipeEditor(); resetProductEditor(); resetOrderEditor(); resetPlanEditor(); els.plannerStartDate.value=getTodayString(); refreshAll(); }
+    function initialize(){ loadDb(); bindEvents(); resetMaterialMasterEditor(); resetRecipeEditor(); resetProductEditor(); resetOrderEditor(); resetPlanEditor(); els.plannerStartDate.value=getTodayString(); refreshAll(); initMaterialFilter();
+renderMaterialOptions();}
 
     function refreshAll(){ renderMaterialsMasterList(); renderRecipeMaterials(); renderFlows(); renderRecipeMasterList(); renderProductComponents(); renderProductList(); renderOrderList(); renderAggregate(); renderBatchList(); renderScheduleCandidates(); renderPlanSteps(); renderPlanList(); renderPlanner(); refreshRecipeMaterialSelect(); refreshProductComponentRefSelect(); refreshOrderProductSelect(); updateRecipeCostLabel(); updateEditingLabel(); persistDb(); }
 
@@ -458,6 +472,26 @@
     function renderFlows(){ els.flowList.innerHTML=''; if(!appState.currentRecipeFlows.length){ els.flowEmpty.classList.remove('is-hidden'); return; } els.flowEmpty.classList.add('is-hidden'); appState.currentRecipeFlows.forEach((flow,index)=>{ const card=document.createElement('article'); card.className='item-card'; card.innerHTML=`<div class="item-main"><div class="item-title">${escapeHtml(flow.title)}</div><div class="record-sub">${escapeHtml(flow.description||'説明なし')} / ${flow.durationMinutes||0}分 / ${escapeHtml(flow.type)}</div><div class="record-sub">設備: ${escapeHtml(flow.equipment||'未設定')} / 並行: ${flow.canParallel ? 'しやすい' : 'しにくい'}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline edit-flow-btn" type="button" data-index="${index}">開く</button><button class="btn btn-danger btn-inline delete-flow-btn" type="button" data-index="${index}">削除</button></div>`; els.flowList.appendChild(card); }); }
     function handleFlowListClick(e){ const edit=e.target.closest('.edit-flow-btn'); const del=e.target.closest('.delete-flow-btn'); if(edit){ const idx=Number(edit.dataset.index); const flow=appState.currentRecipeFlows[idx]; if(!flow) return; appState.editingFlowIndex=idx; els.flowTitle.value=flow.title||''; els.flowDescription.value=flow.description||''; els.flowDurationMinutes.value=flow.durationMinutes??''; els.flowType.value=flow.type||'prep'; els.flowCanParallel.value=String(!!flow.canParallel); els.flowEquipment.value=flow.equipment||''; els.flowChecks.value=(flow.checks||[]).map(c=>c.text).join('\n'); els.flowFormCard.classList.remove('is-hidden'); } if(del){ appState.currentRecipeFlows.splice(Number(del.dataset.index),1); renderFlows(); } }
     function saveRecipeMaster(){ const name=els.recipeName.value.trim(); if(!name){ alert('レシピ名を入力してください。'); return; } const recipe={ id: appState.currentRecipeId || createId('recipe'), name, type:els.recipeType.value, date:els.recipeDate.value, owner:els.recipeOwner.value.trim(), memo:els.recipeMemo.value.trim(), yieldQuantity:Number(els.recipeYieldQuantity.value||0), yieldUnit:els.recipeYieldUnit.value, materials:deepCopy(appState.currentRecipeMaterials), flows:deepCopy(appState.currentRecipeFlows), updatedAt:new Date().toISOString() }; const idx=db.recipeMasters.findIndex(x=>x.id===recipe.id); if(idx===-1) db.recipeMasters.unshift(recipe); else db.recipeMasters[idx]=recipe; appState.currentRecipeId=recipe.id; refreshAll(); alert('レシピを保存しました。'); }
+    function getSubCategories() {
+  const set = new Set();
+  db.materialMasters.forEach(m => {
+    if (m.subcategory) set.add(m.subcategory);
+  });
+  return Array.from(set);
+}
+function renderMaterialOptions() {
+  const category = document.getElementById("materialFilterCategory").value;
+  const select = document.getElementById("materialNameSelect");
+
+  let list = db.materialMasters;
+
+  if (category) {
+    list = list.filter(m => m.subcategory === category);
+  }
+
+  select.innerHTML = `<option value="">選択してください</option>` +
+    list.map(m => `<option value="${m.name}">${m.name}</option>`).join("");
+}
     function loadRecipeMaster(id){ const recipe=findRecipe(id); if(!recipe) return; appState.currentRecipeId=recipe.id; els.recipeName.value=recipe.name||''; els.recipeType.value=recipe.type||'試作'; els.recipeDate.value=recipe.date||getTodayString(); els.recipeOwner.value=recipe.owner||''; els.recipeYieldQuantity.value=recipe.yieldQuantity??''; els.recipeYieldUnit.value=recipe.yieldUnit||'個'; els.recipeMemo.value=recipe.memo||''; appState.currentRecipeMaterials=deepCopy(recipe.materials||[]); appState.currentRecipeFlows=deepCopy(recipe.flows||[]); renderRecipeMaterials(); renderFlows(); updateEditingLabel(); updateRecipeCostLabel(); activateTab('recipes'); }
     function deleteRecipeMaster(id){ if(!confirm('このレシピを削除しますか？')) return; db.recipeMasters=db.recipeMasters.filter(x=>x.id!==id); if(appState.currentRecipeId===id) resetRecipeEditor(); refreshAll(); }
     function renderRecipeMasterList(){ els.recipeCountBadge.textContent=`${db.recipeMasters.length}件`; els.recipeMasterList.innerHTML=''; if(!db.recipeMasters.length){ els.recipeMasterList.innerHTML='<div class="empty-box">まだレシピがありません。</div>'; return; } db.recipeMasters.forEach(recipe=>{ const card=document.createElement('article'); card.className='item-card'; card.innerHTML=`<div class="item-main"><div class="item-title">${escapeHtml(recipe.name)}</div><div class="record-sub">${escapeHtml(recipe.type)} / 出来高 ${round2(recipe.yieldQuantity||0)}${escapeHtml(recipe.yieldUnit||'')}</div><div class="record-sub">原価: ¥${calculateRecipeCost(recipe)}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-recipe-btn" type="button" data-id="${recipe.id}">開く</button><button class="btn btn-danger btn-inline delete-recipe-btn" type="button" data-id="${recipe.id}">削除</button></div>`; els.recipeMasterList.appendChild(card); }); }
