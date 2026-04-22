@@ -521,6 +521,9 @@
     function escapeHtml(str){ return String(str ?? '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
     function round2(n){ return Math.round(Number(n||0)*100)/100; }
     function ceil2(n){ return Math.ceil(Number(n||0)*100)/100; }
+    function getRecipeYieldPresetValues(){
+  return Array.from(els.recipeYieldUnit.options).map(option => option.value);
+}
     function formatDateLabel(dateStr){ const d=parseDate(dateStr); return `${d.getMonth()+1}/${d.getDate()}`; }
     function formatPrintDate(dateStr){ const d=parseDate(dateStr); const w=['日','月','火','水','木','金','土'][d.getDay()]; return `${d.getMonth()+1}/${d.getDate()}(${w})`; }
     function findRecipe(id){ return db.recipeMasters.find(r => r.id === id); }
@@ -617,14 +620,17 @@
     els.recipeYieldCustomUnit.value = '';
   }
 }
-    function refreshAll(){ renderMaterialsMasterList(); renderRecipeMaterials(); renderFlows(); renderRecipeMasterList(); renderProductComponents(); renderProductList(); renderOrderList(); renderAggregate(); renderBatchList(); renderScheduleCandidates(); renderPlanSteps(); renderPlanList(); renderPlanner(); refreshRecipeMaterialSelect(); refreshProductComponentRefSelect(); refreshOrderProductSelect(); updateRecipeCostLabel(); updateEditingLabel(); persistDb(); }
+    function refreshAll(){ renderMaterialsMasterList(); renderRecipeMaterials(); renderFlows(); renderRecipeMasterList(); renderProductComponents(); renderProductList(); renderOrderList(); renderAggregate(); renderBatchList(); renderScheduleCandidates(); renderPlanSteps(); renderPlanList(); renderPlanner(); refreshRecipeMaterialSelect(); refreshProductComponentRefSelect(); refreshOrderProductSelect(); updateRecipeCostLabel(); updateEditingLabel();  toggleRecipeYieldCustomField(); persistDb(); }
 
     function resetMaterialMasterEditor(){ appState.currentMaterialMasterId=null; els.matName.value=''; els.matBaseAmount.value=''; els.matBaseUnit.value='g'; els.matBasePrice.value=''; els.matCategory.value=''; els.matSupplier.value=''; els.matNote.value=''; }
     function saveMaterialMaster(){ const name=els.matName.value.trim(); if(!name){ alert('材料名を入力してください。'); return; } const rec={ id: appState.currentMaterialMasterId || createId('mat'), name, baseAmount:Number(els.matBaseAmount.value||0), baseUnit:els.matBaseUnit.value, basePrice:Number(els.matBasePrice.value||0), category:els.matCategory.value.trim(), supplier:els.matSupplier.value.trim(), note:els.matNote.value.trim() }; const idx=db.materialsMaster.findIndex(x=>x.id===rec.id); if(idx===-1) db.materialsMaster.unshift(rec); else db.materialsMaster[idx]=rec; appState.currentMaterialMasterId=rec.id; refreshAll(); alert('材料を保存しました。'); }
     function renderMaterialsMasterList(){ els.materialsMasterCountBadge.textContent=`${db.materialsMaster.length}件`; els.materialsMasterList.innerHTML=''; if(!db.materialsMaster.length){ els.materialsMasterList.innerHTML='<div class="empty-box">まだ材料がありません。</div>'; return; } db.materialsMaster.forEach(mat=>{ const card=document.createElement('article'); card.className='item-card'; card.innerHTML=`<div class="item-main"><div class="item-title">${escapeHtml(mat.name)}</div><div class="record-sub">${round2(mat.baseAmount)}${escapeHtml(mat.baseUnit)} / ¥${round2(mat.basePrice)}</div><div class="record-sub">単価: ¥${round2(unitCostFromMaterial(mat))} / ${escapeHtml(mat.baseUnit)}</div><div class="record-sub">${escapeHtml(mat.category||'')}${mat.supplier ? ' / ' + escapeHtml(mat.supplier) : ''}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline edit-matmaster-btn" type="button" data-id="${mat.id}">開く</button><button class="btn btn-danger btn-inline delete-matmaster-btn" type="button" data-id="${mat.id}">削除</button></div>`; els.materialsMasterList.appendChild(card); }); }
     function handleMaterialsMasterListClick(e){ const edit=e.target.closest('.edit-matmaster-btn'); const del=e.target.closest('.delete-matmaster-btn'); if(edit){ const mat=db.materialsMaster.find(x=>x.id===edit.dataset.id); if(!mat) return; appState.currentMaterialMasterId=mat.id; els.matName.value=mat.name||''; els.matBaseAmount.value=mat.baseAmount??''; els.matBaseUnit.value=mat.baseUnit||'g'; els.matBasePrice.value=mat.basePrice??''; els.matCategory.value=mat.category||''; els.matSupplier.value=mat.supplier||''; els.matNote.value=mat.note||''; } if(del){ if(!confirm('この材料を削除しますか？')) return; db.materialsMaster=db.materialsMaster.filter(x=>x.id!==del.dataset.id); refreshAll(); } }
 
-    function resetRecipeEditor(){ appState.currentRecipeId=null; appState.currentRecipeMaterials=[]; appState.currentRecipeFlows=[]; appState.editingRecipeMaterialIndex=null; appState.editingFlowIndex=null; els.recipeName.value=''; els.recipeType.value='試作'; els.recipeDate.value=getTodayString(); els.recipeOwner.value=''; els.recipeYieldQuantity.value=''; els.recipeYieldUnit.value='個'; els.recipeMemo.value=''; closeRecipeMaterialForm(); closeFlowForm(); renderRecipeMaterials(); renderFlows(); updateEditingLabel(); updateRecipeCostLabel();els.recipeYieldCustomUnit.value = '';
+    function resetRecipeEditor(){ appState.currentRecipeId=null; appState.currentRecipeMaterials=[]; appState.currentRecipeFlows=[]; appState.editingRecipeMaterialIndex=null; appState.editingFlowIndex=null; els.recipeName.value=''; els.recipeType.value='試作'; els.recipeDate.value=getTodayString(); els.recipeOwner.value=''; els.recipeYieldQuantity.value=''; els.recipeYieldUnit.value='個'; els.recipeMemo.value=''; els.recipeDiameter.value = '';
+els.recipeHeight.value = '';
+els.targetDiameter.value = '';
+els.targetHeight.value = '';closeRecipeMaterialForm(); closeFlowForm(); renderRecipeMaterials(); renderFlows(); updateEditingLabel(); updateRecipeCostLabel();els.recipeYieldCustomUnit.value = '';
 toggleRecipeYieldCustomField(); }
     function getRecipeMaterialCategories(){ const set=new Set(); db.materialsMaster.forEach(m=>{ if(m.category) set.add(m.category); }); return Array.from(set).sort((a,b)=>a.localeCompare(b,'ja')); }
     function initRecipeMaterialFilter(){ els.recipeMaterialFilterCategory.innerHTML = [`<option value="">すべて</option>`].concat(getRecipeMaterialCategories().map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`)).join(''); }
@@ -681,10 +687,43 @@ function saveRecipeMaster(){
   appState.currentRecipeId = recipe.id;
   refreshAll();
   alert('レシピを保存しました。');
-}  function loadRecipeMaster(id){ const recipe=findRecipe(id); if(!recipe) return; appState.currentRecipeId=recipe.id; els.recipeName.value=recipe.name||''; els.recipeType.value=recipe.type||'試作'; els.recipeDate.value=recipe.date||getTodayString(); els.recipeOwner.value=recipe.owner||''; els.recipeYieldQuantity.value=recipe.yieldQuantity??''; els.recipeYieldUnit.value=recipe.yieldUnit||'個'; els.recipeMemo.value=recipe.memo||''; 
-els.recipeDiameter.value = recipe.size?.diameter || '';
-els.recipeHeight.value = recipe.size?.height || '';
-appState.currentRecipeMaterials=deepCopy(recipe.materials||[]); appState.currentRecipeFlows=deepCopy(recipe.flows||[]); renderRecipeMaterials(); renderFlows(); updateEditingLabel(); updateRecipeCostLabel(); activateTab('recipes'); }
+} function loadRecipeMaster(id){
+  const recipe = findRecipe(id);
+  if(!recipe) return;
+
+  appState.currentRecipeId = recipe.id;
+  els.recipeName.value = recipe.name || '';
+  els.recipeType.value = recipe.type || '試作';
+  els.recipeDate.value = recipe.date || getTodayString();
+  els.recipeOwner.value = recipe.owner || '';
+  els.recipeYieldQuantity.value = recipe.yieldQuantity ?? '';
+  els.recipeMemo.value = recipe.memo || '';
+
+  const presetUnits = getRecipeYieldPresetValues();
+  if(presetUnits.includes(recipe.yieldUnit)){
+    els.recipeYieldUnit.value = recipe.yieldUnit || '個';
+    els.recipeYieldCustomUnit.value = '';
+  }else{
+    els.recipeYieldUnit.value = '自由入力';
+    els.recipeYieldCustomUnit.value = recipe.yieldUnit || '';
+  }
+
+  els.recipeDiameter.value = recipe.size?.diameter || '';
+  els.recipeHeight.value = recipe.size?.height || '';
+  els.targetDiameter.value = '';
+  els.targetHeight.value = '';
+
+  toggleRecipeYieldCustomField();
+
+  appState.currentRecipeMaterials = deepCopy(recipe.materials || []);
+  appState.currentRecipeFlows = deepCopy(recipe.flows || []);
+
+  renderRecipeMaterials();
+  renderFlows();
+  updateEditingLabel();
+  updateRecipeCostLabel();
+  activateTab('recipes');
+}
     function deleteRecipeMaster(id){ if(!confirm('このレシピを削除しますか？')) return; db.recipeMasters=db.recipeMasters.filter(x=>x.id!==id); if(appState.currentRecipeId===id) resetRecipeEditor(); refreshAll(); }
     function renderRecipeMasterList(){ els.recipeCountBadge.textContent=`${db.recipeMasters.length}件`; els.recipeMasterList.innerHTML=''; if(!db.recipeMasters.length){ els.recipeMasterList.innerHTML='<div class="empty-box">まだレシピがありません。</div>'; return; } db.recipeMasters.forEach(recipe=>{ const card=document.createElement('article'); card.className='item-card'; card.innerHTML=`<div class="item-main"><div class="item-title">${escapeHtml(recipe.name)}</div><div class="record-sub">${escapeHtml(recipe.type)} / 出来高 ${round2(recipe.yieldQuantity||0)}${escapeHtml(recipe.yieldUnit||'')}</div><div class="record-sub">原価: ¥${calculateRecipeCost(recipe)}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-recipe-btn" type="button" data-id="${recipe.id}">開く</button><button class="btn btn-danger btn-inline delete-recipe-btn" type="button" data-id="${recipe.id}">削除</button></div>`; els.recipeMasterList.appendChild(card); }); }
     function handleRecipeMasterListClick(e){ const load=e.target.closest('.load-recipe-btn'); const del=e.target.closest('.delete-recipe-btn'); if(load) loadRecipeMaster(load.dataset.id); if(del) deleteRecipeMaster(del.dataset.id); }
@@ -705,8 +744,7 @@ appState.currentRecipeMaterials=deepCopy(recipe.materials||[]); appState.current
     function handleProductListClick(e){ const load=e.target.closest('.load-product-btn'); const del=e.target.closest('.delete-product-btn'); if(load) loadProductMaster(load.dataset.id); if(del) deleteProductMaster(del.dataset.id); }
 
     function refreshOrderProductSelect(){ els.orderProductSelect.innerHTML=['<option value="">選択してください</option>'].concat(db.productMasters.map(x=>`<option value="${x.id}">${escapeHtml(x.name)}</option>`)).join(''); }
-    function scaleRecipeBySize(){
-
+ function scaleRecipeBySize(){
   const baseD = Number(els.recipeDiameter.value);
   const baseH = Number(els.recipeHeight.value);
   const targetD = Number(els.targetDiameter.value);
@@ -717,24 +755,26 @@ appState.currentRecipeMaterials=deepCopy(recipe.materials||[]); appState.current
     return;
   }
 
-  // 高さ未入力は同じとみなす
   const h1 = baseH || 1;
   const h2 = targetH || h1;
 
-  // スケール計算
   const scale = (targetD / baseD) ** 2 * (h2 / h1);
 
-  // 材料スケール
   appState.currentRecipeMaterials = appState.currentRecipeMaterials.map(m => ({
     ...m,
-    amountValue: Math.round(m.amountValue * scale * 100) / 100
+    amountValue: Math.round(Number(m.amountValue || 0) * scale * 100) / 100
   }));
 
-  // 出来高も更新（任意）
   if(els.recipeYieldQuantity.value){
     els.recipeYieldQuantity.value =
       Math.round(Number(els.recipeYieldQuantity.value) * scale * 100) / 100;
   }
+
+  // 変換後サイズを現在値として持たせる
+  els.recipeDiameter.value = targetD || '';
+  els.recipeHeight.value = targetH || h2 || '';
+  els.targetDiameter.value = '';
+  els.targetHeight.value = '';
 
   renderRecipeMaterials();
   updateRecipeCostLabel();
@@ -853,6 +893,10 @@ function normalizeImportedRecipe(data){
     memo: data.memo || '',
     yieldQuantity: Number(data.yieldQuantity || 0),
     yieldUnit: data.yieldUnit || '個',
+    size: {
+  diameter: Number(data.size?.diameter || 0),
+  height: Number(data.size?.height || 0)
+},
     materials: attachMaterialIdsToRecipeMaterials(normalizedMaterials),
     flows: Array.isArray(data.flows)
       ? data.flows.map(flow => ({
@@ -904,26 +948,44 @@ function normalizeImportedRecipe(data){
         alert(mode === 'replace' ? '全体JSONを置換読込しました。' : '全体JSONを追加読込しました。');
         return;
       }
-      if(parsed.name && Array.isArray(parsed.materials)){
-        const recipe=normalizeImportedRecipe(parsed);
-        appState.currentRecipeId=null;
-        els.recipeName.value=recipe.name||'';
-        els.recipeType.value=recipe.type||'試作';
-        els.recipeDate.value=recipe.date||getTodayString();
-        els.recipeOwner.value=recipe.owner||'';
-        els.recipeYieldQuantity.value=recipe.yieldQuantity||0;
-        els.recipeYieldUnit.value=recipe.yieldUnit||'個';
-        els.recipeMemo.value=recipe.memo||'';
-        appState.currentRecipeMaterials=recipe.materials||[];
-        appState.currentRecipeFlows=recipe.flows||[];
-        renderRecipeMaterials();
-        renderFlows();
-        updateEditingLabel();
-        updateRecipeCostLabel();
-        activateTab('recipes');
-        alert('単体レシピJSONを読み込みました。');
-        return;
-      }
+  if(parsed.name && Array.isArray(parsed.materials)){
+  const recipe = normalizeImportedRecipe(parsed);
+
+  appState.currentRecipeId = null;
+  els.recipeName.value = recipe.name || '';
+  els.recipeType.value = recipe.type || '試作';
+  els.recipeDate.value = recipe.date || getTodayString();
+  els.recipeOwner.value = recipe.owner || '';
+  els.recipeYieldQuantity.value = recipe.yieldQuantity || 0;
+  els.recipeMemo.value = recipe.memo || '';
+
+  const presetUnits = getRecipeYieldPresetValues();
+  if(presetUnits.includes(recipe.yieldUnit)){
+    els.recipeYieldUnit.value = recipe.yieldUnit || '個';
+    els.recipeYieldCustomUnit.value = '';
+  }else{
+    els.recipeYieldUnit.value = '自由入力';
+    els.recipeYieldCustomUnit.value = recipe.yieldUnit || '';
+  }
+
+  els.recipeDiameter.value = recipe.size?.diameter || '';
+  els.recipeHeight.value = recipe.size?.height || '';
+  els.targetDiameter.value = '';
+  els.targetHeight.value = '';
+
+  toggleRecipeYieldCustomField();
+
+  appState.currentRecipeMaterials = recipe.materials || [];
+  appState.currentRecipeFlows = recipe.flows || [];
+
+  renderRecipeMaterials();
+  renderFlows();
+  updateEditingLabel();
+  updateRecipeCostLabel();
+  activateTab('recipes');
+  alert('単体レシピJSONを読み込みました。');
+  return;
+}
       alert('対応していないJSON形式です。');
     }
 
