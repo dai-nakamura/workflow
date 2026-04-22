@@ -766,8 +766,8 @@ function saveRecipeMaster(){
   }));
 
   if(els.recipeYieldQuantity.value){
-    els.recipeYieldQuantity.value =
-      Math.round(Number(els.recipeYieldQuantity.value) * scale * 100) / 100;
+ els.recipeYieldQuantity.value =
+  Math.round(Number(els.recipeYieldQuantity.value) / scale * 100) / 100;
   }
 
   // 変換後サイズを現在値として持たせる
