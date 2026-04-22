@@ -192,10 +192,36 @@
             <label class="field"><span class="field-label">区分</span><select id="recipeType"><option>試作</option><option>仕込み</option><option>試作＋仕込み</option></select></label>
             <label class="field"><span class="field-label">日付</span><input type="date" id="recipeDate"></label>
             <label class="field"><span class="field-label">担当</span><input type="text" id="recipeOwner"></label>
-            <div class="micro-row">
-              <label class="field"><span class="field-label">出来高数量</span><input type="number" id="recipeYieldQuantity" step="0.01" min="0"></label>
-              <label class="field"><span class="field-label">出来高単位</span><select id="recipeYieldUnit"><option>個</option><option>台</option><option>人前</option><option>箱</option><option>本</option><option>枚</option></select></label>
-            </div>
+   <div class="micro-row">
+  <label class="field">
+    <span class="field-label">出来高数量</span>
+    <input type="number" id="recipeYieldQuantity" step="0.01" min="0">
+  </label>
+  <label class="field">
+    <span class="field-label">出来高単位</span>
+    <select id="recipeYieldUnit">
+      <option>個</option>
+      <option>台</option>
+      <option>人前</option>
+      <option>箱</option>
+      <option>本</option>
+      <option>枚</option>
+      <option>g</option>
+      <option>kg</option>
+      <option>ml</option>
+      <option>L</option>
+      <option>バット</option>
+      <option>ボウル</option>
+      <option>シート</option>
+      <option>自由入力</option>
+    </select>
+  </label>
+</div>
+
+<label class="field is-hidden" id="recipeYieldCustomField">
+  <span class="field-label">自由入力単位</span>
+  <input type="text" id="recipeYieldCustomUnit" placeholder="例：7号1台分 / バット1枚分 / ホテルパン1枚分">
+</label>
             <label class="field"><span class="field-label">メモ</span><textarea id="recipeMemo"></textarea></label>
           </div>
           <div class="sub-card"><div class="inline-actions"><button class="btn btn-primary" type="button" id="saveRecipeBtn">レシピ保存</button><button class="btn btn-secondary" type="button" id="newRecipeBtn">新規</button><span class="badge" id="recipeCostLabel">原価: -</span></div></div>
@@ -453,7 +479,7 @@
     const els = {};
     [
       'storageStatus','currentEditingLabel','matName','matBaseAmount','matBaseUnit','matBasePrice','matCategory','matSupplier','matNote','materialsMasterList','materialsMasterCountBadge',
-      'recipeName','recipeType','recipeDate','recipeOwner','recipeYieldQuantity','recipeYieldUnit','recipeMemo','recipeCostLabel','recipeMaterialsList','recipeMaterialsEmpty','recipeMaterialFormCard','recipeMaterialFilterCategory','recipeMaterialSelect','recipeMaterialAmountValue','recipeMaterialAmountUnit','recipeMaterialNote','flowList','flowEmpty','flowFormCard','flowTitle','flowDescription','flowDurationMinutes','flowType','flowCanParallel','flowEquipment','flowChecks','recipeMasterList','recipeCountBadge',
+      'recipeName','recipeType','recipeDate','recipeOwner','recipeYieldQuantity','recipeYieldUnit','recipeYieldCustomField','recipeYieldCustomUnit','recipeMemo','recipeCostLabel','recipeMaterialsList','recipeMaterialsEmpty','recipeMaterialFormCard','recipeMaterialFilterCategory','recipeMaterialSelect','recipeMaterialAmountValue','recipeMaterialAmountUnit','recipeMaterialNote','flowList','flowEmpty','flowFormCard','flowTitle','flowDescription','flowDurationMinutes','flowType','flowCanParallel','flowEquipment','flowChecks','recipeMasterList','recipeCountBadge',
       'productName','productCategory','productUnitLabel','productNote','productComponentsList','productComponentsEmpty','productComponentFormCard','productComponentSourceType','productComponentRefSelect','productComponentQuantity','productComponentUnit','productList','productCountBadge',
       'orderDate','orderProductSelect','orderQuantity','orderUnit','orderCustomer','orderMemo','orderList','orderCountBadge',
       'aggregateRecipeList','aggregateTaskList','aggregateRecipeCountBadge','aggregateTaskCountBadge','batchList','batchCountBadge','batchDetailView',
@@ -554,10 +580,17 @@
       els.assignMode.addEventListener('change', renderAssignMode);
       document.getElementById('confirmAssignBtn').addEventListener('click', confirmAssignToPlanner);
       document.getElementById('cancelAssignBtn').addEventListener('click', closeAssignModal);
+      els.recipeYieldUnit.addEventListener('change', toggleRecipeYieldCustomField);
     }
 
     function initialize(){ loadDb(); bindEvents(); resetMaterialMasterEditor(); resetRecipeEditor(); resetProductEditor(); resetOrderEditor(); resetPlanEditor(); els.plannerStartDate.value=getTodayString(); refreshAll(); }
-
+    function toggleRecipeYieldCustomField(){
+  const isCustom = els.recipeYieldUnit.value === '自由入力';
+  els.recipeYieldCustomField.classList.toggle('is-hidden', !isCustom);
+  if(!isCustom){
+    els.recipeYieldCustomUnit.value = '';
+  }
+}
     function refreshAll(){ renderMaterialsMasterList(); renderRecipeMaterials(); renderFlows(); renderRecipeMasterList(); renderProductComponents(); renderProductList(); renderOrderList(); renderAggregate(); renderBatchList(); renderScheduleCandidates(); renderPlanSteps(); renderPlanList(); renderPlanner(); refreshRecipeMaterialSelect(); refreshProductComponentRefSelect(); refreshOrderProductSelect(); updateRecipeCostLabel(); updateEditingLabel(); persistDb(); }
 
     function resetMaterialMasterEditor(){ appState.currentMaterialMasterId=null; els.matName.value=''; els.matBaseAmount.value=''; els.matBaseUnit.value='g'; els.matBasePrice.value=''; els.matCategory.value=''; els.matSupplier.value=''; els.matNote.value=''; }
@@ -565,7 +598,8 @@
     function renderMaterialsMasterList(){ els.materialsMasterCountBadge.textContent=`${db.materialsMaster.length}件`; els.materialsMasterList.innerHTML=''; if(!db.materialsMaster.length){ els.materialsMasterList.innerHTML='<div class="empty-box">まだ材料がありません。</div>'; return; } db.materialsMaster.forEach(mat=>{ const card=document.createElement('article'); card.className='item-card'; card.innerHTML=`<div class="item-main"><div class="item-title">${escapeHtml(mat.name)}</div><div class="record-sub">${round2(mat.baseAmount)}${escapeHtml(mat.baseUnit)} / ¥${round2(mat.basePrice)}</div><div class="record-sub">単価: ¥${round2(unitCostFromMaterial(mat))} / ${escapeHtml(mat.baseUnit)}</div><div class="record-sub">${escapeHtml(mat.category||'')}${mat.supplier ? ' / ' + escapeHtml(mat.supplier) : ''}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline edit-matmaster-btn" type="button" data-id="${mat.id}">開く</button><button class="btn btn-danger btn-inline delete-matmaster-btn" type="button" data-id="${mat.id}">削除</button></div>`; els.materialsMasterList.appendChild(card); }); }
     function handleMaterialsMasterListClick(e){ const edit=e.target.closest('.edit-matmaster-btn'); const del=e.target.closest('.delete-matmaster-btn'); if(edit){ const mat=db.materialsMaster.find(x=>x.id===edit.dataset.id); if(!mat) return; appState.currentMaterialMasterId=mat.id; els.matName.value=mat.name||''; els.matBaseAmount.value=mat.baseAmount??''; els.matBaseUnit.value=mat.baseUnit||'g'; els.matBasePrice.value=mat.basePrice??''; els.matCategory.value=mat.category||''; els.matSupplier.value=mat.supplier||''; els.matNote.value=mat.note||''; } if(del){ if(!confirm('この材料を削除しますか？')) return; db.materialsMaster=db.materialsMaster.filter(x=>x.id!==del.dataset.id); refreshAll(); } }
 
-    function resetRecipeEditor(){ appState.currentRecipeId=null; appState.currentRecipeMaterials=[]; appState.currentRecipeFlows=[]; appState.editingRecipeMaterialIndex=null; appState.editingFlowIndex=null; els.recipeName.value=''; els.recipeType.value='試作'; els.recipeDate.value=getTodayString(); els.recipeOwner.value=''; els.recipeYieldQuantity.value=''; els.recipeYieldUnit.value='個'; els.recipeMemo.value=''; closeRecipeMaterialForm(); closeFlowForm(); renderRecipeMaterials(); renderFlows(); updateEditingLabel(); updateRecipeCostLabel(); }
+    function resetRecipeEditor(){ appState.currentRecipeId=null; appState.currentRecipeMaterials=[]; appState.currentRecipeFlows=[]; appState.editingRecipeMaterialIndex=null; appState.editingFlowIndex=null; els.recipeName.value=''; els.recipeType.value='試作'; els.recipeDate.value=getTodayString(); els.recipeOwner.value=''; els.recipeYieldQuantity.value=''; els.recipeYieldUnit.value='個'; els.recipeMemo.value=''; closeRecipeMaterialForm(); closeFlowForm(); renderRecipeMaterials(); renderFlows(); updateEditingLabel(); updateRecipeCostLabel();els.recipeYieldCustomUnit.value = '';
+toggleRecipeYieldCustomField(); }
     function getRecipeMaterialCategories(){ const set=new Set(); db.materialsMaster.forEach(m=>{ if(m.category) set.add(m.category); }); return Array.from(set).sort((a,b)=>a.localeCompare(b,'ja')); }
     function initRecipeMaterialFilter(){ els.recipeMaterialFilterCategory.innerHTML = [`<option value="">すべて</option>`].concat(getRecipeMaterialCategories().map(c=>`<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`)).join(''); }
     function refreshRecipeMaterialSelect(){ renderRecipeMaterialOptions(); }
@@ -587,8 +621,37 @@
     function saveFlow(){ const title=els.flowTitle.value.trim(); if(!title){ alert('工程名を入力してください。'); return; } const flow={ title, description:els.flowDescription.value.trim(), durationMinutes:Number(els.flowDurationMinutes.value||0), type:els.flowType.value, canParallel:els.flowCanParallel.value==='true', equipment:els.flowEquipment.value.trim(), checks:parseChecks(els.flowChecks.value) }; if(appState.editingFlowIndex===null) appState.currentRecipeFlows.unshift(flow); else appState.currentRecipeFlows[appState.editingFlowIndex]=flow; renderFlows(); closeFlowForm(); }
     function renderFlows(){ els.flowList.innerHTML=''; if(!appState.currentRecipeFlows.length){ els.flowEmpty.classList.remove('is-hidden'); return; } els.flowEmpty.classList.add('is-hidden'); appState.currentRecipeFlows.forEach((flow,index)=>{ const card=document.createElement('article'); card.className='item-card'; card.innerHTML=`<div class="item-main"><div class="item-title">${escapeHtml(flow.title)}</div><div class="record-sub">${escapeHtml(flow.description||'説明なし')} / ${flow.durationMinutes||0}分 / ${escapeHtml(flow.type)}</div><div class="record-sub">設備: ${escapeHtml(flow.equipment||'未設定')} / 並行: ${flow.canParallel ? 'しやすい' : 'しにくい'}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline edit-flow-btn" type="button" data-index="${index}">開く</button><button class="btn btn-danger btn-inline delete-flow-btn" type="button" data-index="${index}">削除</button></div>`; els.flowList.appendChild(card); }); }
     function handleFlowListClick(e){ const edit=e.target.closest('.edit-flow-btn'); const del=e.target.closest('.delete-flow-btn'); if(edit){ const idx=Number(edit.dataset.index); const flow=appState.currentRecipeFlows[idx]; if(!flow) return; appState.editingFlowIndex=idx; els.flowTitle.value=flow.title||''; els.flowDescription.value=flow.description||''; els.flowDurationMinutes.value=flow.durationMinutes??''; els.flowType.value=flow.type||'prep'; els.flowCanParallel.value=String(!!flow.canParallel); els.flowEquipment.value=flow.equipment||''; els.flowChecks.value=(flow.checks||[]).map(c=>c.text).join('\n'); els.flowFormCard.classList.remove('is-hidden'); } if(del){ appState.currentRecipeFlows.splice(Number(del.dataset.index),1); renderFlows(); } }
-    function saveRecipeMaster(){ const name=els.recipeName.value.trim(); if(!name){ alert('レシピ名を入力してください。'); return; } const recipe={ id: appState.currentRecipeId || createId('recipe'), name, type:els.recipeType.value, date:els.recipeDate.value, owner:els.recipeOwner.value.trim(), memo:els.recipeMemo.value.trim(), yieldQuantity:Number(els.recipeYieldQuantity.value||0), yieldUnit:els.recipeYieldUnit.value, materials:deepCopy(appState.currentRecipeMaterials), flows:deepCopy(appState.currentRecipeFlows), updatedAt:new Date().toISOString() }; const idx=db.recipeMasters.findIndex(x=>x.id===recipe.id); if(idx===-1) db.recipeMasters.unshift(recipe); else db.recipeMasters[idx]=recipe; appState.currentRecipeId=recipe.id; refreshAll(); alert('レシピを保存しました。'); }
-    function loadRecipeMaster(id){ const recipe=findRecipe(id); if(!recipe) return; appState.currentRecipeId=recipe.id; els.recipeName.value=recipe.name||''; els.recipeType.value=recipe.type||'試作'; els.recipeDate.value=recipe.date||getTodayString(); els.recipeOwner.value=recipe.owner||''; els.recipeYieldQuantity.value=recipe.yieldQuantity??''; els.recipeYieldUnit.value=recipe.yieldUnit||'個'; els.recipeMemo.value=recipe.memo||''; appState.currentRecipeMaterials=deepCopy(recipe.materials||[]); appState.currentRecipeFlows=deepCopy(recipe.flows||[]); renderRecipeMaterials(); renderFlows(); updateEditingLabel(); updateRecipeCostLabel(); activateTab('recipes'); }
+   function saveRecipeMaster(){
+  const name = els.recipeName.value.trim();
+  if(!name){
+    alert('レシピ名を入力してください。');
+    return;
+  }
+
+  const recipe = {
+    id: appState.currentRecipeId || createId('recipe'),
+    name,
+    type: els.recipeType.value,
+    date: els.recipeDate.value,
+    owner: els.recipeOwner.value.trim(),
+    memo: els.recipeMemo.value.trim(),
+    yieldQuantity: Number(els.recipeYieldQuantity.value || 0),
+    yieldUnit: els.recipeYieldUnit.value === '自由入力'
+      ? (els.recipeYieldCustomUnit.value.trim() || '自由入力')
+      : els.recipeYieldUnit.value,
+    materials: deepCopy(appState.currentRecipeMaterials),
+    flows: deepCopy(appState.currentRecipeFlows),
+    updatedAt: new Date().toISOString()
+  };
+
+  const idx = db.recipeMasters.findIndex(x => x.id === recipe.id);
+  if(idx === -1) db.recipeMasters.unshift(recipe);
+  else db.recipeMasters[idx] = recipe;
+
+  appState.currentRecipeId = recipe.id;
+  refreshAll();
+  alert('レシピを保存しました。');
+}  function loadRecipeMaster(id){ const recipe=findRecipe(id); if(!recipe) return; appState.currentRecipeId=recipe.id; els.recipeName.value=recipe.name||''; els.recipeType.value=recipe.type||'試作'; els.recipeDate.value=recipe.date||getTodayString(); els.recipeOwner.value=recipe.owner||''; els.recipeYieldQuantity.value=recipe.yieldQuantity??''; els.recipeYieldUnit.value=recipe.yieldUnit||'個'; els.recipeMemo.value=recipe.memo||''; appState.currentRecipeMaterials=deepCopy(recipe.materials||[]); appState.currentRecipeFlows=deepCopy(recipe.flows||[]); renderRecipeMaterials(); renderFlows(); updateEditingLabel(); updateRecipeCostLabel(); activateTab('recipes'); }
     function deleteRecipeMaster(id){ if(!confirm('このレシピを削除しますか？')) return; db.recipeMasters=db.recipeMasters.filter(x=>x.id!==id); if(appState.currentRecipeId===id) resetRecipeEditor(); refreshAll(); }
     function renderRecipeMasterList(){ els.recipeCountBadge.textContent=`${db.recipeMasters.length}件`; els.recipeMasterList.innerHTML=''; if(!db.recipeMasters.length){ els.recipeMasterList.innerHTML='<div class="empty-box">まだレシピがありません。</div>'; return; } db.recipeMasters.forEach(recipe=>{ const card=document.createElement('article'); card.className='item-card'; card.innerHTML=`<div class="item-main"><div class="item-title">${escapeHtml(recipe.name)}</div><div class="record-sub">${escapeHtml(recipe.type)} / 出来高 ${round2(recipe.yieldQuantity||0)}${escapeHtml(recipe.yieldUnit||'')}</div><div class="record-sub">原価: ¥${calculateRecipeCost(recipe)}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-recipe-btn" type="button" data-id="${recipe.id}">開く</button><button class="btn btn-danger btn-inline delete-recipe-btn" type="button" data-id="${recipe.id}">削除</button></div>`; els.recipeMasterList.appendChild(card); }); }
     function handleRecipeMasterListClick(e){ const load=e.target.closest('.load-recipe-btn'); const del=e.target.closest('.delete-recipe-btn'); if(load) loadRecipeMaster(load.dataset.id); if(del) deleteRecipeMaster(del.dataset.id); }
