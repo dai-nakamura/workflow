@@ -665,55 +665,43 @@
     function exportJson(){ const payload=JSON.stringify(db,null,2); const blob=new Blob([payload],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`production-design-final-${getTodayString()}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); }
     function importJsonFile(event){ const file=event.target.files?.[0]; if(!file) return; const reader=new FileReader(); reader.onload=()=>{ try{ importParsedJson(JSON.parse(reader.result), 'merge'); } catch(e){ console.error(e); alert('JSONの読み込みに失敗しました。'); } finally { event.target.value=''; } }; reader.readAsText(file,'utf-8'); }
     function importJsonFromText(mode){ const raw=els.jsonPasteArea.value.trim(); if(!raw){ alert('JSONを貼ってください。'); return; } try{ importParsedJson(JSON.parse(raw), mode); if(mode==='merge') els.jsonPasteArea.value=''; } catch(e){ console.error(e); alert('JSON形式が正しくありません。'); } }
-    function normalizeMaterialName(name) {
-
+function normalizeMaterialName(name) {
   return String(name || "")
-
     .trim()
-
     .replace(/\s+/g, "")
-
     .replace(/[　]/g, "")
-
     .replace(/[（）()]/g, "")
-
     .toLowerCase();
-
 }
 
 function findMaterialMasterByName(name) {
-
   if (!name) return null;
 
-  const exact = db.materialsMaster.find(m => (m.name || "").trim() === String(name).trim());
-
+  const exact = db.materialsMaster.find(
+    m => (m.name || "").trim() === String(name).trim()
+  );
   if (exact) return exact;
 
   const normalizedTarget = normalizeMaterialName(name);
-
-  return db.materialsMaster.find(m => normalizeMaterialName(m.name) === normalizedTarget) || null;
-
+  return db.materialsMaster.find(
+    m => normalizeMaterialName(m.name) === normalizedTarget
+  ) || null;
 }
 
 function attachMaterialIdsToRecipeMaterials(materials) {
-
   return (materials || []).map(item => {
-
     if (item.materialId) return item;
 
     const matched = findMaterialMasterByName(item.name);
 
     return {
-
       ...item,
-
       materialId: matched ? matched.id : null,
-
       name: item.name || matched?.name || ""
-
     };
+  });
+}
 
-  })
 function normalizeImportedRecipe(data){
   const normalizedMaterials = Array.isArray(data.materials)
     ? data.materials.map(item => ({
