@@ -929,11 +929,29 @@
           <div class="stack-form">
             <label class="field"><span class="field-label">施工日</span><input type="date" id="orderDate"></label>
             <label class="field"><span class="field-label">商品</span><select id="orderProductSelect"></select></label>
-            <div class="micro-row">
-              <label class="field"><span class="field-label">数量</span><input type="number" id="orderQuantity" min="0"
-                  step="0.01" value="1"></label>
-              <label class="field"><span class="field-label">単位</span><input type="text" id="orderUnit"></label>
-            </div>
+<div class="micro-row">
+  <label class="field">
+    <span class="field-label">数量</span>
+    <input type="number" id="productComponentQuantity" min="0" step="0.01" value="1">
+  </label>
+
+  <label class="field">
+    <span class="field-label">単位</span>
+    <input type="text" id="productComponentUnit">
+  </label>
+</div>
+
+<div class="micro-row">
+  <label class="field">
+    <span class="field-label">使用直径(mm)</span>
+    <input type="number" id="productComponentDiameter" placeholder="例：150">
+  </label>
+
+  <label class="field">
+    <span class="field-label">使用高さ(mm)</span>
+    <input type="number" id="productComponentHeight" placeholder="例：45">
+  </label>
+</div>
             <label class="field"><span class="field-label">顧客 / 案件名</span><input type="text" id="orderCustomer"></label>
             <label class="field"><span class="field-label">メモ</span><textarea id="orderMemo"></textarea></label>
           </div>
