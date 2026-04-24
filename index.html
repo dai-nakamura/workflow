@@ -1572,7 +1572,7 @@ function resolveComponentName(type, refId){
 
       renderProductComponents();
       closeProductComponentForm();
-    } function saveProductComponent() { const sourceType = els.productComponentSourceType.value, refId = els.productComponentRefSelect.value; const quantity = Number(els.productComponentQuantity.value || 0), unit = els.productComponentUnit.value.trim(); if (!refId) { alert('参照先を選択してください。'); return; } const item = { sourceType, refId, name: resolveComponentName(sourceType, refId), quantity, unit }; if (appState.editingProductComponentIndex === null) appState.currentProductComponents.unshift(item); else appState.currentProductComponents[appState.editingProductComponentIndex] = item; renderProductComponents(); closeProductComponentForm(); }
+    } 
     function renderProductComponents() {
       els.productComponentsList.innerHTML = '';
       if (!appState.currentProductComponents.length) {
@@ -1746,6 +1746,9 @@ function expandProduct(productId, multiplier, eventDate) {
 
       addRecipeNeed(component.refId, finalQty, component.unit, eventDate);
     }
+    else if (component.sourceType === 'material') {
+      addMaterialNeed(component.refId, qty, component.unit, eventDate);
+    }
     else if (component.sourceType === 'task') {
       addTaskNeed(component.refId, qty, component.unit, eventDate);
     }
@@ -1753,9 +1756,6 @@ function expandProduct(productId, multiplier, eventDate) {
       expandProduct(component.refId, qty, eventDate);
     }
   });
-}
-else if (component.sourceType === 'material') {
-  addMaterialNeed(component.refId, qty, component.unit, eventDate);
 }
       db.orderItems.forEach(order => {
         expandProduct(order.productId, Number(order.quantity || 0), order.date);
