@@ -889,15 +889,15 @@
                 <div class="micro-row" id="productComponentSizeRow">
                   <label class="field">
                     <span class="field-label">使用直径(mm)</span>
-                    <input type="number" id="productComponentDiameter" placeholder="例：150">
+                    <input type="number" id="orderDiameter" placeholder="例：150">
                   </label>
                   <label class="field">
                     <span class="field-label">使用高さ(mm)</span>
-                    <input type="number" id="productComponentHeight" placeholder="例：45">
+                    <input type="number" id="orderHeight" placeholder="例：45">
                   </label>
                 </div>
                 <label class="field"><span class="field-label">単位</span><input type="text"
-                    id="productComponentUnit"></label>
+                    id="orderUnit"></label>
               </div>
               <div class="inline-actions"><button class="btn btn-primary" type="button"
                   id="saveProductComponentBtn">保存</button><button class="btn btn-secondary" type="button"
@@ -932,7 +932,7 @@
 <div class="micro-row">
   <label class="field">
     <span class="field-label">数量</span>
-    <input type="number" id="productComponentQuantity" min="0" step="0.01" value="1">
+    <input type="number" id="orderQuantity" min="0" step="0.01" value="1">
   </label>
 
   <label class="field">
@@ -1580,8 +1580,8 @@ function resetRecipeEditor() {
     }
     function refreshOrderProductSelect() { els.orderProductSelect.innerHTML = ['<option value="">選択してください</option>'].concat(db.productMasters.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)).join(''); }
     function scaleRecipeBySize() {
-      const baseD = Number(els.recipeDiameter.value);
-      const baseH = Number(els.recipeHeight.value);
+      const baseD = Number(els.recipeBaseDiameter.value);
+      const baseH = Number(els.recipeBaseHeight.value);
       const targetD = Number(els.targetDiameter.value);
       const targetH = Number(els.targetHeight.value);
 
@@ -1606,8 +1606,8 @@ function resetRecipeEditor() {
       }
 
       // 変換後サイズを現在値として持たせる
-      els.recipeDiameter.value = targetD || '';
-      els.recipeHeight.value = targetH || h2 || '';
+      els.recipeBaseDiameter.value = targetD || '';
+      els.recipeBaseHeight.value = targetH || h2 || '';
       els.targetDiameter.value = '';
       els.targetHeight.value = '';
 
