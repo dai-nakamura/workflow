@@ -1603,9 +1603,33 @@ function resolveComponentName(type, refId){
         els.productComponentsList.appendChild(card);
       });
     } function handleProductComponentsListClick(e) {
-      const edit = e.target.closest('.edit-productcomponent-btn'); const del = e.target.closest('.delete-productcomponent-btn'); if (edit) { const idx = Number(edit.dataset.index); const item = appState.currentProductComponents[idx]; if (!item) return; appState.editingProductComponentIndex = idx; els.productComponentSourceType.value = item.sourceType; refreshProductComponentRefSelect(); els.productComponentRefSelect.value = item.refId || ''; els.productComponentQuantity.value = item.quantity ?? 1; els.productComponentUnit.value = item.unit || ''; els.productComponentFormCard.classList.remove('is-hidden'); } if (del) { appState.currentProductComponents.splice(Number(del.dataset.index), 1); renderProductComponents(); } els.productComponentDiameter.value = item.size?.diameter || '';
-      els.productComponentHeight.value = item.size?.height || '';
-    }
+  const edit = e.target.closest('.edit-productcomponent-btn');
+  const del = e.target.closest('.delete-productcomponent-btn');
+
+  if (edit) {
+    const idx = Number(edit.dataset.index);
+    const item = appState.currentProductComponents[idx];
+    if (!item) return;
+
+    appState.editingProductComponentIndex = idx;
+    els.productComponentSourceType.value = item.sourceType;
+    refreshProductComponentRefSelect();
+
+    els.productComponentRefSelect.value = item.refId || '';
+    els.productComponentQuantity.value = item.quantity ?? 1;
+    els.productComponentUnit.value = item.unit || '';
+    els.productComponentDiameter.value = item.size?.diameter || '';
+    els.productComponentHeight.value = item.size?.height || '';
+
+    els.productComponentFormCard.classList.remove('is-hidden');
+    return;
+  }
+
+  if (del) {
+    appState.currentProductComponents.splice(Number(del.dataset.index), 1);
+    renderProductComponents();
+  }
+}
     function saveProductMaster() { const name = els.productName.value.trim(); if (!name) { alert('商品名を入力してください。'); return; } const product = { id: appState.currentProductId || createId('product'), name, category: els.productCategory.value.trim(), unitLabel: els.productUnitLabel.value.trim(), components: deepCopy(appState.currentProductComponents), note: els.productNote.value.trim() }; const idx = db.productMasters.findIndex(x => x.id === product.id); if (idx === -1) db.productMasters.unshift(product); else db.productMasters[idx] = product; appState.currentProductId = product.id; refreshAll(); alert('商品を保存しました。'); }
     function loadProductMaster(id) { const product = findProduct(id); if (!product) return; appState.currentProductId = product.id; els.productName.value = product.name || ''; els.productCategory.value = product.category || ''; els.productUnitLabel.value = product.unitLabel || ''; els.productNote.value = product.note || ''; appState.currentProductComponents = deepCopy(product.components || []); renderProductComponents(); activateTab('products'); }
     function deleteProductMaster(id) { if (!confirm('この商品を削除しますか？')) return; db.productMasters = db.productMasters.filter(x => x.id !== id); if (appState.currentProductId === id) resetProductEditor(); refreshAll(); }
@@ -1838,7 +1862,12 @@ function loadScheduleCandidates() {
   appState.currentScheduleCandidates = [];
 
   targets.forEach(batch => {
-    (batch.flows || []).forEach((flow, index) => {
+    if (!batch.flows || !batch.flows.length) {
+      console.warn('このバッチには工程がありません:', batch.name);
+      return;
+    }
+
+    batch.flows.forEach((flow, index) => {
       appState.currentScheduleCandidates.push({
         id: createId('candidate'),
         batchId: batch.id,
@@ -1846,11 +1875,11 @@ function loadScheduleCandidates() {
         recipeId: batch.recipeId,
         recipeName: batch.recipeName,
         order: index,
-        title: flow.title,
+        title: flow.title || '工程',
         description: flow.description || '',
-        durationMinutes: flow.durationMinutes || 0,
+        durationMinutes: Number(flow.durationMinutes || 0),
         taskType: flow.type || 'other',
-        canParallel: !!flow.canParallel,
+        canParallel: flow.canParallel !== false,
         equipment: flow.equipment || '',
         eventDate: batch.date || getTodayString(),
         scheduledDate: batch.date || getTodayString(),
@@ -1863,6 +1892,10 @@ function loadScheduleCandidates() {
   });
 
   renderScheduleCandidates();
+
+  if (!appState.currentScheduleCandidates.length) {
+    alert('この製造バッチには工程が入っていません。元レシピに工程を登録してから、もう一度集計→製造バッチ作成してください。');
+  }
 }
     function renderScheduleCandidates() { els.scheduleCandidateList.innerHTML = ''; if (!appState.currentScheduleCandidates.length) { els.scheduleCandidateEmpty.classList.remove('is-hidden'); return; } els.scheduleCandidateEmpty.classList.add('is-hidden'); appState.currentScheduleCandidates.forEach(item => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(item.title)}</div><div class="record-sub">${escapeHtml(item.batchName)} / ${item.durationMinutes}分 / ${escapeHtml(item.taskType)}</div><div class="record-sub">設備: ${escapeHtml(item.equipment || '未設定')} / 並行: ${item.canParallel ? 'しやすい' : 'しにくい'} / 施工日 ${escapeHtml(item.eventDate || '-')}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline add-plan-step-btn" type="button" data-id="${item.id}">追加</button></div>`; els.scheduleCandidateList.appendChild(card); }); }
     function handleScheduleCandidateClick(e) { const add = e.target.closest('.add-plan-step-btn'); if (!add) return; const c = appState.currentScheduleCandidates.find(x => x.id === add.dataset.id); if (!c) return; appState.currentPlanSteps.push({ id: createId('planstep'), sourceType: 'batch', sourceId: c.batchId, title: c.title, recipeId: c.recipeId, recipeName: c.recipeName, batchId: c.batchId, batchName: c.batchName, scale: c.scale, durationMinutes: c.durationMinutes, taskType: c.taskType, equipment: c.equipment, canParallel: c.canParallel, eventDate: c.eventDate, scheduledDate: c.scheduledDate, status: 'planned', note: c.note, materialsSnapshot: deepCopy(c.materialsSnapshot || []) }); renderPlanSteps(); }
