@@ -1801,9 +1801,69 @@ materialTotals.forEach(item => {
 
     function renderBatchList() { els.batchCountBadge.textContent = `${db.productionBatches.length}件`; els.batchList.innerHTML = ''; if (!db.productionBatches.length) { els.batchList.innerHTML = '<div class="empty-box">まだ製造バッチがありません。</div>'; return; } db.productionBatches.forEach(batch => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(batch.name)}</div><div class="record-sub">${escapeHtml(batch.recipeName)} / 必要 ${round2(batch.requiredQuantity || 0)}${escapeHtml(batch.requiredUnit || '')}</div><div class="record-sub">施工日 ${escapeHtml(batch.date || '-')} / 倍率 ${batch.scale}倍</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline open-batch-btn" type="button" data-id="${batch.id}">詳細</button><button class="btn btn-secondary btn-inline use-batch-btn" type="button" data-id="${batch.id}">段取りへ</button><button class="btn btn-danger btn-inline delete-batch-btn" type="button" data-id="${batch.id}">削除</button></div>`; els.batchList.appendChild(card); }); }
     function showBatchDetail(id) { const batch = db.productionBatches.find(x => x.id === id); if (!batch) return; appState.currentBatchId = id; const materialsHtml = (batch.materials || []).length ? batch.materials.map(m => `<div class="record-sub">${escapeHtml(m.name)} : ${round2(m.scaledAmountValue)}${escapeHtml(m.amountUnit)}</div>`).join('') : '<div class="record-sub">材料なし</div>'; const flowsHtml = (batch.flows || []).length ? batch.flows.map(f => `<div class="record-sub">${escapeHtml(f.title)} / ${f.durationMinutes || 0}分 / ${escapeHtml(f.type || '')}</div>`).join('') : '<div class="record-sub">工程なし</div>'; els.batchDetailView.innerHTML = `<div class="stack-form"><div><strong>${escapeHtml(batch.name)}</strong></div><div class="record-sub">元レシピ: ${escapeHtml(batch.recipeName || '')}</div><div class="record-sub">施工日: ${escapeHtml(batch.date || '')}</div><div class="record-sub">必要数: ${round2(batch.requiredQuantity || 0)}${escapeHtml(batch.requiredUnit || '')}</div><div class="record-sub">倍率: ${batch.scale || 0}倍</div><div class="record-sub">メモ: ${escapeHtml(batch.memo || '')}</div><div><strong>再計算材料</strong><div>${materialsHtml}</div></div><div><strong>工程</strong><div>${flowsHtml}</div></div></div>`; }
-    function handleBatchListClick(e) { const open = e.target.closest('.open-batch-btn'); const use = e.target.closest('.use-batch-btn'); const del = e.target.closest('.delete-batch-btn'); if (open) { showBatchDetail(open.dataset.id); } if (use) { appState.currentBatchId = use.dataset.id; activateTab('schedule'); loadScheduleCandidates(); } if (del) { if (!confirm('このバッチを削除しますか？')) return; db.productionBatches = db.productionBatches.filter(x => x.id !== del.dataset.id); if (appState.currentBatchId === del.dataset.id) els.batchDetailView.innerHTML = 'バッチを選ぶと詳細がここに出ます。'; refreshAll(); } }
+function handleBatchListClick(e) {
+  const open = e.target.closest('.open-batch-btn');
+  const use = e.target.closest('.use-batch-btn');
+  const del = e.target.closest('.delete-batch-btn');
 
-    function loadScheduleCandidates() { const targets = appState.currentBatchId ? db.productionBatches.filter(b => b.id === appState.currentBatchId) : db.productionBatches; appState.currentScheduleCandidates = []; targets.forEach(batch => { (batch.flows || []).forEach((flow, index) => { appState.currentScheduleCandidates.push({ id: createId('candidate'), batchId: batch.id, batchName: batch.name, recipeId: batch.recipeId, recipeName: batch.recipeName, order: index, title: flow.title, description: flow.description, durationMinutes: flow.durationMinutes || 0, taskType: flow.type || 'other', canParallel: !!flow.canParallel, equipment: flow.equipment || '', eventDate: batch.date || getTodayString(), scheduledDate: batch.date || getTodayString(), status: 'planned', note: `倍率 ${batch.scale}倍`, materialsSnapshot: deepCopy(batch.materials || []), scale: batch.scale }); }); }); renderScheduleCandidates(); }
+  if (open) {
+    showBatchDetail(open.dataset.id);
+    return;
+  }
+
+  if (use) {
+    appState.currentBatchId = use.dataset.id;
+    loadScheduleCandidates();
+    activateTab('schedule');
+    return;
+  }
+
+  if (del) {
+    if (!confirm('このバッチを削除しますか？')) return;
+    db.productionBatches = db.productionBatches.filter(x => x.id !== del.dataset.id);
+
+    if (appState.currentBatchId === del.dataset.id) {
+      appState.currentBatchId = null;
+      els.batchDetailView.innerHTML = 'バッチを選ぶと詳細がここに出ます。';
+    }
+
+    refreshAll();
+  }
+}
+function loadScheduleCandidates() {
+  const targets = appState.currentBatchId
+    ? db.productionBatches.filter(b => b.id === appState.currentBatchId)
+    : db.productionBatches;
+
+  appState.currentScheduleCandidates = [];
+
+  targets.forEach(batch => {
+    (batch.flows || []).forEach((flow, index) => {
+      appState.currentScheduleCandidates.push({
+        id: createId('candidate'),
+        batchId: batch.id,
+        batchName: batch.name,
+        recipeId: batch.recipeId,
+        recipeName: batch.recipeName,
+        order: index,
+        title: flow.title,
+        description: flow.description || '',
+        durationMinutes: flow.durationMinutes || 0,
+        taskType: flow.type || 'other',
+        canParallel: !!flow.canParallel,
+        equipment: flow.equipment || '',
+        eventDate: batch.date || getTodayString(),
+        scheduledDate: batch.date || getTodayString(),
+        status: 'planned',
+        note: `倍率 ${batch.scale || 1}倍`,
+        materialsSnapshot: deepCopy(batch.materials || []),
+        scale: batch.scale || 1
+      });
+    });
+  });
+
+  renderScheduleCandidates();
+}
     function renderScheduleCandidates() { els.scheduleCandidateList.innerHTML = ''; if (!appState.currentScheduleCandidates.length) { els.scheduleCandidateEmpty.classList.remove('is-hidden'); return; } els.scheduleCandidateEmpty.classList.add('is-hidden'); appState.currentScheduleCandidates.forEach(item => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(item.title)}</div><div class="record-sub">${escapeHtml(item.batchName)} / ${item.durationMinutes}分 / ${escapeHtml(item.taskType)}</div><div class="record-sub">設備: ${escapeHtml(item.equipment || '未設定')} / 並行: ${item.canParallel ? 'しやすい' : 'しにくい'} / 施工日 ${escapeHtml(item.eventDate || '-')}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline add-plan-step-btn" type="button" data-id="${item.id}">追加</button></div>`; els.scheduleCandidateList.appendChild(card); }); }
     function handleScheduleCandidateClick(e) { const add = e.target.closest('.add-plan-step-btn'); if (!add) return; const c = appState.currentScheduleCandidates.find(x => x.id === add.dataset.id); if (!c) return; appState.currentPlanSteps.push({ id: createId('planstep'), sourceType: 'batch', sourceId: c.batchId, title: c.title, recipeId: c.recipeId, recipeName: c.recipeName, batchId: c.batchId, batchName: c.batchName, scale: c.scale, durationMinutes: c.durationMinutes, taskType: c.taskType, equipment: c.equipment, canParallel: c.canParallel, eventDate: c.eventDate, scheduledDate: c.scheduledDate, status: 'planned', note: c.note, materialsSnapshot: deepCopy(c.materialsSnapshot || []) }); renderPlanSteps(); }
     function resetPlanEditor() { appState.currentPlanId = null; appState.currentPlanSteps = []; els.planName.value = ''; els.planMemo.value = ''; renderPlanSteps(); }
