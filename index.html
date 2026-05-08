@@ -653,50 +653,9 @@
           class="tab-label">一覧</span></button>
     </div>
   </nav>
-<script src="./assets/js/utils.js"></script>
+  <script src="./assets/js/utils.js"></script>
+<script src="./assets/js/db.js"></script>
   <script>
-    const STORAGE_KEY = 'production_design_app_final_clean_v1';
-    let db = {
-      materialsMaster: [],
-      recipeMasters: [],
-      productMasters: [],
-      orders: [],
-      orderItems: [],
-      productionBatches: [],
-      taskMasters: [
-        { id: 'task_box_pack', name: '箱詰め', category: '包装', defaultDurationMinutes: 20, equipment: '作業台', canParallel: true, note: '' },
-        { id: 'task_finish_cake', name: 'ケーキ仕上げ', category: '仕上げ', defaultDurationMinutes: 30, equipment: '作業台', canParallel: false, note: '' },
-        { id: 'task_plating', name: '盛り付け', category: 'デセール', defaultDurationMinutes: 30, equipment: '作業台', canParallel: false, note: '' }
-      ],
-      schedulePlans: [],
-      planItems: [],
-      reservationOrders: [],
-      reservationOrderItems: []
-    };
-
-    let appState = {
-      currentMaterialMasterId: null,
-      currentRecipeId: null,
-      currentProductId: null,
-      currentOrderId: null,
-      currentBatchId: null,
-      editingRecipeMaterialIndex: null,
-      editingFlowIndex: null,
-      editingProductComponentIndex: null,
-      currentRecipeMaterials: [],
-      currentRecipeFlows: [],
-      currentProductComponents: [],
-      currentScheduleCandidates: [],
-      currentPlanId: null,
-      currentPlanSteps: [],
-      aggregateResult: {
-        recipeTotals: [],
-        taskTotals: [],
-        materialTotals: [],
-        unmatchedItems: []
-      },
-      pendingPlanStepIndex: null
-    };
 
     const els = {};
     [
@@ -753,10 +712,6 @@
       });
       return Array.from(map.values());
     }
-
-    function persistDb() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); els.storageStatus.textContent = '端末内保存中'; } catch (e) { console.error(e); els.storageStatus.textContent = '保存失敗'; } }
-    function loadDb() { try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return; const parsed = JSON.parse(raw); Object.keys(db).forEach(k => { if (Array.isArray(parsed[k])) db[k] = parsed[k]; }); } catch (e) { console.error(e); els.storageStatus.textContent = '保存読込エラー'; } }
-
     function activateTab(tabName) { document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('is-active', p.dataset.tab === tabName)); document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('is-active', b.dataset.tabTarget === tabName)); if (tabName === 'planner') renderPlanner(); }
     function updateEditingLabel() { const name = els.recipeName.value.trim(); els.currentEditingLabel.textContent = appState.currentRecipeId ? `編集中: ${name || '名称未入力'}` : `新規レシピ作成中${name ? `: ${name}` : ''}`; }
 
