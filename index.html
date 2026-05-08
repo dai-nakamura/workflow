@@ -442,7 +442,7 @@
       width: min(100%, 1100px);
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(9, minmax(78px, 1fr));
+      grid-template-columns: repeat(10, minmax(78px, 1fr));
       gap: 8px
     }
 
@@ -721,6 +721,13 @@
                 </select>
               </label>
             </div>
+            <label class="field">
+              <span class="field-label">基準形状</span>
+              <select id="recipeBaseShape">
+                <option value="round">丸</option>
+                <option value="rectangle">四角</option>
+              </select>
+            </label>
             <div class="micro-row">
               <label class="field">
                 <span class="field-label">基準直径(mm)</span>
@@ -731,6 +738,17 @@
                 <input type="number" id="recipeBaseHeight" placeholder="例：45">
               </label>
             </div>
+            <div class="micro-row is-hidden" id="recipeRectangleSizeRow">
+              <label class="field">
+                <span class="field-label">基準横幅（ｍｍ）</span>
+                <input type="number" id="recipeBaseWidth" placeholder="例：３００">
+              </label>
+              <label class="field">
+                <span class="field-label">基準奥行（ｍｍ）</span>
+                <input type="number" id="recipeBaseDepth" placeholder="例：４００">
+              </label>
+            </div>
+
 
             <div class="micro-row">
               <label class="field">
@@ -878,27 +896,44 @@
             <div class="stack-form">
               <label class="field"><span class="field-label">種類</span><select id="productComponentSourceType">
                   <option value="recipe">レシピ</option>
-                   <option value="material">材料</option>
                   <option value="product">商品</option>
                   <option value="task">作業</option>
                 </select></label>
               <label class="field"><span class="field-label">参照先</span><select
                   id="productComponentRefSelect"></select></label>
+              <label class="field"><span class="field-label">数量</span><input type="number" id="productComponentQuantity"
+                  min="0" step="0.01" value="1"></label>
               <div class="micro-row">
-                <label class="field"><span class="field-label">数量</span><input type="number"
-                    id="productComponentQuantity" min="0" step="0.01" value="1"></label>
+                <label class="field">
+                  <span class="field-label">使用形状</span>
+                  <select id="productComponentShape">
+                    <option value="round">丸</option>
+                    <option value="rectangle">四角</option>
+                  </select>
+                </label>
                 <div class="micro-row" id="productComponentSizeRow">
+
                   <label class="field">
                     <span class="field-label">使用直径(mm)</span>
-                    <input type="number" id="orderDiameter" placeholder="例：150">
+                    <input type="number" id="productComponentDiameter" placeholder="例：150">
                   </label>
                   <label class="field">
                     <span class="field-label">使用高さ(mm)</span>
-                    <input type="number" id="orderHeight" placeholder="例：45">
+                    <input type="number" id="productComponentHeight" placeholder="例：45">
                   </label>
+                  <div class="micro-row is-hidden" id="productComponentRectangleSizeRow">
+                    <label class="field">
+                      <span class="field-label">使用横幅</span>
+                      <input type="number" id="productComponentWidth" placeholder="例：３００">
+                    </label>
+                    <label class="field">
+                      <span class="field-label">使用奥行</span>
+                      <input type="number" id="productComponentDepth" placeholder="例：４００">
+                    </label>
+                  </div>
                 </div>
                 <label class="field"><span class="field-label">単位</span><input type="text"
-                    id="orderUnit"></label>
+                    id="productComponentUnit"></label>
               </div>
               <div class="inline-actions"><button class="btn btn-primary" type="button"
                   id="saveProductComponentBtn">保存</button><button class="btn btn-secondary" type="button"
@@ -930,29 +965,11 @@
           <div class="stack-form">
             <label class="field"><span class="field-label">施工日</span><input type="date" id="orderDate"></label>
             <label class="field"><span class="field-label">商品</span><select id="orderProductSelect"></select></label>
-<div class="micro-row">
-  <label class="field">
-    <span class="field-label">数量</span>
-    <input type="number" id="orderQuantity" min="0" step="0.01" value="1">
-  </label>
-
-  <label class="field">
-    <span class="field-label">単位</span>
-    <input type="text" id="productComponentUnit">
-  </label>
-</div>
-
-<div class="micro-row">
-  <label class="field">
-    <span class="field-label">使用直径(mm)</span>
-    <input type="number" id="productComponentDiameter" placeholder="例：150">
-  </label>
-
-  <label class="field">
-    <span class="field-label">使用高さ(mm)</span>
-    <input type="number" id="productComponentHeight" placeholder="例：45">
-  </label>
-</div>
+            <div class="micro-row">
+              <label class="field"><span class="field-label">数量</span><input type="number" id="orderQuantity" min="0"
+                  step="0.01" value="1"></label>
+              <label class="field"><span class="field-label">単位</span><input type="text" id="orderUnit"></label>
+            </div>
             <label class="field"><span class="field-label">顧客 / 案件名</span><input type="text" id="orderCustomer"></label>
             <label class="field"><span class="field-label">メモ</span><textarea id="orderMemo"></textarea></label>
           </div>
@@ -973,20 +990,66 @@
         </section>
       </div>
     </section>
+    <section class="tab-panel" data-tab="reservations">
+      <div class="layout-grid two-cols">
+
+        <section class="card">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">予約</p>
+              <h2>予約JSON読込</h2>
+            </div>
+          </div>
+
+          <div class="stack-form">
+            <label class="field">
+              <span class="field-label">予約JSON</span>
+              <textarea id="reservationJsonArea"></textarea>
+            </label>
+          </div>
+
+          <div class="sub-card">
+            <div class="inline-actions">
+              <button class="btn btn-primary" type="button" id="importReservationBtn">
+                予約JSON読込
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">一覧</p>
+              <h2>予約一覧</h2>
+            </div>
+
+            <span class="badge" id="reservationCountBadge">0件</span>
+          </div>
+
+          <div class="list" id="reservationList"></div>
+        </section>
+
+      </div>
+    </section>
 
     <section class="tab-panel" data-tab="aggregate">
       <div class="layout-grid">
         <section class="card">
           <div class="section-heading">
             <div>
-              <p class="section-kicker">集計</p>
+              集計 <p class="section-kicker"></p>
               <h2>必要数集計</h2>
             </div>
           </div>
           <div class="sub-card">
             <div class="inline-actions"><button class="btn btn-secondary" type="button"
                 id="runAggregateBtn">受注から集計</button><button class="btn btn-primary" type="button"
-                id="createBatchesFromAggregateBtn">集計結果から製造バッチ作成</button></div>
+                id="createBatchesFromAggregateBtn">集計結果から製造バッチ作成</button>
+              <button class="btn btn-secondary" type="button" id="createUnlinkedBatchesBtn">
+                未紐付け仮バッチ作成
+              </button>
+            </div>
           </div>
         </section>
         <section class="card">
@@ -998,16 +1061,6 @@
           </div>
           <div class="list" id="aggregateRecipeList"></div>
         </section>
-        <section class="card">
-  <div class="section-heading">
-    <div>
-      <p class="section-kicker">必要材料</p>
-      <h2>材料合計</h2>
-    </div>
-    <span class="badge" id="aggregateMaterialCountBadge">0件</span>
-  </div>
-  <div class="list" id="aggregateMaterialList"></div>
-</section>
         <section class="card">
           <div class="section-heading">
             <div>
@@ -1190,6 +1243,10 @@
           class="tab-label">商品</span></button>
       <button class="tab-btn" type="button" data-tab-target="orders"><span class="tab-icon">🧾</span><span
           class="tab-label">受注</span></button>
+      <button class="tab-btn" type="button" data-tab-target="reservations">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">予約</span>
+      </button>
       <button class="tab-btn" type="button" data-tab-target="aggregate"><span class="tab-icon">🧮</span><span
           class="tab-label">集計</span></button>
       <button class="tab-btn" type="button" data-tab-target="production"><span class="tab-icon">⚖️</span><span
@@ -1209,6 +1266,7 @@
       materialsMaster: [],
       recipeMasters: [],
       productMasters: [],
+      orders: [],
       orderItems: [],
       productionBatches: [],
       taskMasters: [
@@ -1217,7 +1275,9 @@
         { id: 'task_plating', name: '盛り付け', category: 'デセール', defaultDurationMinutes: 30, equipment: '作業台', canParallel: false, note: '' }
       ],
       schedulePlans: [],
-      planItems: []
+      planItems: [],
+      reservationOrders: [],
+      reservationOrderItems: []
     };
 
     let appState = {
@@ -1235,20 +1295,33 @@
       currentScheduleCandidates: [],
       currentPlanId: null,
       currentPlanSteps: [],
-      aggregateResult: { recipeTotals: [], taskTotals: [] },
+      aggregateResult: {
+        recipeTotals: [],
+        taskTotals: [],
+        materialTotals: [],
+        unmatchedItems: []
+      },
       pendingPlanStepIndex: null
     };
 
     const els = {};
     [
       'storageStatus', 'currentEditingLabel', 'matName', 'matBaseAmount', 'matBaseUnit', 'matBasePrice', 'matCategory', 'matSupplier', 'matNote', 'materialsMasterList', 'materialsMasterCountBadge',
-      'recipeName', 'recipeType', 'recipeDate', 'recipeOwner', 'recipeYieldQuantity', 'recipeYieldUnit', 'recipeYieldCustomField', 'recipeYieldCustomUnit', 'recipeMemo', 'recipeCostLabel', 'recipeMaterialsList', 'recipeMaterialsEmpty', 'recipeMaterialFormCard', 'recipeMaterialFilterCategory', 'recipeMaterialSelect', 'recipeMaterialAmountValue', 'recipeMaterialAmountUnit', 'recipeMaterialNote', 'flowList', 'flowEmpty', 'flowFormCard', 'flowTitle', 'flowDescription', 'flowDurationMinutes', 'flowType', 'flowCanParallel', 'flowEquipment', 'flowChecks', 'recipeMasterList', 'recipeCountBadge', 'recipeBaseDiameter', 'recipeBaseHeight', 'targetDiameter', 'targetHeight', 'scaleRecipeBtn',
+      'recipeName', 'recipeType', 'recipeDate', 'recipeOwner', 'recipeYieldQuantity', 'recipeYieldUnit', 'recipeYieldCustomField', 'recipeYieldCustomUnit', 'recipeMemo', 'recipeCostLabel', 'recipeMaterialsList', 'recipeMaterialsEmpty', 'recipeMaterialFormCard', 'recipeMaterialFilterCategory', 'recipeMaterialSelect', 'recipeMaterialAmountValue', 'recipeMaterialAmountUnit', 'recipeMaterialNote', 'flowList', 'flowEmpty', 'flowFormCard', 'flowTitle', 'flowDescription', 'flowDurationMinutes', 'flowType', 'flowCanParallel', 'flowEquipment', 'flowChecks', 'recipeMasterList', 'recipeCountBadge', 'recipeBaseDiameter', 'recipeBaseHeight',
+      'recipeBaseShape', 'recipeBaseWidth', 'recipeBaseDepth', 'recipeRoundSizeRow', 'recipeRectangleSizeRow', 'productConponent', 'productConponentShape', 'productConponentWidth', 'productConponentDepth', 'productConponentRoundSizeRow', 'productConponentRectangleSizeRow', 'targetDiameter', 'targetHeight', 'scaleRecipeBtn',
       'productName', 'productCategory', 'productUnitLabel', 'productNote', 'productComponentsList', 'productComponentsEmpty', 'productComponentFormCard', 'productComponentSourceType', 'productComponentRefSelect', 'productComponentQuantity', 'productComponentUnit', 'productList', 'productCountBadge', 'productComponentDiameter', 'productComponentHeight',
       'orderDate', 'orderProductSelect', 'orderQuantity', 'orderUnit', 'orderCustomer', 'orderMemo', 'orderList', 'orderCountBadge',
-      'aggregateRecipeList', 'aggregateTaskList', 'aggregateRecipeCountBadge', 'aggregateTaskCountBadge', 'aggregateMaterialList','aggregateMaterialCountBadge','batchList', 'batchCountBadge', 'batchDetailView',
+      'aggregateRecipeList', 'aggregateTaskList', 'aggregateRecipeCountBadge', 'aggregateTaskCountBadge', 'batchList', 'batchCountBadge', 'batchDetailView',
       'scheduleCandidateList', 'scheduleCandidateEmpty', 'planName', 'planMemo', 'planStepList', 'planStepEmpty', 'planList', 'planCountBadge',
       'plannerMode', 'plannerStartDate', 'plannerGrid', 'planItemCountBadge', 'buildPrintViewBtn', 'printPlannerBtn', 'printPlannerView',
-      'importJsonInput', 'jsonPasteArea', 'planAssignModal', 'assignMode', 'assignDaysField', 'assignDaysBefore', 'assignDateField', 'assignFixedDate'
+      'importJsonInput', 'jsonPasteArea', 'planAssignModal', 'assignMode', 'assignDaysField', 'assignDaysBefore', 'assignDateField', 'assignFixedDate', 'reservationJsonArea',
+      'reservationList',
+      'reservationCountBadge', 'importReservationBtn',
+      'productComponentShape',
+      'productComponentWidth',
+      'productComponentDepth',
+      'productComponentRectangleSizeRow',
+      'productComponentSizeRow',
     ].forEach(id => els[id] = document.getElementById(id));
 
     function getTodayString() { return toDateInput(new Date()); }
@@ -1268,6 +1341,20 @@
     function findRecipe(id) { return db.recipeMasters.find(r => r.id === id); }
     function findProduct(id) { return db.productMasters.find(p => p.id === id); }
     function findTask(id) { return db.taskMasters.find(t => t.id === id); }
+    function expandProduct(productId, multiplier = 1, eventDate = '', order = null) {
+  const product = findProduct(productId);
+  if (!product) return [];
+
+  return (product.components || []).map(component => ({
+    productId,
+    componentId: component.refId || '',
+    sourceType: component.sourceType || '',
+    quantity: Number(component.quantity || 0) * Number(multiplier || 1),
+    unit: component.unit || '',
+    eventDate,
+    order
+  }));
+}
     function unitCostFromMaterial(mat) { const amount = Number(mat.baseAmount || 0), price = Number(mat.basePrice || 0); return amount ? price / amount : 0; }
     function calculateRecipeCost(recipe) { let total = 0; (recipe.materials || []).forEach(m => { if (!m.materialId) return; const mat = db.materialsMaster.find(x => x.id === m.materialId); if (mat) total += unitCostFromMaterial(mat) * Number(m.amountValue || 0); }); return round2(total); }
     function mergeById(currentList, importedList, prefix) {
@@ -1317,6 +1404,8 @@
       els.productComponentsList.addEventListener('click', handleProductComponentsListClick);
 
       document.getElementById('saveOrderBtn').addEventListener('click', saveOrderItem);
+      document.getElementById('importReservationBtn')
+        .addEventListener('click', handleImportReservationJson);
       document.getElementById('newOrderBtn').addEventListener('click', resetOrderEditor);
       els.orderProductSelect.addEventListener('change', syncOrderUnitFromProduct);
       els.orderList.addEventListener('click', handleOrderListClick);
@@ -1342,70 +1431,18 @@
       document.getElementById('mergeJsonBtn').addEventListener('click', () => importJsonFromText('merge'));
       document.getElementById('replaceJsonBtn').addEventListener('click', () => importJsonFromText('replace'));
       document.getElementById('clearJsonPasteBtn').addEventListener('click', () => els.jsonPasteArea.value = '');
-
+      els.importReservationBtn.addEventListener('click', handleImportReservationJson);
       els.assignMode.addEventListener('change', renderAssignMode);
       document.getElementById('confirmAssignBtn').addEventListener('click', confirmAssignToPlanner);
       document.getElementById('cancelAssignBtn').addEventListener('click', closeAssignModal);
       document.getElementById('scaleRecipeBtn').addEventListener('click', scaleRecipeBySize);
       els.recipeYieldUnit.addEventListener('change', toggleRecipeYieldCustomField);
-      document.addEventListener('click', function(e) {
-  const openBatch = e.target.closest('.open-batch-btn');
-  if (openBatch) {
-    showBatchDetail(openBatch.dataset.id);
-    return;
-  }
-
-  const useBatch = e.target.closest('.use-batch-btn');
-  if (useBatch) {
-    appState.currentBatchId = useBatch.dataset.id;
-    activateTab('schedule');
-    loadScheduleCandidates();
-    return;
-  }
-
-  const addPlanStep = e.target.closest('.add-plan-step-btn');
-  if (addPlanStep) {
-    const c = appState.currentScheduleCandidates.find(x => x.id === addPlanStep.dataset.id);
-    if (!c) {
-      alert('追加する工程が見つかりません。もう一度「候補を読込」を押してください。');
-      return;
-    }
-
-    appState.currentPlanSteps.push({
-      id: createId('planstep'),
-      sourceType: 'batch',
-      sourceId: c.batchId,
-      title: c.title,
-      recipeId: c.recipeId,
-      recipeName: c.recipeName,
-      batchId: c.batchId,
-      batchName: c.batchName,
-      scale: c.scale,
-      durationMinutes: c.durationMinutes,
-      taskType: c.taskType,
-      equipment: c.equipment,
-      canParallel: c.canParallel,
-      eventDate: c.eventDate,
-      scheduledDate: c.scheduledDate,
-      status: 'planned',
-      note: c.note,
-      materialsSnapshot: deepCopy(c.materialsSnapshot || [])
-    });
-
-    renderPlanSteps();
-    alert('段取りに追加しました。');
-    return;
-  }
-
-  const sendPlanner = e.target.closest('.send-to-planner-btn');
-  if (sendPlanner) {
-    openAssignModal(Number(sendPlanner.dataset.index));
-    return;
-  }
-});
+      document.getElementById('createUnlinkBatchesFromOrderItems');
+      els.recipeBaseShape.addEventListener('change', toggleRecipeBaseSizeFields);
+      els.productComponentShape.addEventListener('change', toggleproductConponentSizeFields);
+      els.reservationList.addEventListener('change', handleReservationProductLinkChange);
 
     }
-
     function initialize() { loadDb(); bindEvents(); resetMaterialMasterEditor(); resetRecipeEditor(); resetProductEditor(); resetOrderEditor(); resetPlanEditor(); els.plannerStartDate.value = getTodayString(); refreshAll(); }
     function toggleRecipeYieldCustomField() {
       const isCustom = els.recipeYieldUnit.value === '自由入力';
@@ -1414,6 +1451,420 @@
         els.recipeYieldCustomUnit.value = '';
       }
     }
+    function toggleRecipeBaseSizeFields() {
+      const isRectangle = els.recipeBaseShape.value === 'rectangle';
+
+      if (els.recipeRoundSizeRow) {
+        els.recipeRoundSizeRow.classList.toggle('is-hidden', isRectangle);
+      }
+
+      if (els.recipeRectangleSizeRow) {
+        els.recipeRectangleSizeRow.classList.toggle('is-hidden', !isRectangle);
+      }
+    }
+    function toggleproductConponentSizeFields() {
+      const isRectangle = els.productComponentShape.value === 'rectangle';
+
+      if (els.productComponentSizeRow) {
+        // 今は全体は表示したまま
+      }
+
+      if (els.productComponentRectangleSizeRow) {
+        els.productComponentRectangleSizeRow.classList.toggle('is-hidden', !isRectangle);
+      }
+    }
+    function importReservationData(payload) {
+      db.reservationOrders = payload.orders || [];
+      db.reservationOrderItems = payload.orderItems || [];
+
+      refreshAll();
+      renderReservations();
+      alert('予約データを読み込みました。');
+    }
+    function handleImportReservationJson() {
+      const text = els.reservationJsonArea.value.trim();
+
+      if (!text) {
+        alert('予約JSONを貼り付けてください。');
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(text);
+
+        let payload;
+
+        if (Array.isArray(parsed)) {
+          payload = convertReservationAppOrdersToPayload(parsed);
+        } else if (Array.isArray(parsed.orders) && Array.isArray(parsed.orderItems)) {
+          payload = parsed;
+        } else if (Array.isArray(parsed.orders)) {
+          payload = convertReservationAppOrdersToPayload(parsed.orders);
+        } else {
+          alert('予約JSONの形式を判定できません。');
+          return;
+        }
+
+        importReservationData(payload);
+      } catch (e) {
+        console.error(e);
+        alert('JSONの形式が正しくありません。');
+      }
+    }
+    function convertReservationAppOrdersToPayload(reservationOrders) {
+      const orders = [];
+      const orderItems = [];
+
+      reservationOrders.forEach(order => {
+        const orderId = order.id || createId('resord');
+
+        orders.push({
+          id: orderId,
+          date: order.date || '',
+          customer: order.clientName || order.customer || '',
+          category: order.category || '',
+          venue: order.venue || '',
+          notes: order.orderNotes || order.notes || ''
+        });
+
+        (order.items || []).forEach(item => {
+          orderItems.push({
+            id: createId('resitem'),
+            orderId,
+            productId: '',
+            productName: item.name || item.productName || '',
+            quantity: Number(item.quantity || 1),
+            unit: item.type === '皿盛りデザート' ? '人前' : '点',
+            category: item.type || item.category || order.category || '',
+            size: item.size || item.squareSize || '',
+            multiSize: item.multiSize || '',
+            options: Array.isArray(item.options) ? item.options : [],
+            notes: [
+              item.notes || '',
+              item.plateMessage ? `プレート: ${item.plateMessage}` : '',
+              item.dessertCostNote ? `原価メモ: ${item.dessertCostNote}` : ''
+            ].filter(Boolean).join(' / ')
+          });
+        });
+      });
+
+      return { orders, orderItems };
+    }
+    function renderReservations() {
+      if (!els.reservationList) return;
+
+      els.reservationCountBadge.textContent = `${db.reservationOrders.length}件`;
+
+      if (!db.reservationOrders.length) {
+        els.reservationList.innerHTML =
+          '<div class="empty-box">予約データはまだありません。</div>';
+        return;
+      }
+
+      els.reservationList.innerHTML = db.reservationOrders.map(order => {
+        const items = db.reservationOrderItems.filter(
+          item => item.orderId === order.id
+        );
+
+        return `
+      <article class="item-card">
+
+        <div class="item-main">
+          <div class="item-title">
+            ${escapeHtml(order.customer || '名称未設定')}
+          </div>
+
+          <div class="record-sub">
+            ${escapeHtml(order.date || '')}
+            ${order.venue ? ' / ' + escapeHtml(order.venue) : ''}
+            ${order.category ? ' / ' + escapeHtml(order.category) : ''}
+          </div>
+
+          <div class="record-sub">
+            商品 ${items.length}件
+          </div>
+        </div>
+
+        <div class="list">
+          ${items.map(item => `
+            <div class="sub-card">
+
+              <div class="item-title">
+                ${escapeHtml(item.productName || '商品名未設定')}
+              </div>
+
+              <div class="record-sub">
+                ${Number(item.quantity || 1)}
+                ${escapeHtml(item.unit || '点')}
+
+                ${item.size
+            ? ' / ' + escapeHtml(item.size)
+            : ''}
+
+                ${item.multiSize
+            ? ' / ' + escapeHtml(item.multiSize)
+            : ''}
+
+                ${item.productId
+            ? ' / 紐付け済み'
+            : ' / 未紐付け'}
+              </div>
+
+              <label class="field" style="margin-top:10px;">
+                <span class="field-label">
+                  商品マスター紐付け
+                </span>
+
+                <select
+                  class="reservation-product-select"
+                  data-id="${item.id}">
+
+                  <option value="">
+                    未紐付け
+                  </option>
+
+                  ${db.productMasters.map(product => `
+                    <option
+                      value="${product.id}"
+                      ${item.productId === product.id ? 'selected' : ''}>
+
+                      ${escapeHtml(product.name)}
+
+                    </option>
+                  `).join('')}
+
+                </select>
+              </label>
+
+            </div>
+          `).join('')}
+        </div>
+
+        <div class="item-actions">
+<button
+  class="btn btn-primary btn-inline"
+  type="button"
+  onclick="sendReservationToProduction('${order.id}')">
+
+  製造へ送る
+
+</button>
+        </div>
+
+      </article>
+    `;
+      }).join('');
+    }
+    function handleReservationProductLinkChange(e) {
+      const select = e.target.closest('.reservation-product-select');
+      if (!select) return;
+
+      const itemId = select.dataset.id;
+      const productId = select.value;
+
+      const item = db.reservationOrderItems.find(x => x.id === itemId);
+      if (!item) return;
+
+      item.productId = productId;
+
+      const product = db.productMasters.find(p => p.id === productId);
+      if (product) {
+        item.productName = item.productName || product.name || '';
+        item.unit = item.unit || product.unitLabel || '点';
+      }
+
+      refreshAll();
+    }
+    function sendReservationToProduction(orderId) {
+      const order = db.reservationOrders.find(o => o.id === orderId);
+      if (!order) {
+        alert('予約が見つかりません。');
+        return;
+      }
+
+      const items = db.reservationOrderItems.filter(item => item.orderId === orderId);
+
+      if (!items.length) {
+        alert('この予約には商品がありません。');
+        return;
+      }
+
+      createBatchesFromReservation(order, items);
+
+      refreshAll();
+      activateTab('production');
+      alert('予約から製造バッチを作成しました。');
+    }
+    function createBatchesFromReservation(order, items) {
+      const exists = db.productionBatches.some(batch =>
+        batch.sourceType === 'reservation' &&
+        batch.sourceOrderId === order.id
+      );
+
+      if (exists) {
+        if (!confirm('この予約はすでに製造バッチ化されています。もう一度作成しますか？')) {
+          return;
+        }
+      }
+      items.forEach(item => {
+        if (item.productId) {
+          createReservationLinkedBatch(order, item);
+        } else {
+          createReservationTemporaryBatch(order, item);
+        }
+      });
+    }
+    function createReservationLinkedBatch(order, item) {
+      const product = db.productMasters.find(p => p.id === item.productId);
+
+      if (!product) {
+        createReservationTemporaryBatch(order, item);
+        return;
+      }
+
+      const quantity = Number(item.quantity || 1);
+
+      const batch = {
+        id: createId('batch'),
+        sourceType: 'reservation',
+        sourceOrderId: order.id,
+        sourceOrderItemId: item.id,
+
+        productId: product.id,
+        productName: product.name || item.productName || '',
+        title: product.name || item.productName || '',
+
+        quantity,
+        unit: item.unit || product.unitLabel || '点',
+
+        eventDate: order.date || '',
+        status: '未着手',
+        isTemporary: false,
+
+        recipeItems: [],
+        taskItems: [],
+
+        note: [
+          '予約由来',
+          order.customer ? `顧客: ${order.customer}` : '',
+          order.venue ? `会場: ${order.venue}` : '',
+          item.category ? `区分: ${item.category}` : '',
+          item.size ? `サイズ: ${item.size}` : '',
+          item.multiSize ? `複数サイズ: ${item.multiSize}` : '',
+          item.options?.length ? `オプション: ${item.options.join('、')}` : '',
+          item.notes || ''
+        ].filter(Boolean).join(' / ')
+      };
+
+      (product.components || []).forEach(component => {
+        const componentQuantity = Number(component.quantity || 1) * quantity;
+
+        if (component.sourceType === 'recipe') {
+          const recipe = db.recipeMasters.find(r => r.id === component.refId);
+
+          const sizeScale = recipe
+            ? calcReservationComponentSizeScale(recipe, component)
+            : 1;
+
+          const finalScale = componentQuantity * sizeScale;
+
+          batch.recipeItems.push({
+            recipeId: component.refId,
+            recipeName: recipe?.name || component.name || 'レシピ未設定',
+            quantity: componentQuantity,
+            unit: component.unit || recipe?.yieldUnit || '',
+            sizeScale,
+            scale: finalScale
+          });
+        }
+
+        if (component.sourceType === 'task') {
+          const task = db.taskMasters.find(t => t.id === component.refId);
+
+          batch.taskItems.push({
+            taskId: component.refId,
+            taskName: task?.name || component.name || '作業未設定',
+            quantity: componentQuantity,
+            durationMinutes: Number(task?.defaultDurationMinutes || 0) * componentQuantity,
+            equipment: task?.equipment || '',
+            canParallel: task?.canParallel ?? true
+          });
+        }
+      });
+
+      db.productionBatches.unshift(batch);
+    }
+    function calcReservationComponentSizeScale(recipe, component) {
+      if (!recipe || !component) return 1;
+
+      const baseShape = recipe.baseShape || 'round';
+      const targetShape = component.shape || baseShape;
+
+      // 四角
+      if (baseShape === 'rectangle' || targetShape === 'rectangle') {
+        const baseWidth = Number(recipe.baseWidth || 0);
+        const baseDepth = Number(recipe.baseDepth || 0);
+        const baseHeight = Number(recipe.baseHeight || 0);
+
+        const targetWidth = Number(component.width || 0);
+        const targetDepth = Number(component.depth || 0);
+        const targetHeight = Number(component.height || 0);
+
+        if (!baseWidth || !baseDepth || !baseHeight || !targetWidth || !targetDepth || !targetHeight) {
+          return 1;
+        }
+
+        return round2(
+          (targetWidth * targetDepth * targetHeight) /
+          (baseWidth * baseDepth * baseHeight)
+        );
+      }
+
+      // 丸
+      const baseDiameter = Number(recipe.baseDiameter || 0);
+      const baseHeight = Number(recipe.baseHeight || 0);
+      const targetDiameter = Number(component.diameter || 0);
+      const targetHeight = Number(component.height || 0);
+
+      if (!baseDiameter || !baseHeight || !targetDiameter || !targetHeight) {
+        return 1;
+      }
+
+      return round2(
+        (targetDiameter * targetDiameter * targetHeight) /
+        (baseDiameter * baseDiameter * baseHeight)
+      );
+    }
+    function createReservationTemporaryBatch(order, item) {
+      db.productionBatches.unshift({
+        id: createId('batch_tmp'),
+        sourceType: 'reservation',
+        sourceOrderId: order.id,
+        sourceOrderItemId: item.id,
+
+        productId: '',
+        productName: item.productName || '未紐付け商品',
+        title: item.productName || '未紐付け商品',
+
+        quantity: Number(item.quantity || 1),
+        unit: item.unit || '点',
+
+        eventDate: order.date || '',
+        status: '未紐付け',
+        isTemporary: true,
+
+        note: [
+          '予約由来の未紐付け仮バッチ',
+          order.customer ? `顧客: ${order.customer}` : '',
+          order.venue ? `会場: ${order.venue}` : '',
+          item.category ? `区分: ${item.category}` : '',
+          item.size ? `サイズ: ${item.size}` : '',
+          item.multiSize ? `複数サイズ: ${item.multiSize}` : '',
+          item.options?.length ? `オプション: ${item.options.join('、')}` : '',
+          item.notes || ''
+        ].filter(Boolean).join(' / ')
+      });
+    }
     function refreshAll() { renderMaterialsMasterList(); renderRecipeMaterials(); renderFlows(); renderRecipeMasterList(); renderProductComponents(); renderProductList(); renderOrderList(); renderAggregate(); renderBatchList(); renderScheduleCandidates(); renderPlanSteps(); renderPlanList(); renderPlanner(); refreshRecipeMaterialSelect(); refreshProductComponentRefSelect(); refreshOrderProductSelect(); updateRecipeCostLabel(); updateEditingLabel(); toggleRecipeYieldCustomField(); persistDb(); }
 
     function resetMaterialMasterEditor() { appState.currentMaterialMasterId = null; els.matName.value = ''; els.matBaseAmount.value = ''; els.matBaseUnit.value = 'g'; els.matBasePrice.value = ''; els.matCategory.value = ''; els.matSupplier.value = ''; els.matNote.value = ''; }
@@ -1421,35 +1872,41 @@
     function renderMaterialsMasterList() { els.materialsMasterCountBadge.textContent = `${db.materialsMaster.length}件`; els.materialsMasterList.innerHTML = ''; if (!db.materialsMaster.length) { els.materialsMasterList.innerHTML = '<div class="empty-box">まだ材料がありません。</div>'; return; } db.materialsMaster.forEach(mat => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(mat.name)}</div><div class="record-sub">${round2(mat.baseAmount)}${escapeHtml(mat.baseUnit)} / ¥${round2(mat.basePrice)}</div><div class="record-sub">単価: ¥${round2(unitCostFromMaterial(mat))} / ${escapeHtml(mat.baseUnit)}</div><div class="record-sub">${escapeHtml(mat.category || '')}${mat.supplier ? ' / ' + escapeHtml(mat.supplier) : ''}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline edit-matmaster-btn" type="button" data-id="${mat.id}">開く</button><button class="btn btn-danger btn-inline delete-matmaster-btn" type="button" data-id="${mat.id}">削除</button></div>`; els.materialsMasterList.appendChild(card); }); }
     function handleMaterialsMasterListClick(e) { const edit = e.target.closest('.edit-matmaster-btn'); const del = e.target.closest('.delete-matmaster-btn'); if (edit) { const mat = db.materialsMaster.find(x => x.id === edit.dataset.id); if (!mat) return; appState.currentMaterialMasterId = mat.id; els.matName.value = mat.name || ''; els.matBaseAmount.value = mat.baseAmount ?? ''; els.matBaseUnit.value = mat.baseUnit || 'g'; els.matBasePrice.value = mat.basePrice ?? ''; els.matCategory.value = mat.category || ''; els.matSupplier.value = mat.supplier || ''; els.matNote.value = mat.note || ''; } if (del) { if (!confirm('この材料を削除しますか？')) return; db.materialsMaster = db.materialsMaster.filter(x => x.id !== del.dataset.id); refreshAll(); } }
 
-function resetRecipeEditor() {
-  appState.currentRecipeId = null;
-  appState.currentRecipeMaterials = [];
-  appState.currentRecipeFlows = [];
-  appState.editingRecipeMaterialIndex = null;
-  appState.editingFlowIndex = null;
+    function resetRecipeEditor() {
+      appState.currentRecipeId = null;
+      appState.currentRecipeMaterials = [];
+      appState.currentRecipeFlows = [];
+      appState.editingRecipeMaterialIndex = null;
+      appState.editingFlowIndex = null;
 
-  els.recipeName.value = '';
-  els.recipeType.value = '試作';
-  els.recipeDate.value = getTodayString();
-  els.recipeOwner.value = '';
-  els.recipeYieldQuantity.value = '';
-  els.recipeYieldUnit.value = '個';
-  els.recipeMemo.value = '';
-  els.recipeYieldCustomUnit.value = '';
+      els.recipeName.value = '';
+      els.recipeType.value = '試作';
+      els.recipeDate.value = getTodayString();
+      els.recipeOwner.value = '';
+      els.recipeYieldQuantity.value = '';
+      els.recipeYieldUnit.value = '個';
+      els.recipeMemo.value = '';
+      els.recipeYieldCustomUnit.value = '';
 
-  els.recipeBaseDiameter.value = '';
-  els.recipeBaseHeight.value = '';
-  els.targetDiameter.value = '';
-  els.targetHeight.value = '';
+      els.recipeBaseShape.value = 'round';
+      els.recipeBaseDiameter.value = '';
+      els.recipeBaseWidth.value = '';
+      els.recipeBaseDepth.value = '';
+      els.recipeBaseHeight.value = '';
 
-  closeRecipeMaterialForm();
-  closeFlowForm();
-  renderRecipeMaterials();
-  renderFlows();
-  updateEditingLabel();
-  updateRecipeCostLabel();
-  toggleRecipeYieldCustomField();
-}
+      els.targetDiameter.value = '';
+      els.targetHeight.value = '';
+
+      renderReservations();
+      closeRecipeMaterialForm();
+      closeFlowForm();
+      renderRecipeMaterials();
+      renderFlows();
+      updateEditingLabel();
+      updateRecipeCostLabel();
+      toggleRecipeBaseSizeFields();
+      toggleRecipeYieldCustomField();
+    }
     function getRecipeMaterialCategories() { const set = new Set(); db.materialsMaster.forEach(m => { if (m.category) set.add(m.category); }); return Array.from(set).sort((a, b) => a.localeCompare(b, 'ja')); }
     function initRecipeMaterialFilter() { els.recipeMaterialFilterCategory.innerHTML = [`<option value="">すべて</option>`].concat(getRecipeMaterialCategories().map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`)).join(''); }
     function refreshRecipeMaterialSelect() { renderRecipeMaterialOptions(); }
@@ -1471,42 +1928,45 @@ function resetRecipeEditor() {
     function saveFlow() { const title = els.flowTitle.value.trim(); if (!title) { alert('工程名を入力してください。'); return; } const flow = { title, description: els.flowDescription.value.trim(), durationMinutes: Number(els.flowDurationMinutes.value || 0), type: els.flowType.value, canParallel: els.flowCanParallel.value === 'true', equipment: els.flowEquipment.value.trim(), checks: parseChecks(els.flowChecks.value) }; if (appState.editingFlowIndex === null) appState.currentRecipeFlows.unshift(flow); else appState.currentRecipeFlows[appState.editingFlowIndex] = flow; renderFlows(); closeFlowForm(); }
     function renderFlows() { els.flowList.innerHTML = ''; if (!appState.currentRecipeFlows.length) { els.flowEmpty.classList.remove('is-hidden'); return; } els.flowEmpty.classList.add('is-hidden'); appState.currentRecipeFlows.forEach((flow, index) => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(flow.title)}</div><div class="record-sub">${escapeHtml(flow.description || '説明なし')} / ${flow.durationMinutes || 0}分 / ${escapeHtml(flow.type)}</div><div class="record-sub">設備: ${escapeHtml(flow.equipment || '未設定')} / 並行: ${flow.canParallel ? 'しやすい' : 'しにくい'}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline edit-flow-btn" type="button" data-index="${index}">開く</button><button class="btn btn-danger btn-inline delete-flow-btn" type="button" data-index="${index}">削除</button></div>`; els.flowList.appendChild(card); }); }
     function handleFlowListClick(e) { const edit = e.target.closest('.edit-flow-btn'); const del = e.target.closest('.delete-flow-btn'); if (edit) { const idx = Number(edit.dataset.index); const flow = appState.currentRecipeFlows[idx]; if (!flow) return; appState.editingFlowIndex = idx; els.flowTitle.value = flow.title || ''; els.flowDescription.value = flow.description || ''; els.flowDurationMinutes.value = flow.durationMinutes ?? ''; els.flowType.value = flow.type || 'prep'; els.flowCanParallel.value = String(!!flow.canParallel); els.flowEquipment.value = flow.equipment || ''; els.flowChecks.value = (flow.checks || []).map(c => c.text).join('\n'); els.flowFormCard.classList.remove('is-hidden'); } if (del) { appState.currentRecipeFlows.splice(Number(del.dataset.index), 1); renderFlows(); } }
-   function saveRecipeMaster() {
-  const name = els.recipeName.value.trim();
-  if (!name) {
-    alert('レシピ名を入力してください。');
-    return;
-  }
+    function saveRecipeMaster() {
+      const name = els.recipeName.value.trim();
+      if (!name) {
+        alert('レシピ名を入力してください。');
+        return;
+      }
 
-  const recipe = {
-    id: appState.currentRecipeId || createId('recipe'),
-    name,
-    type: els.recipeType.value,
-    date: els.recipeDate.value,
-    owner: els.recipeOwner.value.trim(),
-    memo: els.recipeMemo.value.trim(),
-    yieldQuantity: Number(els.recipeYieldQuantity.value || 0),
-    yieldUnit: els.recipeYieldUnit.value === '自由入力'
-      ? (els.recipeYieldCustomUnit.value.trim() || '自由入力')
-      : els.recipeYieldUnit.value,
-    baseSize: {
-      diameter: Number(els.recipeBaseDiameter.value || 0),
-      height: Number(els.recipeBaseHeight.value || 0)
-    },
-    materials: deepCopy(appState.currentRecipeMaterials),
-    flows: deepCopy(appState.currentRecipeFlows),
-    updatedAt: new Date().toISOString()
-  };
+      const recipe = {
+        id: appState.currentRecipeId || createId('recipe'),
+        name,
+        type: els.recipeType.value,
+        date: els.recipeDate.value,
+        owner: els.recipeOwner.value.trim(),
+        memo: els.recipeMemo.value.trim(),
+        yieldQuantity: Number(els.recipeYieldQuantity.value || 0),
+        yieldUnit: els.recipeYieldUnit.value === '自由入力'
+          ? (els.recipeYieldCustomUnit.value.trim() || '自由入力')
+          : els.recipeYieldUnit.value,
+        baseSize: {
+          shape: elss.recipeBaseShape.value || 'round',
+          diameter: Number(els.recipeBaseDiameter.value || 0),
+          width: Number(els.recipeBaseWidth.value || 0),
+          depth: Number(els.recipeBaseDepth.value || 0),
+          height: Number(els.recipeBaseHeight.value || 0)
+        },
+        materials: deepCopy(appState.currentRecipeMaterials),
+        flows: deepCopy(appState.currentRecipeFlows),
+        updatedAt: new Date().toISOString()
+      };
 
-  const idx = db.recipeMasters.findIndex(x => x.id === recipe.id);
-  if (idx === -1) db.recipeMasters.unshift(recipe);
-  else db.recipeMasters[idx] = recipe;
+      const idx = db.recipeMasters.findIndex(x => x.id === recipe.id);
+      if (idx === -1) db.recipeMasters.unshift(recipe);
+      else db.recipeMasters[idx] = recipe;
 
-  appState.currentRecipeId = recipe.id;
-  refreshAll();
-  alert('レシピを保存しました。');
-}
-     function loadRecipeMaster(id) {
+      appState.currentRecipeId = recipe.id;
+      refreshAll();
+      alert('レシピを保存しました。');
+    }
+    function loadRecipeMaster(id) {
       const recipe = findRecipe(id);
       if (!recipe) return;
 
@@ -1529,9 +1989,13 @@ function resetRecipeEditor() {
 
       els.recipeBaseDiameter.value = recipe.baseSize?.diameter || '';
       els.recipeBaseHeight.value = recipe.baseSize?.height || '';
+      els.recipeBaseWidth.value = recipe.baseSize?.width || '';
+      els.recipeBaseDepth.value = recipe.baseSize?.depth || '';
+      els.recipeBaseHeight.value = recipe.baseSize?.height || '';
       els.targetDiameter.value = '';
       els.targetHeight.value = '';
 
+      toggleRecipeBaseSizeFields();
       toggleRecipeYieldCustomField();
 
       appState.currentRecipeMaterials = deepCopy(recipe.materials || []);
@@ -1549,38 +2013,7 @@ function resetRecipeEditor() {
     function updateRecipeCostLabel() { els.recipeCostLabel.textContent = `原価: ¥${calculateRecipeCost({ materials: appState.currentRecipeMaterials })}`; }
 
     function resetProductEditor() { appState.currentProductId = null; appState.currentProductComponents = []; appState.editingProductComponentIndex = null; els.productName.value = ''; els.productCategory.value = ''; els.productUnitLabel.value = ''; els.productNote.value = ''; closeProductComponentForm(); renderProductComponents(); }
-function refreshProductComponentRefSelect(){
-  const type = els.productComponentSourceType.value;
-  let options = ['<option value="">選択してください</option>'];
-
-  if(type === 'recipe'){
-    options = options.concat(
-      db.recipeMasters.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)
-    );
-  }
-
-  if(type === 'material'){
-    options = options.concat(
-      db.materialsMaster.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)
-    );
-  }
-
-  if(type === 'product'){
-    options = options.concat(
-      db.productMasters
-        .filter(x => x.id !== appState.currentProductId)
-        .map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)
-    );
-  }
-
-  if(type === 'task'){
-    options = options.concat(
-      db.taskMasters.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)
-    );
-  }
-
-  els.productComponentRefSelect.innerHTML = options.join('');
-}
+    function refreshProductComponentRefSelect() { const type = els.productComponentSourceType.value; let options = ['<option value="">選択してください</option>']; if (type === 'recipe') options = options.concat(db.recipeMasters.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)); if (type === 'product') options = options.concat(db.productMasters.filter(x => x.id !== appState.currentProductId).map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)); if (type === 'task') options = options.concat(db.taskMasters.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)); els.productComponentRefSelect.innerHTML = options.join(''); }
     function openAddProductComponentForm() {
       appState.editingProductComponentIndex = null; els.productComponentSourceType.value = 'recipe'; refreshProductComponentRefSelect(); els.productComponentRefSelect.value = ''; els.productComponentQuantity.value = '1'; els.productComponentUnit.value = ''; els.productComponentFormCard.classList.remove('is-hidden'); els.productComponentDiameter.value = '';
       els.productComponentHeight.value = '';
@@ -1589,13 +2022,7 @@ function refreshProductComponentRefSelect(){
       els.productComponentFormCard.classList.add('is-hidden'); appState.editingProductComponentIndex = null; els.productComponentDiameter.value = '';
       els.productComponentHeight.value = '';
     }
-function resolveComponentName(type, refId){
-  if(type === 'recipe') return findRecipe(refId)?.name || '';
-  if(type === 'product') return findProduct(refId)?.name || '';
-  if(type === 'task') return findTask(refId)?.name || '';
-  if(type === 'material') return db.materialsMaster.find(m => m.id === refId)?.name || '';
-  return '';
-}
+    function resolveComponentName(type, refId) { if (type === 'recipe') return findRecipe(refId)?.name || ''; if (type === 'product') return findProduct(refId)?.name || ''; if (type === 'task') return findTask(refId)?.name || ''; return ''; }
     function saveProductComponent() {
       const sourceType = els.productComponentSourceType.value;
       const refId = els.productComponentRefSelect.value;
@@ -1614,8 +2041,11 @@ function resolveComponentName(type, refId){
         quantity,
         unit,
         size: {
+          shape: els.productComponentshape.value || 'round',
           diameter: Number(els.productComponentDiameter.value || 0),
-          height: Number(els.productComponentHeight.value || 0)
+          width: Number(els.productComponentwidth.value || 0),
+          depth: Number(els.productComponentdepth.value || 0),
+          height: Number(els.productComponentheight.value || 0)
         }
       };
 
@@ -1627,7 +2057,7 @@ function resolveComponentName(type, refId){
 
       renderProductComponents();
       closeProductComponentForm();
-    } 
+    } function saveProductComponent() { const sourceType = els.productComponentSourceType.value, refId = els.productComponentRefSelect.value; const quantity = Number(els.productComponentQuantity.value || 0), unit = els.productComponentUnit.value.trim(); if (!refId) { alert('参照先を選択してください。'); return; } const item = { sourceType, refId, name: resolveComponentName(sourceType, refId), quantity, unit }; if (appState.editingProductComponentIndex === null) appState.currentProductComponents.unshift(item); else appState.currentProductComponents[appState.editingProductComponentIndex] = item; renderProductComponents(); closeProductComponentForm(); }
     function renderProductComponents() {
       els.productComponentsList.innerHTML = '';
       if (!appState.currentProductComponents.length) {
@@ -1658,57 +2088,37 @@ function resolveComponentName(type, refId){
         els.productComponentsList.appendChild(card);
       });
     } function handleProductComponentsListClick(e) {
-  const edit = e.target.closest('.edit-productcomponent-btn');
-  const del = e.target.closest('.delete-productcomponent-btn');
-
-  if (edit) {
-    const idx = Number(edit.dataset.index);
-    const item = appState.currentProductComponents[idx];
-    if (!item) return;
-
-    appState.editingProductComponentIndex = idx;
-    els.productComponentSourceType.value = item.sourceType;
-    refreshProductComponentRefSelect();
-
-    els.productComponentRefSelect.value = item.refId || '';
-    els.productComponentQuantity.value = item.quantity ?? 1;
-    els.productComponentUnit.value = item.unit || '';
-    els.productComponentDiameter.value = item.size?.diameter || '';
-    els.productComponentHeight.value = item.size?.height || '';
-
-    els.productComponentFormCard.classList.remove('is-hidden');
-    return;
-  }
-
-  if (del) {
-    appState.currentProductComponents.splice(Number(del.dataset.index), 1);
-    renderProductComponents();
-  }
-}
+      const edit = e.target.closest('.edit-productcomponent-btn'); const del = e.target.closest('.delete-productcomponent-btn'); if (edit) { const idx = Number(edit.dataset.index); const item = appState.currentProductComponents[idx]; if (!item) return; appState.editingProductComponentIndex = idx; els.productComponentSourceType.value = item.sourceType; refreshProductComponentRefSelect(); els.productComponentRefSelect.value = item.refId || ''; els.productComponentQuantity.value = item.quantity ?? 1; els.productComponentUnit.value = item.unit || ''; els.productComponentFormCard.classList.remove('is-hidden'); } if (del) { appState.currentProductComponents.splice(Number(del.dataset.index), 1); renderProductComponents(); } els.productComponentDiameter.value = item.size?.diameter || '';
+      els.productComponentHeight.value = item.size?.height || '';
+    }
     function saveProductMaster() { const name = els.productName.value.trim(); if (!name) { alert('商品名を入力してください。'); return; } const product = { id: appState.currentProductId || createId('product'), name, category: els.productCategory.value.trim(), unitLabel: els.productUnitLabel.value.trim(), components: deepCopy(appState.currentProductComponents), note: els.productNote.value.trim() }; const idx = db.productMasters.findIndex(x => x.id === product.id); if (idx === -1) db.productMasters.unshift(product); else db.productMasters[idx] = product; appState.currentProductId = product.id; refreshAll(); alert('商品を保存しました。'); }
     function loadProductMaster(id) { const product = findProduct(id); if (!product) return; appState.currentProductId = product.id; els.productName.value = product.name || ''; els.productCategory.value = product.category || ''; els.productUnitLabel.value = product.unitLabel || ''; els.productNote.value = product.note || ''; appState.currentProductComponents = deepCopy(product.components || []); renderProductComponents(); activateTab('products'); }
     function deleteProductMaster(id) { if (!confirm('この商品を削除しますか？')) return; db.productMasters = db.productMasters.filter(x => x.id !== id); if (appState.currentProductId === id) resetProductEditor(); refreshAll(); }
     function renderProductList() { els.productCountBadge.textContent = `${db.productMasters.length}件`; els.productList.innerHTML = ''; if (!db.productMasters.length) { els.productList.innerHTML = '<div class="empty-box">まだ商品がありません。</div>'; return; } db.productMasters.forEach(product => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(product.name)}</div><div class="record-sub">${escapeHtml(product.category || '')} / 単位: ${escapeHtml(product.unitLabel || '')}</div><div class="record-sub">構成 ${product.components?.length || 0}件</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-product-btn" type="button" data-id="${product.id}">開く</button><button class="btn btn-danger btn-inline delete-product-btn" type="button" data-id="${product.id}">削除</button></div>`; els.productList.appendChild(card); }); }
     function handleProductListClick(e) { const load = e.target.closest('.load-product-btn'); const del = e.target.closest('.delete-product-btn'); if (load) loadProductMaster(load.dataset.id); if (del) deleteProductMaster(del.dataset.id); }
     function calcSizeScale(baseSize, targetSize) {
-      const baseD = Number(baseSize?.diameter || 0);
-      const baseH = Number(baseSize?.height || 0);
-      const targetD = Number(targetSize?.diameter || 0);
-      const targetH = Number(targetSize?.height || 0);
+      const shape = targetSize?.shape || baseSize?.shape || 'round';
 
-      if (!baseD || !targetD) {
-        return 1;
+      if (shape === 'rectangle') {
+        const baseW = Number(baseSize?.width || 0);
+        const baseD = Number(baseSize?.depth || 0);
+        const targetW = Number(targetSize?.width || 0);
+        const targetD = Number(targetSize?.depth || 0);
+
+        if (!baseW || !baseD || !targetW || !targetD) return 1;
+        return (targetW * targetD * targetH) / (baseW * baseD * baseH);
       }
 
-      const h1 = baseH || 1;
-      const h2 = targetH || h1;
+      const baseDiameter = Number(baseSize?.diameter || 0);
+      const targetDiameter = Number(baseSize?.diameter || 0);
 
-      return (targetD / baseD) ** 2 * (h2 / h1);
+      if (!baseDiameter || !targetDiameter) return 1;
+      return (targetDiameter / baseDiameter) ** 2 * (targetH / baseH);
     }
     function refreshOrderProductSelect() { els.orderProductSelect.innerHTML = ['<option value="">選択してください</option>'].concat(db.productMasters.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)).join(''); }
     function scaleRecipeBySize() {
-      const baseD = Number(els.recipeBaseDiameter.value);
-      const baseH = Number(els.recipeBaseHeight.value);
+      const baseD = Number(els.recipeDiameter.value);
+      const baseH = Number(els.recipeHeight.value);
       const targetD = Number(els.targetDiameter.value);
       const targetH = Number(els.targetHeight.value);
 
@@ -1733,8 +2143,8 @@ function resolveComponentName(type, refId){
       }
 
       // 変換後サイズを現在値として持たせる
-      els.recipeBaseDiameter.value = targetD || '';
-      els.recipeBaseHeight.value = targetH || h2 || '';
+      els.recipeDiameter.value = targetD || '';
+      els.recipeHeight.value = targetH || h2 || '';
       els.targetDiameter.value = '';
       els.targetHeight.value = '';
 
@@ -1746,31 +2156,52 @@ function resolveComponentName(type, refId){
     function syncOrderUnitFromProduct() { const p = findProduct(els.orderProductSelect.value); els.orderUnit.value = p?.unitLabel || ''; }
     function resetOrderEditor() { appState.currentOrderId = null; els.orderDate.value = getTodayString(); els.orderProductSelect.value = ''; els.orderQuantity.value = '1'; els.orderUnit.value = ''; els.orderCustomer.value = ''; els.orderMemo.value = ''; }
     function saveOrderItem() { const productId = els.orderProductSelect.value, product = findProduct(productId); if (!product) { alert('商品を選択してください。'); return; } const item = { id: appState.currentOrderId || createId('order'), date: els.orderDate.value || getTodayString(), productId, productName: product.name, quantity: Number(els.orderQuantity.value || 0), unit: els.orderUnit.value.trim() || product.unitLabel || '', customer: els.orderCustomer.value.trim(), memo: els.orderMemo.value.trim() }; const idx = db.orderItems.findIndex(x => x.id === item.id); if (idx === -1) db.orderItems.unshift(item); else db.orderItems[idx] = item; appState.currentOrderId = item.id; refreshAll(); alert('受注を保存しました。'); }
-    function renderOrderList() { els.orderCountBadge.textContent = `${db.orderItems.length}件`; els.orderList.innerHTML = ''; if (!db.orderItems.length) { els.orderList.innerHTML = '<div class="empty-box">まだ受注がありません。</div>'; return; } db.orderItems.forEach(order => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(order.productName)}</div><div class="record-sub">施工日 ${escapeHtml(order.date)} / ${round2(order.quantity)}${escapeHtml(order.unit)}</div><div class="record-sub">${escapeHtml(order.customer || '')}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-order-btn" type="button" data-id="${order.id}">開く</button><button class="btn btn-danger btn-inline delete-order-btn" type="button" data-id="${order.id}">削除</button></div>`; els.orderList.appendChild(card); }); }
+    function renderOrderList() {
+      els.orderCountBadge.textContent = `${db.orderItems.length}件`; els.orderList.innerHTML = ''; if (!db.orderItems.length) { els.orderList.innerHTML = '<div class="empty-box">まだ受注がありません。</div>'; return; } db.orderItems.forEach(order => {
+        expandProduct(
+          order.productId,
+          Number(order.quantity || 0),
+          order.date,
+          order
+        );
+      });
+    }
     function handleOrderListClick(e) { const load = e.target.closest('.load-order-btn'); const del = e.target.closest('.delete-order-btn'); if (load) { const order = db.orderItems.find(x => x.id === load.dataset.id); if (!order) return; appState.currentOrderId = order.id; els.orderDate.value = order.date || getTodayString(); els.orderProductSelect.value = order.productId || ''; els.orderQuantity.value = order.quantity ?? 1; els.orderUnit.value = order.unit || ''; els.orderCustomer.value = order.customer || ''; els.orderMemo.value = order.memo || ''; activateTab('orders'); } if (del) { if (!confirm('この受注を削除しますか？')) return; db.orderItems = db.orderItems.filter(x => x.id !== del.dataset.id); refreshAll(); } }
+    function findProductForOrderItem(order) {
+      if (order.productId) {
+        return findProduct(order.productId);
+      }
 
+      if (order.productName) {
+        return db.productMasters.find(p => p.name === order.productName) || null;
+      }
+
+      return null;
+    }
     function aggregateOrderItems() {
       const recipeMap = new Map();
       const taskMap = new Map();
-  const materialMap = new Map();
-  function addMaterialNeed(materialId, count, unit, eventDate){
-  const mat = db.materialsMaster.find(m => m.id === materialId);
-  if(!mat) return;
+      const materialMap = new Map();
+      const unmatchedItems = [];
+      function addMaterialNeed(materialId, count, unit, eventDate) {
+        const mat = db.materialsMaster.find(m => m.id === materialId);
+        if (!mat) return;
 
-  const cur = materialMap.get(materialId) || {
-    materialId,
-    materialName: mat.name,
-    requiredQuantity: 0,
-    unit: unit || mat.baseUnit || '',
-    eventDate
-  };
+        const cur = materialMap.get(materialId) || {
+          materialId,
+          materialName: mat.name,
+          requiredQuantity: 0,
+          unit: unit || mat.baseUnit || '',
+          eventDate
+        };
 
-  cur.requiredQuantity += Number(count || 0);
-  if(eventDate) cur.eventDate = eventDate;
+        cur.requiredQuantity += Number(count || 0);
+        if (eventDate) cur.eventDate = eventDate;
 
-  materialMap.set(materialId, cur);
-}
-      function addRecipeNeed(recipeId, neededQty, neededUnit, eventDate) {
+        materialMap.set(materialId, cur);
+      }
+
+      function addRecipeNeed(recipeId, neededQty, neededUnit, eventDate, order) {
         const recipe = findRecipe(recipeId);
         if (!recipe) return;
 
@@ -1781,15 +2212,26 @@ function resolveComponentName(type, refId){
           requiredUnit: neededUnit || recipe.yieldUnit || '',
           yieldQuantity: Number(recipe.yieldQuantity || 0),
           yieldUnit: recipe.yieldUnit || '',
-          eventDate
+          eventDate,
+          sourceOrders: []
         };
 
         cur.requiredQuantity += Number(neededQty || 0);
         if (eventDate) cur.eventDate = eventDate;
+
+        if (order) {
+          cur.sourceOrders.push({
+            orderId: order.id,
+            customer: order.customer || '',
+            date: order.date || '',
+            productName: order.productName || ''
+          });
+        }
+
         recipeMap.set(recipeId, cur);
       }
 
-      function addTaskNeed(taskId, count, unit, eventDate) {
+      function addTaskNeed(taskId, count, unit, eventDate, order) {
         const task = findTask(taskId);
         if (!task) return;
 
@@ -1801,43 +2243,77 @@ function resolveComponentName(type, refId){
           defaultDurationMinutes: task.defaultDurationMinutes || 0,
           equipment: task.equipment || '',
           canParallel: !!task.canParallel,
-          eventDate
+          eventDate,
+          sourceOrders: []
         };
 
         cur.requiredCount += Number(count || 0);
         if (eventDate) cur.eventDate = eventDate;
+
+        if (order) {
+          cur.sourceOrders.push({
+            orderId: order.id,
+            customer: order.customer || '',
+            date: order.date || '',
+            productName: order.productName || ''
+          });
+        }
+
         taskMap.set(taskId, cur);
       }
 
-function expandProduct(productId, multiplier, eventDate) {
-  const product = findProduct(productId);
-  if (!product) return;
+      function expandProduct(productId, multiplier, eventDate, order) {
+        const product = findProduct(productId);
+        if (!product) return;
 
-  (product.components || []).forEach(component => {
-    const qty = Number(component.quantity || 0) * Number(multiplier || 0);
+        (product.components || []).forEach(component => {
+          const qty = Number(component.quantity || 0) * Number(multiplier || 0);
 
-    if (component.sourceType === 'recipe') {
-      const recipe = findRecipe(component.refId);
-      if (!recipe) return;
+          if (component.sourceType === 'recipe') {
+            const recipe = findRecipe(component.refId);
+            if (!recipe) return;
 
-      const sizeScale = calcSizeScale(recipe.baseSize, component.size);
-      const finalQty = qty * sizeScale;
+            const sizeScale = calcSizeScale(recipe.baseSize, component.size);
+            const finalQty = qty * sizeScale;
 
-      addRecipeNeed(component.refId, finalQty, component.unit, eventDate);
-    }
-    else if (component.sourceType === 'material') {
-      addMaterialNeed(component.refId, qty, component.unit, eventDate);
-    }
-    else if (component.sourceType === 'task') {
-      addTaskNeed(component.refId, qty, component.unit, eventDate);
-    }
-    else if (component.sourceType === 'product') {
-      expandProduct(component.refId, qty, eventDate);
-    }
-  });
-}
+            addRecipeNeed(component.refId, finalQty, component.unit, eventDate, order);
+          }
+          else if (component.sourceType === 'material') {
+            addMaterialNeed(component.refId, qty, component.unit, eventDate);
+          }
+          else if (component.sourceType === 'task') {
+            addTaskNeed(component.refId, qty, component.unit, eventDate, order);
+          }
+          else if (component.sourceType === 'product') {
+            expandProduct(component.refId, qty, eventDate, order);
+          }
+        });
+      }
+
       db.orderItems.forEach(order => {
-        expandProduct(order.productId, Number(order.quantity || 0), order.date);
+        const product = findProductForOrderItem(order);
+
+        if (product) {
+          expandProduct(
+            product.id,
+            Number(order.quantity || 0),
+            order.date,
+            order
+          );
+          return;
+        }
+
+        unmatchedItems.push({
+          orderId: order.id || '',
+          sourceOrderId: order.sourceOrderId || '',
+          sourceOrderItemId: order.sourceOrderItemId || '',
+          productName: order.productName || '商品名なし',
+          quantity: Number(order.quantity || 0),
+          unit: order.unit || '点',
+          date: order.date || '',
+          customer: order.customer || '',
+          memo: order.memo || order.notes || ''
+        });
       });
 
       return {
@@ -1848,113 +2324,399 @@ function expandProduct(productId, multiplier, eventDate) {
             : 0
         })),
         taskTotals: Array.from(taskMap.values()),
-        materialTotals: Array.from(materialMap.values())
+        materialTotals: Array.from(materialMap.values()),
+        unmatchedItems
       };
     }
     function runAggregate() { appState.aggregateResult = aggregateOrderItems(); renderAggregate(); alert('集計しました。'); }
-    function renderAggregate() { const recipeTotals = appState.aggregateResult.recipeTotals || [], taskTotals = appState.aggregateResult.taskTotals || []; els.aggregateRecipeCountBadge.textContent = `${recipeTotals.length}件`; els.aggregateTaskCountBadge.textContent = `${taskTotals.length}件`; els.aggregateRecipeList.innerHTML = recipeTotals.length ? '' : '<div class="empty-box">まだ集計していません。</div>'; recipeTotals.forEach(item => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(item.recipeName)}</div><div class="record-sub">必要数: ${round2(item.requiredQuantity)}${escapeHtml(item.requiredUnit)}</div><div class="record-sub">出来高: ${round2(item.yieldQuantity || 0)}${escapeHtml(item.yieldUnit)}</div><div class="record-sub">必要倍率: ${item.requiredScale}倍 / 施工日 ${escapeHtml(item.eventDate || '-')}</div></div>`; els.aggregateRecipeList.appendChild(card); }); els.aggregateTaskList.innerHTML = taskTotals.length ? '' : '<div class="empty-box">必要作業はまだありません。</div>'; taskTotals.forEach(item => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(item.taskName)}</div><div class="record-sub">必要数: ${round2(item.requiredCount)}${escapeHtml(item.unit)}</div><div class="record-sub">所要時間目安: ${item.defaultDurationMinutes}分 / 設備: ${escapeHtml(item.equipment || '未設定')} / 施工日 ${escapeHtml(item.eventDate || '-')}</div></div>`; els.aggregateTaskList.appendChild(card); }); const materialTotals = appState.aggregateResult.materialTotals || [];
+    function renderAggregate() {
+      const recipeTotals = appState.aggregateResult.recipeTotals || [], taskTotals = appState.aggregateResult.taskTotals || []; els.aggregateRecipeCountBadge.textContent = `${recipeTotals.length}件`; els.aggregateTaskCountBadge.textContent = `${taskTotals.length}件`; els.aggregateRecipeList.innerHTML = recipeTotals.length ? '' : '<div class="empty-box">まだ集計していません。</div>'; recipeTotals.forEach(item => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(item.recipeName)}</div><div class="record-sub">必要数: ${round2(item.requiredQuantity)}${escapeHtml(item.requiredUnit)}</div><div class="record-sub">出来高: ${round2(item.yieldQuantity || 0)}${escapeHtml(item.yieldUnit)}</div><div class="record-sub">必要倍率: ${item.requiredScale}倍 / 施工日 ${escapeHtml(item.eventDate || '-')}</div></div>`; els.aggregateRecipeList.appendChild(card); }); els.aggregateTaskList.innerHTML = taskTotals.length ? '' : '<div class="empty-box">必要作業はまだありません。</div>'; taskTotals.forEach(item => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(item.taskName)}</div><div class="record-sub">必要数: ${round2(item.requiredCount)}${escapeHtml(item.unit)}</div><div class="record-sub">所要時間目安: ${item.defaultDurationMinutes}分 / 設備: ${escapeHtml(item.equipment || '未設定')} / 施工日 ${escapeHtml(item.eventDate || '-')}</div></div>`; els.aggregateTaskList.appendChild(card); }); const unmatchedItems = appState.aggregateResult.unmatchedItems || [];
 
-els.aggregateMaterialCountBadge.textContent = `${materialTotals.length}件`;
-els.aggregateMaterialList.innerHTML = materialTotals.length
-  ? ''
-  : '<div class="empty-box">必要材料はまだありません。</div>';
-
-materialTotals.forEach(item => {
-  const card = document.createElement('article');
-  card.className = 'item-card';
-  card.innerHTML = `
-    <div class="item-main">
-      <div class="item-title">${escapeHtml(item.materialName)}</div>
-      <div class="record-sub">
-        必要数: ${round2(item.requiredQuantity)}${escapeHtml(item.unit)}
-      </div>
-      <div class="record-sub">
-        施工日 ${escapeHtml(item.eventDate || '-')}
-      </div>
-    </div>
-  `;
-  els.aggregateMaterialList.appendChild(card);
-});}
+      if (unmatchedItems.length) {
+        alert(
+          '未紐付けの商品があります。\n商品マスターに登録するか、productNameを既存商品名と合わせてください。\n\n' +
+          unmatchedItems.map(item =>
+            `${item.date || '-'} / ${item.productName} × ${item.quantity}${item.unit}`
+          ).join('\n')
+        );
+      }
+    }
     function scaleRecipeMaterials(recipe, scale) { return (recipe.materials || []).map(m => ({ materialId: m.materialId || null, name: m.name, baseAmountValue: Number(m.amountValue || 0), amountUnit: m.amountUnit, scale, scaledAmountValue: round2(Number(m.amountValue || 0) * scale), note: m.note || '' })); }
-    function createBatchesFromAggregate() { const recipeTotals = appState.aggregateResult.recipeTotals || []; if (!recipeTotals.length) { alert('先に集計してください。'); return; } recipeTotals.forEach(total => { const recipe = findRecipe(total.recipeId); if (!recipe) return; db.productionBatches.unshift({ id: createId('batch'), recipeId: recipe.id, recipeName: recipe.name, name: `${recipe.name} ${total.requiredScale}倍`, date: total.eventDate || getTodayString(), scale: total.requiredScale, requiredQuantity: total.requiredQuantity, requiredUnit: total.requiredUnit, yieldQuantity: recipe.yieldQuantity || 0, yieldUnit: recipe.yieldUnit || '', materials: scaleRecipeMaterials(recipe, total.requiredScale), flows: deepCopy(recipe.flows || []).map((flow, idx) => ({ ...flow, flowOrder: idx, batchName: `${recipe.name} ${total.requiredScale}倍`, recipeName: recipe.name, scale: total.requiredScale })), memo: '集計から自動生成', createdAt: new Date().toISOString() }); }); refreshAll(); alert('製造バッチを作成しました。'); activateTab('production'); }
-
-    function renderBatchList() { els.batchCountBadge.textContent = `${db.productionBatches.length}件`; els.batchList.innerHTML = ''; if (!db.productionBatches.length) { els.batchList.innerHTML = '<div class="empty-box">まだ製造バッチがありません。</div>'; return; } db.productionBatches.forEach(batch => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(batch.name)}</div><div class="record-sub">${escapeHtml(batch.recipeName)} / 必要 ${round2(batch.requiredQuantity || 0)}${escapeHtml(batch.requiredUnit || '')}</div><div class="record-sub">施工日 ${escapeHtml(batch.date || '-')} / 倍率 ${batch.scale}倍</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline open-batch-btn" type="button" data-id="${batch.id}">詳細</button><button class="btn btn-secondary btn-inline use-batch-btn" type="button" data-id="${batch.id}">段取りへ</button><button class="btn btn-danger btn-inline delete-batch-btn" type="button" data-id="${batch.id}">削除</button></div>`; els.batchList.appendChild(card); }); }
-    function showBatchDetail(id) { const batch = db.productionBatches.find(x => x.id === id); if (!batch) return; appState.currentBatchId = id; const materialsHtml = (batch.materials || []).length ? batch.materials.map(m => `<div class="record-sub">${escapeHtml(m.name)} : ${round2(m.scaledAmountValue)}${escapeHtml(m.amountUnit)}</div>`).join('') : '<div class="record-sub">材料なし</div>'; const flowsHtml = (batch.flows || []).length ? batch.flows.map(f => `<div class="record-sub">${escapeHtml(f.title)} / ${f.durationMinutes || 0}分 / ${escapeHtml(f.type || '')}</div>`).join('') : '<div class="record-sub">工程なし</div>'; els.batchDetailView.innerHTML = `<div class="stack-form"><div><strong>${escapeHtml(batch.name)}</strong></div><div class="record-sub">元レシピ: ${escapeHtml(batch.recipeName || '')}</div><div class="record-sub">施工日: ${escapeHtml(batch.date || '')}</div><div class="record-sub">必要数: ${round2(batch.requiredQuantity || 0)}${escapeHtml(batch.requiredUnit || '')}</div><div class="record-sub">倍率: ${batch.scale || 0}倍</div><div class="record-sub">メモ: ${escapeHtml(batch.memo || '')}</div><div><strong>再計算材料</strong><div>${materialsHtml}</div></div><div><strong>工程</strong><div>${flowsHtml}</div></div></div>`; }
-function handleBatchListClick(e) {
-  const open = e.target.closest('.open-batch-btn');
-  const use = e.target.closest('.use-batch-btn');
-  const del = e.target.closest('.delete-batch-btn');
-
-  if (open) {
-    showBatchDetail(open.dataset.id);
-    return;
-  }
-
-  if (use) {
-    appState.currentBatchId = use.dataset.id;
-    loadScheduleCandidates();
-    activateTab('schedule');
-    return;
-  }
-
-  if (del) {
-    if (!confirm('このバッチを削除しますか？')) return;
-    db.productionBatches = db.productionBatches.filter(x => x.id !== del.dataset.id);
-
-    if (appState.currentBatchId === del.dataset.id) {
-      appState.currentBatchId = null;
-      els.batchDetailView.innerHTML = 'バッチを選ぶと詳細がここに出ます。';
+    function createBatchesFromAggregate() {
+      const recipeTotals = appState.aggregateResult.recipeTotals || []; if (!recipeTotals.length) { alert('先に集計してください。'); return; } recipeTotals.forEach(total => {
+        const recipe = findRecipe(total.recipeId); if (!recipe) return; db.productionBatches.unshift({
+          id: createId('batch'), recipeId: recipe.id, recipeName: recipe.name, name: `${recipe.name} ${total.requiredScale}倍`, date: total.eventDate || getTodayString(), sourceOrders: total.sourceOrders || [], scale: total.requiredScale, requiredQuantity: total.requiredQuantity, requiredUnit: total.requiredUnit, yieldQuantity: recipe.yieldQuantity || 0, yieldUnit: recipe.yieldUnit || '', materials: scaleRecipeMaterials(recipe, total.requiredScale), flows: deepCopy(recipe.flows || []).map((flow, idx) => ({ ...flow, flowOrder: idx, batchName: `${recipe.name} ${total.requiredScale}倍`, recipeName: recipe.name, scale: total.requiredScale })), memo: '集計から自動生成', sourceOrders: deepCopy(total.sourceOrders || []),
+          createdAt: new Date().toISOString()
+        });
+      }); refreshAll(); alert('製造バッチを作成しました。'); activateTab('production');
     }
 
-    refreshAll();
-  }
-}
-function loadScheduleCandidates() {
-  const targets = appState.currentBatchId
-    ? db.productionBatches.filter(b => b.id === appState.currentBatchId)
-    : db.productionBatches;
-
-  appState.currentScheduleCandidates = [];
-
-  targets.forEach(batch => {
-    if (!batch.flows || !batch.flows.length) {
-      console.warn('このバッチには工程がありません:', batch.name);
-      return;
-    }
-
-    batch.flows.forEach((flow, index) => {
-      appState.currentScheduleCandidates.push({
-        id: createId('candidate'),
-        batchId: batch.id,
-        batchName: batch.name,
-        recipeId: batch.recipeId,
-        recipeName: batch.recipeName,
-        order: index,
-        title: flow.title || '工程',
-        description: flow.description || '',
-        durationMinutes: Number(flow.durationMinutes || 0),
-        taskType: flow.type || 'other',
-        canParallel: flow.canParallel !== false,
-        equipment: flow.equipment || '',
-        eventDate: batch.date || getTodayString(),
-        scheduledDate: batch.date || getTodayString(),
-        status: 'planned',
-        note: `倍率 ${batch.scale || 1}倍`,
-        materialsSnapshot: deepCopy(batch.materials || []),
-        scale: batch.scale || 1
+    function createUnlinkedBatchesFromOrderItems() {
+      const unlinkedItems = db.orderItems.filter(item => {
+        return !item.productId || !findProduct(item.productId);
       });
-    });
-  });
 
-  renderScheduleCandidates();
+      unlinkedItems.forEach(item => {
+        const alreadyExists = db.productionBatches.some(batch =>
+          batch.sourceOrderItemId === item.id
+        );
 
-  if (!appState.currentScheduleCandidates.length) {
-    alert('この製造バッチには工程が入っていません。元レシピに工程を登録してから、もう一度集計→製造バッチ作成してください。');
-  }
-}
-    function renderScheduleCandidates() { els.scheduleCandidateList.innerHTML = ''; if (!appState.currentScheduleCandidates.length) { els.scheduleCandidateEmpty.classList.remove('is-hidden'); return; } els.scheduleCandidateEmpty.classList.add('is-hidden'); appState.currentScheduleCandidates.forEach(item => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(item.title)}</div><div class="record-sub">${escapeHtml(item.batchName)} / ${item.durationMinutes}分 / ${escapeHtml(item.taskType)}</div><div class="record-sub">設備: ${escapeHtml(item.equipment || '未設定')} / 並行: ${item.canParallel ? 'しやすい' : 'しにくい'} / 施工日 ${escapeHtml(item.eventDate || '-')}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline add-plan-step-btn" type="button" data-id="${item.id}">追加</button></div>`; els.scheduleCandidateList.appendChild(card); }); }
-    function handleScheduleCandidateClick(e) { const add = e.target.closest('.add-plan-step-btn'); if (!add) return; const c = appState.currentScheduleCandidates.find(x => x.id === add.dataset.id); if (!c) return; appState.currentPlanSteps.push({ id: createId('planstep'), sourceType: 'batch', sourceId: c.batchId, title: c.title, recipeId: c.recipeId, recipeName: c.recipeName, batchId: c.batchId, batchName: c.batchName, scale: c.scale, durationMinutes: c.durationMinutes, taskType: c.taskType, equipment: c.equipment, canParallel: c.canParallel, eventDate: c.eventDate, scheduledDate: c.scheduledDate, status: 'planned', note: c.note, materialsSnapshot: deepCopy(c.materialsSnapshot || []) }); renderPlanSteps(); }
-    function resetPlanEditor() { appState.currentPlanId = null; appState.currentPlanSteps = []; els.planName.value = ''; els.planMemo.value = ''; renderPlanSteps(); }
+        if (alreadyExists) return;
+
+        db.productionBatches.unshift({
+          id: createId('batch'),
+          recipeId: null,
+          recipeName: '未紐付け',
+          name: `未紐付け：${item.productName || '商品名未入力'}`,
+          date: item.date || item.eventDate || getTodayString(),
+          scale: 1,
+          requiredQuantity: Number(item.quantity || 0),
+          requiredUnit: item.unit || '',
+          yieldQuantity: 0,
+          yieldUnit: '',
+          materials: [],
+          flows: [],
+          sourceOrderItemId: item.id,
+          sourceOrderId: item.orderId || '',
+          sourceOrders: [{
+            orderId: item.orderId || '',
+            orderItemId: item.id,
+            customer: item.customer || '',
+            date: item.date || '',
+            productName: item.productName || ''
+          }],
+          memo: '商品マスター未紐付けの仮バッチ',
+          createdAt: new Date().toISOString()
+        });
+      });
+
+      refreshAll();
+      alert('未紐付け仮バッチを作成しました。');
+      activateTab('production');
+    }
+    function renderBatchList() {
+      els.batchCountBadge.textContent = `${db.productionBatches.length}件`; els.batchList.innerHTML = ''; if (!db.productionBatches.length) { els.batchList.innerHTML = '<div class="empty-box">まだ製造バッチがありません。</div>'; return; } db.productionBatches.forEach(batch => {
+        const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(batch.name)}</div><div class="record-sub">${escapeHtml(batch.recipeName)} / 必要 ${round2(batch.requiredQuantity || 0)}${escapeHtml(batch.requiredUnit || '')}</div><div class="record-sub">施工日 ${escapeHtml(batch.date || '-')} / 倍率 ${batch.scale}倍</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline open-batch-btn" type="button" data-id="${batch.id}">詳細</button><button class="btn btn-secondary btn-inline view-batch-btn" data-id="${batch.id}">
+詳細
+</button><button class="btn btn-secondary btn-inline use-batch-btn" type="button" data-id="${batch.id}">段取りへ</button><button class="btn btn-danger btn-inline delete-batch-btn" type="button" data-id="${batch.id}">削除</button></div>`; els.batchList.appendChild(card);
+      });
+    }
+    function showBatchDetail(id) {
+      const batch = db.productionBatches.find(x => x.id === id); if (!batch) return; appState.currentBatchId = id; const materialsHtml = (batch.materials || []).length ? batch.materials.map(m => `<div class="record-sub">${escapeHtml(m.name)} : ${round2(m.scaledAmountValue)}${escapeHtml(m.amountUnit)}</div>`).join('') : '<div class="record-sub">材料なし</div>'; const flowsHtml = (batch.flows || []).length ? batch.flows.map(f => `<div class="record-sub">${escapeHtml(f.title)} / ${f.durationMinutes || 0}分 / ${escapeHtml(f.type || '')}</div>`).join('') : '<div class="record-sub">工程なし</div>'; els.batchDetailView.innerHTML = `<div class="stack-form"><div><strong>${escapeHtml(batch.name)}</strong></div><div class="record-sub">元レシピ: ${escapeHtml(batch.recipeName || '')}</div><div class="record-sub">施工日: ${escapeHtml(batch.date || '')}</div><div class="record-sub">  
+      予約:  
+      ${(batch.sourceOrders || []).length
+          ? batch.sourceOrders.map(o =>
+            `${escapeHtml(o.customer)} / ${escapeHtml(o.productName)}`
+          ).join('<br>')
+          : 'なし'}  
+    </div>  <div class="record-sub">必要数: ${round2(batch.requiredQuantity || 0)}${escapeHtml(batch.requiredUnit || '')}</div><div class="record-sub">倍率: ${batch.scale || 0}倍</div><div class="record-sub">メモ: ${escapeHtml(batch.memo || '')}</div><div><strong>再計算材料</strong><div>${materialsHtml}</div></div><div><strong>工程</strong><div>${flowsHtml}</div></div></div>`;
+    }
+    function handleBatchListClick(e) {
+      const open = e.target.closest('.open-batch-btn');
+      const view = e.target.closest('.view-batch-btn');
+
+      if (view) {
+        const batch = db.productionBatches.find(b => b.id === view.dataset.id);
+        if (!batch) return;
+
+        els.batchDetailView.innerHTML = `
+      <div class="item-main">
+        <div class="item-title">
+          ${escapeHtml(batch.title || batch.name || batch.productName || '製造バッチ')}
+        </div>
+
+        <div class="record-sub">
+          日付: ${escapeHtml(batch.eventDate || batch.date || '-')}
+        </div>
+
+        <div class="record-sub">
+          数量: ${round2(batch.quantity || 0)}${escapeHtml(batch.unit || '')}
+        </div>
+
+        <div class="record-sub">
+          状態: ${escapeHtml(batch.status || '-')}
+        </div>
+
+        ${batch.note ? `
+          <div class="sub-card">
+            ${escapeHtml(batch.note)}
+          </div>
+        ` : ''}
+
+        ${(batch.sourceOrders || []).length ? `
+          <div class="sub-card">
+            <div class="item-title">注文情報</div>
+            ${batch.sourceOrders.map(o => `
+              <div class="record-sub">
+                ${escapeHtml(o.customer || '')}
+                ${o.productName ? ' / ' + escapeHtml(o.productName) : ''}
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        ${(batch.recipeItems || []).length ? `
+          <div class="sub-card">
+            <div class="item-title">必要レシピ</div>
+            ${batch.recipeItems.map(recipe => `
+              <div class="record-sub">
+                ${escapeHtml(recipe.recipeName || 'レシピ未設定')}
+                / 数量: ${round2(recipe.quantity || 0)}
+                ${recipe.unit ? escapeHtml(recipe.unit) : ''}
+                / サイズ倍率: ${round2(recipe.sizeScale || 1)}
+                / 最終倍率: ${round2(recipe.scale || 1)}
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+
+        ${(batch.taskItems || []).length ? `
+          <div class="sub-card">
+            <div class="item-title">必要作業</div>
+            ${batch.taskItems.map(task => `
+              <div class="record-sub">
+                ${escapeHtml(task.taskName || '作業未設定')}
+                / ${round2(task.durationMinutes || 0)}分
+                ${task.equipment ? ' / 設備: ' + escapeHtml(task.equipment) : ''}
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+      }
+
+      const use = e.target.closest('.use-batch-btn');
+      const del = e.target.closest('.delete-batch-btn');
+
+      if (open) {
+        showBatchDetail(open.dataset.id);
+      }
+
+      if (use) {
+        appState.currentBatchId = use.dataset.id;
+        activateTab('schedule');
+        loadScheduleCandidates();
+      }
+
+      if (del) {
+        if (!confirm('このバッチを削除しますか？')) return;
+        db.productionBatches = db.productionBatches.filter(x => x.id !== del.dataset.id);
+        if (appState.currentBatchId === del.dataset.id) {
+          els.batchDetailView.innerHTML = 'バッチを選ぶと詳細がここに出ます。';
+        }
+        refreshAll();
+      }
+    }
+
+    function loadScheduleCandidates() {
+      const targets = appState.currentBatchId
+        ? db.productionBatches.filter(b => b.id === appState.currentBatchId)
+        : db.productionBatches;
+
+      appState.currentScheduleCandidates = [];
+
+      targets.forEach(batch => {
+
+        // ① 既存バッチ：flows を候補化
+        (batch.flows || []).forEach((flow, index) => {
+          appState.currentScheduleCandidates.push({
+            id: createId('candidate'),
+            batchId: batch.id,
+            batchName: batch.name || batch.title || batch.productName || '',
+            recipeId: batch.recipeId || '',
+            recipeName: batch.recipeName || '',
+            order: index,
+
+            title: flow.title || '工程',
+            description: flow.description || '',
+            durationMinutes: flow.durationMinutes || 0,
+            taskType: flow.type || 'other',
+            canParallel: !!flow.canParallel,
+            equipment: flow.equipment || '',
+
+            eventDate: batch.date || batch.eventDate || getTodayString(),
+            scheduledDate: batch.date || batch.eventDate || getTodayString(),
+            status: 'planned',
+            note: `倍率 ${batch.scale || 1}倍`,
+
+            materialsSnapshot: deepCopy(batch.materials || []),
+            sourceOrders: deepCopy(batch.sourceOrders || []),
+            scale: batch.scale || 1
+          });
+        });
+
+        // ② 予約由来バッチ：recipeItems を候補化
+        (batch.recipeItems || []).forEach((recipe, index) => {
+          appState.currentScheduleCandidates.push({
+            id: createId('candidate_recipe'),
+            batchId: batch.id,
+            batchName: batch.title || batch.productName || batch.name || '',
+            recipeId: recipe.recipeId || '',
+            recipeName: recipe.recipeName || '',
+            order: index,
+
+            title: recipe.recipeName || 'レシピ未設定',
+            description: [
+              batch.title || batch.productName || '',
+              `最終倍率 ${round2(recipe.scale || 1)}倍`
+            ].filter(Boolean).join(' / '),
+
+            durationMinutes: 0,
+            taskType: 'recipe',
+            canParallel: true,
+            equipment: '',
+
+            eventDate: batch.eventDate || batch.date || getTodayString(),
+            scheduledDate: batch.eventDate || batch.date || getTodayString(),
+            status: 'planned',
+            note: [
+              '予約由来',
+              `数量 ${round2(recipe.quantity || 0)}${recipe.unit || ''}`,
+              `サイズ倍率 ${round2(recipe.sizeScale || 1)}`,
+              `最終倍率 ${round2(recipe.scale || 1)}`
+            ].join(' / '),
+
+            materialsSnapshot: [],
+            sourceOrders: deepCopy(batch.sourceOrders || []),
+            scale: recipe.scale || 1
+          });
+        });
+
+        // ③ 予約由来バッチ：taskItems を候補化
+        (batch.taskItems || []).forEach((task, index) => {
+          appState.currentScheduleCandidates.push({
+            id: createId('candidate_task'),
+            batchId: batch.id,
+            batchName: batch.title || batch.productName || batch.name || '',
+            recipeId: '',
+            recipeName: '',
+            order: index,
+
+            title: task.taskName || '作業未設定',
+            description: [
+              batch.title || batch.productName || '',
+              `${round2(task.durationMinutes || 0)}分`,
+              task.equipment ? `設備: ${task.equipment}` : ''
+            ].filter(Boolean).join(' / '),
+
+            durationMinutes: Number(task.durationMinutes || 0),
+            taskType: 'task',
+            canParallel: task.canParallel ?? true,
+            equipment: task.equipment || '',
+
+            eventDate: batch.eventDate || batch.date || getTodayString(),
+            scheduledDate: batch.eventDate || batch.date || getTodayString(),
+            status: 'planned',
+            note: '予約由来の作業',
+
+            materialsSnapshot: [],
+            sourceOrders: deepCopy(batch.sourceOrders || []),
+            scale: 1
+          });
+        });
+
+        // ④ 保険：flows / recipeItems / taskItems が全部ないバッチ
+        if (
+          !(batch.flows || []).length &&
+          !(batch.recipeItems || []).length &&
+          !(batch.taskItems || []).length
+        ) {
+          appState.currentScheduleCandidates.push({
+            id: createId('candidate_batch'),
+            batchId: batch.id,
+            batchName: batch.title || batch.productName || batch.name || '',
+            recipeId: '',
+            recipeName: '',
+            order: 0,
+
+            title: batch.title || batch.productName || batch.name || '製造バッチ',
+            description: batch.note || '',
+            durationMinutes: Number(batch.durationMinutes || 0),
+            taskType: 'batch',
+            canParallel: true,
+            equipment: batch.equipment || '',
+
+            eventDate: batch.eventDate || batch.date || getTodayString(),
+            scheduledDate: batch.eventDate || batch.date || getTodayString(),
+            status: 'planned',
+            note: batch.note || '',
+
+            materialsSnapshot: deepCopy(batch.materials || []),
+            sourceOrders: deepCopy(batch.sourceOrders || []),
+            scale: batch.scale || 1
+          });
+        }
+      });
+
+      renderScheduleCandidates();
+    }
+    function renderScheduleCandidates() {
+      els.scheduleCandidateList.innerHTML = '';
+
+      if (!appState.currentScheduleCandidates.length) {
+        els.scheduleCandidateEmpty.classList.remove('is-hidden');
+        return;
+      }
+
+      els.scheduleCandidateEmpty.classList.add('is-hidden');
+
+      appState.currentScheduleCandidates.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'item-card';
+
+        card.innerHTML = `
+      <div class="item-main">
+        <div class="item-title">${escapeHtml(item.title)}</div>
+        <div class="record-sub">
+          ${escapeHtml(item.batchName)} / ${item.durationMinutes}分 / ${escapeHtml(item.taskType)}
+        </div>
+        <div class="record-sub">
+          設備: ${escapeHtml(item.equipment || '未設定')} / 
+          並行: ${item.canParallel ? 'しやすい' : 'しにくい'} / 
+          施工日 ${escapeHtml(item.eventDate || '-')}
+        </div>
+      </div>
+      <div class="item-actions">
+        <button class="btn btn-secondary btn-inline add-plan-step-btn" type="button" data-id="${item.id}">
+          追加
+        </button>
+      </div>
+    `;
+
+        els.scheduleCandidateList.appendChild(card);
+      });
+    } function handleScheduleCandidateClick(e) {
+      const btn = e.target.closest('.add-plan-step-btn');
+      if (!btn) return;
+
+      const item = appState.currentScheduleCandidates.find(x => x.id === btn.dataset.id);
+      if (!item) return;
+
+      appState.currentPlanSteps.push({
+        id: createId('planstep'),
+        sourceType: 'batch',
+        sourceId: item.batchId,
+        title: item.title,
+        recipeId: item.recipeId,
+        recipeName: item.recipeName,
+        batchId: item.batchId,
+        batchName: item.batchName,
+        scale: item.scale,
+        durationMinutes: item.durationMinutes,
+        taskType: item.taskType,
+        equipment: item.equipment,
+        canParallel: item.canParallel,
+        eventDate: item.eventDate,
+        scheduledDate: item.scheduledDate,
+        status: 'planned',
+        note: item.note,
+        materialsSnapshot: deepCopy(item.materialsSnapshot || []),
+        sourceOrders: deepCopy(item.sourceOrders || [])
+      });
+
+      renderPlanSteps();
+    } function resetPlanEditor() { appState.currentPlanId = null; appState.currentPlanSteps = []; els.planName.value = ''; els.planMemo.value = ''; renderPlanSteps(); }
     function renderPlanSteps() { els.planStepList.innerHTML = ''; if (!appState.currentPlanSteps.length) { els.planStepEmpty.classList.remove('is-hidden'); return; } els.planStepEmpty.classList.add('is-hidden'); appState.currentPlanSteps.forEach((step, index) => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${index + 1}. ${escapeHtml(step.title)}</div><div class="record-sub">${escapeHtml(step.batchName || '')}${step.scale ? ' / ' + step.scale + '倍' : ''}</div><div class="record-sub">施工日: ${escapeHtml(step.eventDate || '-')} / ${step.durationMinutes || 0}分 / 設備: ${escapeHtml(step.equipment || '未設定')}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline detail-plan-step-btn" type="button" data-index="${index}">詳細</button><button class="btn btn-secondary btn-inline move-up-plan-step-btn" type="button" data-index="${index}">上へ</button><button class="btn btn-secondary btn-inline move-down-plan-step-btn" type="button" data-index="${index}">下へ</button><button class="btn btn-secondary btn-inline send-to-planner-btn" type="button" data-index="${index}">計画へ</button><button class="btn btn-danger btn-inline delete-plan-step-btn" type="button" data-index="${index}">削除</button></div>`; els.planStepList.appendChild(card); }); }
     function showPlanStepDetail(index) { const step = appState.currentPlanSteps[index]; if (!step) return; const materialLines = (step.materialsSnapshot || []).map(m => `${m.name} : ${round2(m.scaledAmountValue || 0)}${m.amountUnit || ''}`).join('\n') || '材料情報なし'; alert(`工程: ${step.title}\nバッチ: ${step.batchName || ''}\n施工日: ${step.eventDate || '-'}\n倍率: ${step.scale || '-'}\n時間: ${step.durationMinutes || 0}分\n設備: ${step.equipment || '-'}\nメモ: ${step.note || 'なし'}\n\n材料:\n${materialLines}`); }
     function handlePlanStepClick(e) {
@@ -1972,30 +2734,36 @@ function loadScheduleCandidates() {
     function saveSchedulePlan() { const name = els.planName.value.trim(); if (!name) { alert('段取り名を入力してください。'); return; } if (!appState.currentPlanSteps.length) { alert('段取り項目がありません。'); return; } const plan = { id: appState.currentPlanId || createId('plan'), name, memo: els.planMemo.value.trim(), steps: deepCopy(appState.currentPlanSteps), updatedAt: new Date().toISOString() }; const idx = db.schedulePlans.findIndex(x => x.id === plan.id); if (idx === -1) db.schedulePlans.unshift(plan); else db.schedulePlans[idx] = plan; appState.currentPlanId = plan.id; refreshAll(); alert('段取りを保存しました。'); }
     function renderPlanList() { els.planCountBadge.textContent = `${db.schedulePlans.length}件`; els.planList.innerHTML = ''; if (!db.schedulePlans.length) { els.planList.innerHTML = '<div class="empty-box">まだ段取りがありません。</div>'; return; } db.schedulePlans.forEach(plan => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(plan.name)}</div><div class="record-sub">工程 ${plan.steps?.length || 0}件</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-plan-btn" type="button" data-id="${plan.id}">開く</button><button class="btn btn-danger btn-inline delete-plan-btn" type="button" data-id="${plan.id}">削除</button></div>`; els.planList.appendChild(card); }); }
     function handlePlanListClick(e) { const load = e.target.closest('.load-plan-btn'); const del = e.target.closest('.delete-plan-btn'); if (load) { const plan = db.schedulePlans.find(x => x.id === load.dataset.id); if (!plan) return; appState.currentPlanId = plan.id; els.planName.value = plan.name || ''; els.planMemo.value = plan.memo || ''; appState.currentPlanSteps = deepCopy(plan.steps || []); renderPlanSteps(); activateTab('schedule'); } if (del) { if (!confirm('この段取りを削除しますか？')) return; db.schedulePlans = db.schedulePlans.filter(x => x.id !== del.dataset.id); refreshAll(); } }
-function openAssignModal(index) {
-  const step = appState.currentPlanSteps[index];
-  if (!step) return;
-
-  appState.pendingPlanStepIndex = index;
-
-  const eventDate = step.eventDate || getTodayString();
-  els.assignMode.value = 'days_before';
-  els.assignDaysBefore.value = '1';
-  els.assignFixedDate.value = addDays(eventDate, -1);
-
-  const modalTitle = els.planAssignModal.querySelector('h2');
-  if (modalTitle) {
-    modalTitle.textContent = `計画日を設定：施工日 ${eventDate}`;
-  }
-
-  renderAssignMode();
-  els.planAssignModal.classList.add('is-open');
-}
+    function openAssignModal(index) { const step = appState.currentPlanSteps[index]; if (!step) return; appState.pendingPlanStepIndex = index; els.assignMode.value = 'days_before'; els.assignDaysBefore.value = '1'; els.assignFixedDate.value = step.eventDate || getTodayString(); renderAssignMode(); els.planAssignModal.classList.add('is-open'); }
     function renderAssignMode() { const fixed = els.assignMode.value === 'fixed_date'; els.assignDaysField.classList.toggle('is-hidden', fixed); els.assignDateField.classList.toggle('is-hidden', !fixed); }
     function closeAssignModal() { els.planAssignModal.classList.remove('is-open'); appState.pendingPlanStepIndex = null; }
     function confirmAssignToPlanner() { const idx = appState.pendingPlanStepIndex; const step = appState.currentPlanSteps[idx]; if (!step) return; let scheduledDate = step.eventDate || getTodayString(); if (els.assignMode.value === 'fixed_date') { if (!els.assignFixedDate.value) { alert('日付を指定してください。'); return; } scheduledDate = els.assignFixedDate.value; } else { const daysBefore = Number(els.assignDaysBefore.value || 0); if (Number.isNaN(daysBefore) || daysBefore < 0) { alert('何日前は0以上の数字で入れてください。'); return; } scheduledDate = addDays(step.eventDate || getTodayString(), -daysBefore); } sendPlanStepToPlanner(idx, scheduledDate); closeAssignModal(); }
-    function sendPlanStepToPlanner(index, forcedDate) { const step = appState.currentPlanSteps[index]; if (!step) return; db.planItems.unshift({ id: createId('planitem'), sourceType: step.sourceType || 'batch', sourceId: step.sourceId || null, title: step.title, recipeName: step.recipeName || '', batchName: step.batchName || '', scale: step.scale || null, scheduledDate: forcedDate || step.scheduledDate || getTodayString(), eventDate: step.eventDate || '', durationMinutes: step.durationMinutes || 0, taskType: step.taskType || 'other', equipment: step.equipment || '', canParallel: !!step.canParallel, materialsSnapshot: deepCopy(step.materialsSnapshot || []), note: step.note || '' }); refreshAll(); alert(`計画表に追加しました。\n計画日：${scheduledDate}\n施工日：${step.eventDate || '-'}`);}
+    function sendPlanStepToPlanner(index, forcedDate) {
+      const step = appState.currentPlanSteps[index];
+      if (!step) return;
 
+      db.planItems.unshift({
+        id: createId('planitem'),
+        sourceType: step.sourceType || 'batch',
+        sourceId: step.sourceId || null,
+        title: step.title,
+        recipeName: step.recipeName || '',
+        batchName: step.batchName || '',
+        scale: step.scale || null,
+        scheduledDate: forcedDate || step.scheduledDate || getTodayString(),
+        eventDate: step.eventDate || '',
+        durationMinutes: step.durationMinutes || 0,
+        taskType: step.taskType || 'other',
+        equipment: step.equipment || '',
+        canParallel: !!step.canParallel,
+        materialsSnapshot: deepCopy(step.materialsSnapshot || []),
+        sourceOrders: deepCopy(step.sourceOrders || []),
+        note: step.note || ''
+      });
+
+      refreshAll();
+      alert('計画表に追加しました。');
+    }
     function renderPlanner() { const mode = els.plannerMode.value, startDate = els.plannerStartDate.value || getTodayString(), days = mode === 'week' ? 7 : 31; els.planItemCountBadge.textContent = `${db.planItems.length}件`; els.plannerGrid.className = `planner-grid ${mode}`; els.plannerGrid.innerHTML = ''; for (let i = 0; i < days; i++) { const dateStr = addDays(startDate, i), items = db.planItems.filter(item => item.scheduledDate === dateStr); const dayCard = document.createElement('article'); dayCard.className = 'day-card'; dayCard.innerHTML = `<div class="day-card-header"><div><div class="item-title">${escapeHtml(dateStr)}</div><div class="meta-text">${formatDateLabel(dateStr)} / ${items.length}件</div></div><button class="btn btn-secondary btn-small add-empty-plan-item-btn" type="button" data-date="${dateStr}">追加</button></div><div class="day-card-body">${items.length ? items.map(item => `<div class="plan-mini-item"><div><strong>${escapeHtml(item.title)}</strong></div><div class="meta-text">${escapeHtml(item.batchName || item.recipeName || '')}${item.scale ? ` / ${item.scale}倍` : ''}${item.durationMinutes ? ` / ${item.durationMinutes}分` : ''}</div><div class="meta-text">施工日 ${escapeHtml(item.eventDate || '-')}</div><div class="inline-actions" style="margin-top:8px;"><button class="btn btn-secondary btn-small shift-plan-item-btn" type="button" data-id="${item.id}" data-days="-1">前日へ</button><button class="btn btn-secondary btn-small shift-plan-item-btn" type="button" data-id="${item.id}" data-days="1">翌日へ</button><button class="btn btn-danger btn-small delete-plan-item-btn" type="button" data-id="${item.id}">削除</button></div></div>`).join('') : '<p class="helper-text">予定なし</p>'}</div>`; els.plannerGrid.appendChild(dayCard); } }
     function handlePlannerGridClick(e) { const add = e.target.closest('.add-empty-plan-item-btn'); const shift = e.target.closest('.shift-plan-item-btn'); const del = e.target.closest('.delete-plan-item-btn'); if (add) { const title = prompt('追加する項目名'); if (!title || !title.trim()) return; db.planItems.unshift({ id: createId('planitem'), sourceType: 'manual', sourceId: null, title: title.trim(), recipeName: '', batchName: '', scale: null, scheduledDate: add.dataset.date, eventDate: '', durationMinutes: 0, taskType: 'other', equipment: '', canParallel: true, materialsSnapshot: [], note: '' }); refreshAll(); } if (shift) { const item = db.planItems.find(x => x.id === shift.dataset.id); if (!item) return; item.scheduledDate = addDays(item.scheduledDate, Number(shift.dataset.days)); refreshAll(); } if (del) { db.planItems = db.planItems.filter(x => x.id !== del.dataset.id); refreshAll(); } }
     function buildPrintPlannerView() { const startDate = els.plannerStartDate.value || getTodayString(); const rangeDates = []; for (let i = 0; i < 7; i++) rangeDates.push(addDays(startDate, i)); els.printPlannerView.innerHTML = `<div class="print-sheet"><div class="print-grid cols-7">${rangeDates.map(dateStr => { const items = db.planItems.filter(item => item.scheduledDate === dateStr); return `<div class="print-day"><div class="print-day-head">${escapeHtml(formatPrintDate(dateStr))}</div><div class="print-day-list">${items.length ? items.map(item => `<div class="print-day-item"><div class="print-item-main">${escapeHtml(item.title || '')}</div><div class="print-item-sub">${escapeHtml(item.batchName || item.recipeName || '')}${item.scale ? ` / ${escapeHtml(String(item.scale))}倍` : ''}${item.durationMinutes ? ` / ${escapeHtml(String(item.durationMinutes))}分` : ''}</div></div>`).join('') : '<div class="print-day-item">　</div>'}</div></div>`; }).join('')}</div></div>`; }
@@ -2011,34 +2779,7 @@ function openAssignModal(index) {
         .replace(/[（）()]/g, "")
         .toLowerCase();
     }
-function safeNumber(value, fallback = 0) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
-}
 
-function normalizeUnit(unit, fallback = "g") {
-  return String(unit || fallback).trim();
-}
-
-function normalizeFlowType(type) {
-  const allowed = ["prep", "mix", "shape", "rest", "bake", "cool", "finish", "other"];
-  return allowed.includes(type) ? type : "other";
-}
-
-function normalizeChecks(checks) {
-  if (!Array.isArray(checks)) return [];
-
-  return checks.map(check => {
-    if (typeof check === "string") {
-      return { text: check, done: false };
-    }
-
-    return {
-      text: String(check.text || ""),
-      done: !!check.done
-    };
-  }).filter(check => check.text);
-}
     function findMaterialMasterByName(name) {
       if (!name) return null;
 
@@ -2053,154 +2794,398 @@ function normalizeChecks(checks) {
       ) || null;
     }
 
- function attachMaterialIdsToRecipeMaterials(materials) {
-  return (materials || []).map(item => {
-    if (item.materialId) return item;
+    function attachMaterialIdsToRecipeMaterials(materials) {
+      return (materials || []).map(item => {
+        if (item.materialId) return item;
 
-    const matched = findMaterialMasterByName(item.name);
-
-    return {
-      ...item,
-      materialId: matched ? matched.id : null,
-      name: item.name || matched?.name || "",
-      unmatchedMaterial: !matched
-    };
-  });
-}
-
-function normalizeImportedRecipe(data) {
-  const normalizedMaterials = Array.isArray(data.materials)
-    ? data.materials.map(item => {
-        const name = String(item.name || item.materialName || "").trim();
+        const matched = findMaterialMasterByName(item.name);
 
         return {
-          materialId: item.materialId || null,
-          name,
-          amountValue: safeNumber(item.amountValue ?? item.amount ?? item.value, 0),
-          amountUnit: normalizeUnit(item.amountUnit ?? item.unit, "g"),
-          note: String(item.note || "")
+          ...item,
+          materialId: matched ? matched.id : null,
+          name: item.name || matched?.name || ""
         };
-      })
-    : [];
+      });
+    }
 
-  const baseSize = data.baseSize || data.size || {};
-
-  return {
-    id: data.id || createId("recipe"),
-    name: String(data.name || "名称未入力").trim(),
-    type: data.type || "仕込み",
-    date: data.date || getTodayString(),
-    owner: data.owner || "",
-    memo: data.memo || "",
-    yieldQuantity: safeNumber(data.yieldQuantity, 1),
-    yieldUnit: data.yieldUnit || "バッチ",
-    baseSize: {
-      diameter: safeNumber(baseSize.diameter, 0),
-      height: safeNumber(baseSize.height, 0)
-    },
-    materials: attachMaterialIdsToRecipeMaterials(normalizedMaterials),
-    flows: Array.isArray(data.flows)
-      ? data.flows.map(flow => ({
-          title: flow.title || "工程",
-          description: flow.description || "",
-          durationMinutes: safeNumber(flow.durationMinutes, 0),
-          type: normalizeFlowType(flow.type),
-          canParallel: flow.canParallel !== false,
-          equipment: flow.equipment || "",
-          checks: normalizeChecks(flow.checks)
+    function normalizeImportedRecipe(data) {
+      const normalizedMaterials = Array.isArray(data.materials)
+        ? data.materials.map(item => ({
+          materialId: item.materialId || null,
+          name: item.name || '',
+          amountValue: Number(item.amountValue || 0),
+          amountUnit: item.amountUnit || 'g',
+          note: item.note || ''
         }))
-      : [],
-    updatedAt: new Date().toISOString()
-  };
-}
+        : [];
+
+      return {
+        name: data.name || '',
+        type: data.type || '試作',
+        date: data.date || getTodayString(),
+        owner: data.owner || '',
+        memo: data.memo || '',
+        yieldQuantity: Number(data.yieldQuantity || 0),
+        yieldUnit: data.yieldUnit || '個',
+        size: {
+          diameter: Number(data.size?.diameter || 0),
+          height: Number(data.size?.height || 0)
+        },
+        materials: attachMaterialIdsToRecipeMaterials(normalizedMaterials),
+        flows: Array.isArray(data.flows)
+          ? data.flows.map(flow => ({
+            title: flow.title || '',
+            description: flow.description || '',
+            durationMinutes: Number(flow.durationMinutes || 0),
+            type: flow.type || 'other',
+            canParallel: !!flow.canParallel,
+            equipment: flow.equipment || '',
+            checks: Array.isArray(flow.checks) ? flow.checks : []
+          }))
+          : []
+      };
+    }
     function importMaterialsArray(arr, mode) { const list = arr.map(item => ({ id: createId('mat'), name: item.name || '', baseAmount: Number(item.lot ?? item.baseAmount ?? 0), baseUnit: item.unit || item.baseUnit || 'g', basePrice: Number(item.price ?? item.basePrice ?? 0), category: item.subcategory || item.category || '', supplier: item.supplier || '', note: item.note || '' })); db.materialsMaster = mode === 'replace' ? list : mergeById(db.materialsMaster, list, 'mat'); refreshAll(); alert(mode === 'replace' ? '材料マスターを置換読込しました。' : '材料マスターを追加読込しました。'); activateTab('materials'); }
-    function importParsedJson(parsed, mode = 'merge') {
-      if (!parsed || typeof parsed !== 'object') { alert('読み込めるJSONではありません。'); return; }
-      if (Array.isArray(parsed)) {
-        if (parsed.every(item => item && typeof item === 'object' && ('name' in item) && (('price' in item) || ('lot' in item) || ('unitPrice' in item)))) { importMaterialsArray(parsed, mode); return; }
-        alert('この配列JSONは未対応です。'); return;
+    function importReservationJson(parsed, mode = 'merge') {
+      if (!parsed || typeof parsed !== 'object') {
+        alert('予約JSONではありません。');
+        return;
       }
-      if (Array.isArray(parsed.materialsMaster) || Array.isArray(parsed.recipeMasters) || Array.isArray(parsed.productMasters) || Array.isArray(parsed.orderItems) || Array.isArray(parsed.productionBatches) || Array.isArray(parsed.schedulePlans) || Array.isArray(parsed.planItems)) {
+
+      if (!Array.isArray(parsed.orders) || !Array.isArray(parsed.orderItems)) {
+        alert('orders と orderItems が必要です。');
+        return;
+      }
+
+      const normalizedOrders = parsed.orders.map(order => ({
+        id: order.id || createId('ord'),
+        date: order.date || getTodayString(),
+        customer: order.customer || '',
+        category: order.category || '',
+        venue: order.venue || '',
+        notes: order.notes || '',
+        importedAt: new Date().toISOString()
+      }));
+
+      const orderMap = new Map(normalizedOrders.map(o => [o.id, o]));
+
+      const normalizedItems = parsed.orderItems.map(item => {
+        const parent = orderMap.get(item.orderId);
+
+        return {
+          id: item.id || createId('orditem'),
+          orderId: item.orderId || '',
+          productId: item.productId || '',
+          productName: item.productName || '都度オリジナル商品',
+          quantity: Number(item.quantity || 0),
+          unit: item.unit || '点',
+          category: item.category || parent?.category || '',
+          size: item.size || '',
+          multiSize: item.multiSize || '',
+          options: Array.isArray(item.options) ? item.options : [],
+          notes: item.notes || '',
+          date: parent?.date || getTodayString(),
+          customer: parent?.customer || '',
+          venue: parent?.venue || '',
+          sourceOrderId: item.orderId || '',
+          sourceOrderItemId: item.id || '',
+          isCustomProduct: !item.productId
+        };
+      });
+
+      if (mode === 'replace') {
+        db.orders = normalizedOrders;
+        db.orderItems = normalizedItems;
+      } else {
+        db.orders = mergeById(db.orders || [], normalizedOrders, 'ord');
+
+        const existingSourceIds = new Set(
+          (db.orderItems || []).map(x => x.sourceOrderItemId || x.id)
+        );
+
+        const newItems = normalizedItems.filter(item => {
+          const key = item.sourceOrderItemId || item.id;
+          return !existingSourceIds.has(key);
+        });
+
+        db.orderItems = mergeById(db.orderItems || [], newItems, 'orditem');
+      }
+
+      refreshAll();
+      activateTab('orders');
+      alert('予約JSONを取り込みました。');
+    }
+    function importReservationJson(parsed, mode = 'merge') {
+      if (!parsed || !Array.isArray(parsed.orders) || !Array.isArray(parsed.orderItems)) {
+        alert('予約JSON形式ではありません。');
+        return;
+      }
+
+      if (!Array.isArray(db.orders)) db.orders = [];
+
+      const orderMap = new Map();
+
+      parsed.orders.forEach(order => {
+        const normalizedOrder = {
+          id: order.id || createId('ord'),
+          date: order.date || '',
+          customer: order.customer || '',
+          category: order.category || '',
+          venue: order.venue || '',
+          notes: order.notes || ''
+        };
+
+        orderMap.set(normalizedOrder.id, normalizedOrder);
+
+        const exists = db.orders.some(x => x.id === normalizedOrder.id);
+        if (!exists) db.orders.unshift(normalizedOrder);
+      });
+
+      parsed.orderItems.forEach(item => {
+        const parentOrder = orderMap.get(item.orderId) || {};
+
+        const normalizedItem = {
+          id: item.id || createId('orditem'),
+          sourceOrderId: item.orderId || '',
+          sourceOrderItemId: item.id || '',
+          orderId: item.orderId || '',
+          date: parentOrder.date || '',
+          customer: parentOrder.customer || '',
+          productId: item.productId || '',
+          productName: item.productName || '',
+          quantity: Number(item.quantity || 0),
+          unit: item.unit || '点',
+          category: item.category || '',
+          size: item.size || '',
+          multiSize: item.multiSize || '',
+          options: Array.isArray(item.options) ? item.options : [],
+          memo: item.notes || ''
+        };
+
+        const exists = db.orderItems.some(x =>
+          x.sourceOrderItemId && x.sourceOrderItemId === normalizedItem.sourceOrderItemId
+        );
+
+        if (!exists) db.orderItems.unshift(normalizedItem);
+      });
+
+      refreshAll();
+      alert('予約JSONを読み込みました。');
+    }
+    function importParsedJson(parsed, mode = 'merge') {
+      if (!parsed || typeof parsed !== 'object') {
+        alert('読み込めるJSONではありません。');
+        return;
+      }
+
+      // 配列JSON：材料マスター配列 or 予約アプリ配列
+      if (Array.isArray(parsed)) {
+        if (
+          parsed.every(item =>
+            item &&
+            typeof item === 'object' &&
+            ('name' in item) &&
+            (('price' in item) || ('lot' in item) || ('unitPrice' in item))
+          )
+        ) {
+          importMaterialsArray(parsed, mode);
+          return;
+        }
+
+        // 予約管理アプリの配列形式
+        if (
+          parsed.every(item =>
+            item &&
+            typeof item === 'object' &&
+            Array.isArray(item.items) &&
+            ('clientName' in item || 'category' in item || 'venue' in item)
+          )
+        ) {
+          const payload = convertReservationAppOrdersToPayload(parsed);
+          importReservationData(payload);
+          return;
+        }
+
+        alert('この配列JSONは未対応です。');
+        return;
+      }
+
+      // 全体バックアップJSON
+      const isFullBackup =
+        Array.isArray(parsed.materialsMaster) ||
+        Array.isArray(parsed.recipeMasters) ||
+        Array.isArray(parsed.productMasters) ||
+        Array.isArray(parsed.orders) ||
+        Array.isArray(parsed.orderItems) ||
+        Array.isArray(parsed.productionBatches) ||
+        Array.isArray(parsed.taskMasters) ||
+        Array.isArray(parsed.schedulePlans) ||
+        Array.isArray(parsed.planItems) ||
+        Array.isArray(parsed.reservationOrders) ||
+        Array.isArray(parsed.reservationOrderItems);
+
+      if (isFullBackup) {
         if (mode === 'replace') {
           db.materialsMaster = Array.isArray(parsed.materialsMaster) ? parsed.materialsMaster : [];
           db.recipeMasters = Array.isArray(parsed.recipeMasters) ? parsed.recipeMasters : [];
           db.productMasters = Array.isArray(parsed.productMasters) ? parsed.productMasters : [];
+
+          db.orders = Array.isArray(parsed.orders) ? parsed.orders : [];
           db.orderItems = Array.isArray(parsed.orderItems) ? parsed.orderItems : [];
+
           db.productionBatches = Array.isArray(parsed.productionBatches) ? parsed.productionBatches : [];
           db.taskMasters = Array.isArray(parsed.taskMasters) && parsed.taskMasters.length ? parsed.taskMasters : db.taskMasters;
           db.schedulePlans = Array.isArray(parsed.schedulePlans) ? parsed.schedulePlans : [];
           db.planItems = Array.isArray(parsed.planItems) ? parsed.planItems : [];
+
+          db.reservationOrders = Array.isArray(parsed.reservationOrders) ? parsed.reservationOrders : [];
+          db.reservationOrderItems = Array.isArray(parsed.reservationOrderItems) ? parsed.reservationOrderItems : [];
         } else {
-          db.materialsMaster = mergeById(db.materialsMaster, Array.isArray(parsed.materialsMaster) ? parsed.materialsMaster : [], 'mat');
-          db.recipeMasters = mergeById(db.recipeMasters, Array.isArray(parsed.recipeMasters) ? parsed.recipeMasters : [], 'recipe');
-          db.productMasters = mergeById(db.productMasters, Array.isArray(parsed.productMasters) ? parsed.productMasters : [], 'product');
-          db.orderItems = mergeById(db.orderItems, Array.isArray(parsed.orderItems) ? parsed.orderItems : [], 'order');
-          db.productionBatches = mergeById(db.productionBatches, Array.isArray(parsed.productionBatches) ? parsed.productionBatches : [], 'batch');
-          db.schedulePlans = mergeById(db.schedulePlans, Array.isArray(parsed.schedulePlans) ? parsed.schedulePlans : [], 'plan');
-          db.planItems = mergeById(db.planItems, Array.isArray(parsed.planItems) ? parsed.planItems : [], 'planitem');
+          db.materialsMaster = mergeById(
+            db.materialsMaster,
+            Array.isArray(parsed.materialsMaster) ? parsed.materialsMaster : [],
+            'mat'
+          );
+
+          db.recipeMasters = mergeById(
+            db.recipeMasters,
+            Array.isArray(parsed.recipeMasters) ? parsed.recipeMasters : [],
+            'recipe'
+          );
+
+          db.productMasters = mergeById(
+            db.productMasters,
+            Array.isArray(parsed.productMasters) ? parsed.productMasters : [],
+            'product'
+          );
+
+          db.orders = mergeById(
+            db.orders,
+            Array.isArray(parsed.orders) ? parsed.orders : [],
+            'order'
+          );
+
+          db.orderItems = mergeById(
+            db.orderItems,
+            Array.isArray(parsed.orderItems) ? parsed.orderItems : [],
+            'orditem'
+          );
+
+          db.productionBatches = mergeById(
+            db.productionBatches,
+            Array.isArray(parsed.productionBatches) ? parsed.productionBatches : [],
+            'batch'
+          );
+
+          db.schedulePlans = mergeById(
+            db.schedulePlans,
+            Array.isArray(parsed.schedulePlans) ? parsed.schedulePlans : [],
+            'plan'
+          );
+
+          db.planItems = mergeById(
+            db.planItems,
+            Array.isArray(parsed.planItems) ? parsed.planItems : [],
+            'planitem'
+          );
+
+          db.reservationOrders = mergeById(
+            db.reservationOrders,
+            Array.isArray(parsed.reservationOrders) ? parsed.reservationOrders : [],
+            'resord'
+          );
+
+          db.reservationOrderItems = mergeById(
+            db.reservationOrderItems,
+            Array.isArray(parsed.reservationOrderItems) ? parsed.reservationOrderItems : [],
+            'resitem'
+          );
+
           if (Array.isArray(parsed.taskMasters) && parsed.taskMasters.length) {
             db.taskMasters = mergeById(db.taskMasters, parsed.taskMasters, 'task');
           }
         }
-db.recipeMasters = db.recipeMasters.map(recipe => {
-  const normalized = normalizeImportedRecipe(recipe);
-  return {
-    ...recipe,
-    ...normalized,
-    id: recipe.id || normalized.id
-  };
-});
+
+        db.recipeMasters = db.recipeMasters.map(recipe => ({
+          ...recipe,
+          materials: attachMaterialIdsToRecipeMaterials(recipe.materials || [])
+        }));
+
         refreshAll();
-        alert(mode === 'replace' ? '全体JSONを置換読込しました。' : '全体JSONを追加読込しました。');
+
+        alert(
+          mode === 'replace'
+            ? '全体JSONを置換読込しました。'
+            : '全体JSONを追加読込しました。'
+        );
+
         return;
       }
-if (parsed.name && Array.isArray(parsed.materials)) {
-  const recipe = normalizeImportedRecipe(parsed);
 
-  appState.currentRecipeId = null;
-  els.recipeName.value = recipe.name || "";
-  els.recipeType.value = recipe.type || "仕込み";
-  els.recipeDate.value = recipe.date || getTodayString();
-  els.recipeOwner.value = recipe.owner || "";
-  els.recipeYieldQuantity.value = recipe.yieldQuantity || 1;
+      // 予約管理アプリ：{ orders: [...] } 形式
+      if (Array.isArray(parsed.orders)) {
+        const looksLikeReservationApp = parsed.orders.some(order =>
+          Array.isArray(order.items) ||
+          'clientName' in order ||
+          'allergyMaster' in order
+        );
 
-  const presetUnits = Array.from(els.recipeYieldUnit.options).map(option => option.value);
-  if (presetUnits.includes(recipe.yieldUnit)) {
-    els.recipeYieldUnit.value = recipe.yieldUnit;
-    els.recipeYieldCustomUnit.value = "";
-  } else {
-    els.recipeYieldUnit.value = "自由入力";
-    els.recipeYieldCustomUnit.value = recipe.yieldUnit;
-  }
+        if (looksLikeReservationApp) {
+          const payload = convertReservationAppOrdersToPayload(parsed.orders);
+          importReservationData(payload);
+          return;
+        }
+      }
 
-  toggleRecipeYieldCustomField();
+      // 単体レシピJSON
+      if (parsed.name && Array.isArray(parsed.materials)) {
+        const recipe = normalizeImportedRecipe(parsed);
 
-  els.recipeBaseDiameter.value = recipe.baseSize?.diameter || "";
-  els.recipeBaseHeight.value = recipe.baseSize?.height || "";
-  els.recipeMemo.value = recipe.memo || "";
+        appState.currentRecipeId = null;
+        els.recipeName.value = recipe.name || '';
+        els.recipeType.value = recipe.type || '試作';
+        els.recipeDate.value = recipe.date || getTodayString();
+        els.recipeOwner.value = recipe.owner || '';
+        els.recipeYieldQuantity.value = recipe.yieldQuantity || 0;
+        els.recipeMemo.value = recipe.memo || '';
 
-  appState.currentRecipeMaterials = recipe.materials || [];
-  appState.currentRecipeFlows = recipe.flows || [];
+        const presetUnits = getRecipeYieldPresetValues();
 
-  renderRecipeMaterials();
-  renderFlows();
-  updateEditingLabel();
-  updateRecipeCostLabel();
-  activateTab("recipes");
+        if (presetUnits.includes(recipe.yieldUnit)) {
+          els.recipeYieldUnit.value = recipe.yieldUnit || '個';
+          els.recipeYieldCustomUnit.value = '';
+        } else {
+          els.recipeYieldUnit.value = '自由入力';
+          els.recipeYieldCustomUnit.value = recipe.yieldUnit || '';
+        }
 
-  const unmatched = recipe.materials.filter(m => m.unmatchedMaterial).map(m => m.name);
+        els.recipeBaseShape.value = recipe.baseShape || recipe.size?.shape || 'round';
+        els.recipeBaseDiameter.value = recipe.baseDiameter || recipe.size?.diameter || '';
+        els.recipeBaseHeight.value = recipe.baseHeight || recipe.size?.height || '';
+        els.recipeBaseWidth.value = recipe.baseWidth || recipe.size?.width || '';
+        els.recipeBaseDepth.value = recipe.baseDepth || recipe.size?.depth || '';
 
-  if (unmatched.length) {
-    alert(`単体レシピJSONを読み込みました。\n未登録材料があります：\n${unmatched.join("\n")}`);
-  } else {
-    alert("単体レシピJSONを読み込みました。");
-  }
+        els.targetDiameter.value = '';
+        els.targetHeight.value = '';
 
-  return;
-}
+        toggleRecipeYieldCustomField();
+        toggleRecipeBaseSizeFields();
+
+        appState.currentRecipeMaterials = recipe.materials || [];
+        appState.currentRecipeFlows = recipe.flows || [];
+
+        renderRecipeMaterials();
+        renderFlows();
+        updateEditingLabel();
+        updateRecipeCostLabel();
+        activateTab('recipes');
+
+        alert('単体レシピJSONを読み込みました。');
+        return;
+      }
+
       alert('対応していないJSON形式です。');
     }
-
     initialize();
   </script>
 </body>
