@@ -409,6 +409,17 @@
               </button>
             </div>
           </div>
+          <button class="btn btn-secondary" type="button" id="mergeReservationBtn">
+  予約JSONを追加読込
+</button>
+
+<button class="btn btn-secondary" type="button" id="replaceReservationBtn">
+  予約JSONで上書き
+</button>
+
+<button class="btn btn-danger" type="button" id="clearReservationBtn">
+  予約データ初期化
+</button>
         </section>
 
         <section class="card">
@@ -420,7 +431,21 @@
 
             <span class="badge" id="reservationCountBadge">0件</span>
           </div>
-
+<div class="sub-card">
+  <label class="field">
+    <span class="field-label">表示フィルター</span>
+    <select id="reservationFilter">
+      <option value="productionTarget">製造対象のみ</option>
+      <option value="all">全件</option>
+      <option value="notSent">未送信</option>
+      <option value="batched">バッチ化済み</option>
+      <option value="wedding">婚礼</option>
+      <option value="anniversary">アニバーサリー</option>
+      <option value="banquet">宴会</option>
+      <option value="delivered">納品済み</option>
+    </select>
+  </label>
+</div>
           <div class="list" id="reservationList"></div>
         </section>
 
@@ -675,6 +700,9 @@
       'productComponentDepth',
       'productComponentRectangleSizeRow',
       'productComponentSizeRow',
+      'mergeReservationBtn',
+'replaceReservationBtn',
+'clearReservationBtn','reservationFilter',
     ].forEach(id => els[id] = document.getElementById(id));
 
      function getRecipeYieldPresetValues() {
@@ -771,7 +799,6 @@
       document.getElementById('mergeJsonBtn').addEventListener('click', () => importJsonFromText('merge'));
       document.getElementById('replaceJsonBtn').addEventListener('click', () => importJsonFromText('replace'));
       document.getElementById('clearJsonPasteBtn').addEventListener('click', () => els.jsonPasteArea.value = '');
-      els.importReservationBtn.addEventListener('click', handleImportReservationJson);
       els.assignMode.addEventListener('change', renderAssignMode);
       document.getElementById('confirmAssignBtn').addEventListener('click', confirmAssignToPlanner);
       document.getElementById('cancelAssignBtn').addEventListener('click', closeAssignModal);
@@ -781,8 +808,11 @@
       els.recipeBaseShape.addEventListener('change', toggleRecipeBaseSizeFields);
       els.productComponentShape.addEventListener('change', toggleproductConponentSizeFields);
       els.reservationList.addEventListener('change', handleReservationProductLinkChange);
-
-    }
+els.mergeReservationBtn.addEventListener('click', () => handleImportReservationJson('merge'));
+els.replaceReservationBtn.addEventListener('click', () => handleImportReservationJson('replace'));
+els.clearReservationBtn.addEventListener('click', clearReservationData);
+els.reservationFilter.addEventListener('change', renderReservations); 
+}
     function initialize() { loadDb(); bindEvents(); resetMaterialMasterEditor(); resetRecipeEditor(); resetProductEditor(); resetOrderEditor(); resetPlanEditor(); els.plannerStartDate.value = getTodayString(); refreshAll(); }
     function toggleRecipeYieldCustomField() {
       const isCustom = els.recipeYieldUnit.value === '自由入力';
@@ -813,45 +843,67 @@
         els.productComponentRectangleSizeRow.classList.toggle('is-hidden', !isRectangle);
       }
     }
-    function importReservationData(payload) {
-      db.reservationOrders = payload.orders || [];
-      db.reservationOrderItems = payload.orderItems || [];
+function importReservationData(payload, mode = 'merge') {
+  const orders = payload.orders || [];
+  const orderItems = payload.orderItems || [];
 
-      refreshAll();
-      renderReservations();
-      alert('予約データを読み込みました。');
+  if (mode === 'replace') {
+    db.reservationOrders = orders;
+    db.reservationOrderItems = orderItems;
+  } else {
+    db.reservationOrders = mergeById(db.reservationOrders, orders, 'resord');
+    db.reservationOrderItems = mergeById(db.reservationOrderItems, orderItems, 'resitem');
+  }
+
+  refreshAll();
+  renderReservations();
+
+  alert(mode === 'replace'
+    ? '予約データを上書きしました。'
+    : '予約データを追加読込しました。'
+  );
+}
+function clearReservationData() {
+  if (!confirm('予約データをすべて初期化しますか？')) return;
+
+  db.reservationOrders = [];
+  db.reservationOrderItems = [];
+
+  refreshAll();
+  renderReservations();
+
+  alert('予約データを初期化しました。');
+}
+function handleImportReservationJson(mode = 'merge') {
+  const text = els.reservationJsonArea.value.trim();
+
+  if (!text) {
+    alert('予約JSONを貼り付けてください。');
+    return;
+  }
+
+  try {
+    const parsed = JSON.parse(text);
+
+    let payload;
+
+    if (Array.isArray(parsed)) {
+      payload = convertReservationAppOrdersToPayload(parsed);
+    } else if (Array.isArray(parsed.orders) && Array.isArray(parsed.orderItems)) {
+      payload = parsed;
+    } else if (Array.isArray(parsed.orders)) {
+      payload = convertReservationAppOrdersToPayload(parsed.orders);
+    } else {
+      alert('予約JSONの形式を判定できません。');
+      return;
     }
-    function handleImportReservationJson() {
-      const text = els.reservationJsonArea.value.trim();
 
-      if (!text) {
-        alert('予約JSONを貼り付けてください。');
-        return;
-      }
-
-      try {
-        const parsed = JSON.parse(text);
-
-        let payload;
-
-        if (Array.isArray(parsed)) {
-          payload = convertReservationAppOrdersToPayload(parsed);
-        } else if (Array.isArray(parsed.orders) && Array.isArray(parsed.orderItems)) {
-          payload = parsed;
-        } else if (Array.isArray(parsed.orders)) {
-          payload = convertReservationAppOrdersToPayload(parsed.orders);
-        } else {
-          alert('予約JSONの形式を判定できません。');
-          return;
-        }
-
-        importReservationData(payload);
-      } catch (e) {
-        console.error(e);
-        alert('JSONの形式が正しくありません。');
-      }
-    }
-    function convertReservationAppOrdersToPayload(reservationOrders) {
+    importReservationData(payload, mode);
+  } catch (e) {
+    console.error(e);
+    alert('JSONの形式が正しくありません。');
+  }
+}    function convertReservationAppOrdersToPayload(reservationOrders) {
       const orders = [];
       const orderItems = [];
 
@@ -864,7 +916,10 @@
           customer: order.clientName || order.customer || '',
           category: order.category || '',
           venue: order.venue || '',
-          notes: order.orderNotes || order.notes || ''
+          notes: order.orderNotes || order.notes || '',
+          status: order.status || '',
+productionStatus: '未送信',
+isProductionTarget: isProductionTargetReservation(order),
         });
 
         (order.items || []).forEach(item => {
@@ -890,6 +945,14 @@
 
       return { orders, orderItems };
     }
+    function isProductionTargetReservation(order) {
+  const status = order.status || '';
+
+  if (status === '納品済み') return false;
+  if (status === '完成') return false;
+
+  return true;
+}
     function renderReservations() {
       if (!els.reservationList) return;
 
@@ -901,7 +964,12 @@
         return;
       }
 
-      els.reservationList.innerHTML = db.reservationOrders.map(order => {
+   const visibleOrders = getFilteredReservationOrders();
+
+els.reservationCountBadge.textContent =
+  `${visibleOrders.length} / ${db.reservationOrders.length}件`;
+
+els.reservationList.innerHTML = visibleOrders.map(order => {
         const items = db.reservationOrderItems.filter(
           item => item.orderId === order.id
         );
@@ -981,14 +1049,26 @@
         </div>
 
         <div class="item-actions">
-<button
-  class="btn btn-primary btn-inline"
-  type="button"
-  onclick="sendReservationToProduction('${order.id}')">
+${order.productionStatus === '製造バッチ化済み'
+  ? `
+    <button
+      class="btn btn-secondary btn-inline"
+      type="button"
+      disabled>
+      製造バッチ化済み
+    </button>
+  `
+  : `
+    <button
+      class="btn btn-primary btn-inline"
+      type="button"
+      onclick="sendReservationToProduction('${order.id}')">
 
-  製造へ送る
+      製造へ送る
 
-</button>
+    </button>
+  `
+}
         </div>
 
       </article>
@@ -1030,7 +1110,7 @@
       }
 
       createBatchesFromReservation(order, items);
-
+      order.productionStatus = '製造バッチ化済み';
       refreshAll();
       activateTab('production');
       alert('予約から製造バッチを作成しました。');
@@ -2527,6 +2607,26 @@
       alert('対応していないJSON形式です。');
     }
     initialize();
+    function getFilteredReservationOrders() {
+  const filter = els.reservationFilter?.value || 'productionTarget';
+
+  return db.reservationOrders.filter(order => {
+    const status = order.status || '';
+    const productionStatus = order.productionStatus || '未送信';
+    const category = order.category || '';
+
+    if (filter === 'all') return true;
+    if (filter === 'productionTarget') return order.isProductionTarget !== false;
+    if (filter === 'notSent') return productionStatus === '未送信';
+    if (filter === 'batched') return productionStatus === '製造バッチ化済み';
+    if (filter === 'wedding') return category === '婚礼';
+    if (filter === 'anniversary') return category === 'アニバーサリー';
+    if (filter === 'banquet') return category === '宴会';
+    if (filter === 'delivered') return status === '納品済み';
+
+    return true;
+  });
+}
   </script>
 </body>
 
