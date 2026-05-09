@@ -900,10 +900,30 @@ function handleImportReservationJson(mode = 'merge') {
 
     importReservationData(payload, mode);
   } catch (e) {
-    console.error(e);
-    alert('JSONの形式が正しくありません。');
-  }
-}    function convertReservationAppOrdersToPayload(reservationOrders) {
+  console.error(e);
+  alert('JSONエラー: ' + e.message);
+}
+}
+function findProductIdByReservationItem(item) {
+  const name = String(item.name || item.productName || '').trim();
+  if (!name) return '';
+
+  const exact = db.productMasters.find(product =>
+    String(product.name || '').trim() === name
+  );
+
+  if (exact) return exact.id;
+
+  const loose = db.productMasters.find(product => {
+    const productName = String(product.name || '').trim();
+    if (!productName) return false;
+
+    return name.includes(productName) || productName.includes(name);
+  });
+
+  return loose ? loose.id : '';
+}
+function convertReservationAppOrdersToPayload(reservationOrders) {
       const orders = [];
       const orderItems = [];
 
@@ -926,8 +946,8 @@ isProductionTarget: isProductionTargetReservation(order),
           orderItems.push({
             id: createId('resitem'),
             orderId,
-            productId: '',
-            productName: item.name || item.productName || '',
+           productId: findProductIdByReservationItem(item),
+productName: item.name || item.productName || '',
             quantity: Number(item.quantity || 1),
             unit: item.type === '皿盛りデザート' ? '人前' : '点',
             category: item.type || item.category || order.category || '',
@@ -966,6 +986,9 @@ isProductionTarget: isProductionTargetReservation(order),
 
    const visibleOrders = getFilteredReservationOrders();
 
+   visibleOrders.sort((a, b) =>
+  String(a.date || '').localeCompare(String(b.date || ''))
+);
 els.reservationCountBadge.textContent =
   `${visibleOrders.length} / ${db.reservationOrders.length}件`;
 
@@ -1097,6 +1120,10 @@ ${order.productionStatus === '製造バッチ化済み'
     }
     function sendReservationToProduction(orderId) {
       const order = db.reservationOrders.find(o => o.id === orderId);
+    if (order.productionStatus === '製造バッチ化済み') {
+  alert('この予約はすでに製造へ送信済みです。');
+  return;
+}
       if (!order) {
         alert('予約が見つかりません。');
         return;
@@ -2626,6 +2653,22 @@ ${order.productionStatus === '製造バッチ化済み'
 
     return true;
   });
+  function findProductIdByReservationItem(item) {
+  const name = String(item.name || item.productName || '').trim();
+  if (!name) return '';
+
+  const exact = db.productMasters.find(product =>
+    String(product.name || '').trim() === name
+  );
+
+  if (exact) return exact.id;
+
+  const loose = db.productMasters.find(product =>
+    name.includes(product.name) || product.name.includes(name)
+  );
+
+  return loose ? loose.id : '';
+}
 }
   </script>
 </body>
