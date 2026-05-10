@@ -14,7 +14,26 @@
       schedulePlans: [],
       planItems: [],
       reservationOrders: [],
-      reservationOrderItems: []
+      reservationOrderItems: [],
+   cakeSizePresets: [
+  { label: '9cm', shape: 'round', diameter: 90, height: 45 },
+  { label: '5号', shape: 'round', diameter: 150, height: 45 },
+  { label: '6号', shape: 'round', diameter: 180, height: 45 },
+  { label: '7号', shape: 'round', diameter: 210, height: 45 },
+  { label: '尺', shape: 'round', diameter: 300, height: 45 }
+],
+productAliases: [
+  {
+    id: 'alias_wedding_cake',
+    keyword: 'ウェディングケーキ',
+    productId: 'ここに商品マスターID'
+  },
+  {
+    id: 'alias_plate_dessert',
+    keyword: '皿盛りデザート',
+    productId: 'ここに商品マスターID'
+  }
+]
     };
 
        let appState = {

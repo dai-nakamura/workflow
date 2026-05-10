@@ -48,6 +48,29 @@
                   <option>袋</option>
                 </select></label>
             </div>
+            <label class="field">
+  <span class="field-label">商品タイプ</span>
+  <select id="productKind">
+    <option value="other">その他</option>
+    <option value="cake">ケーキ</option>
+    <option value="plateDessert">皿盛りデザート</option>
+    <option value="gift">ギフト</option>
+    <option value="afternoonTea">アフタヌーンティー</option>
+  </select>
+</label>
+
+<label class="field">
+  <span class="field-label">予約サイズを使う</span>
+  <select id="productUseReservationSize">
+    <option value="false">使わない</option>
+    <option value="true">使う</option>
+  </select>
+</label>
+
+<label class="field">
+  <span class="field-label">別名・予約名</span>
+  <textarea id="productAliases" placeholder="1行に1つ&#10;例：ウェディングケーキ&#10;例：婚礼ケーキ"></textarea>
+</label>
             <label class="field"><span class="field-label">規格価格</span><input type="number" id="matBasePrice" step="0.01"
                 min="0"></label>
             <label class="field"><span class="field-label">カテゴリ</span><input type="text" id="matCategory"></label>
@@ -410,16 +433,21 @@
             </div>
           </div>
           <button class="btn btn-secondary" type="button" id="mergeReservationBtn">
-  予約JSONを追加読込
-</button>
+            予約JSONを追加読込
+          </button>
 
-<button class="btn btn-secondary" type="button" id="replaceReservationBtn">
-  予約JSONで上書き
-</button>
+          <button class="btn btn-secondary" type="button" id="replaceReservationBtn">
+            予約JSONで上書き
+          </button>
 
-<button class="btn btn-danger" type="button" id="clearReservationBtn">
-  予約データ初期化
-</button>
+          <button class="btn btn-danger" type="button" id="clearReservationBtn">
+            予約データ初期化
+          </button>
+          <button class="btn btn-secondary" type="button" id="rebuildReservationBtn">
+
+            予約解析を再実行
+
+          </button>
         </section>
 
         <section class="card">
@@ -431,21 +459,47 @@
 
             <span class="badge" id="reservationCountBadge">0件</span>
           </div>
-<div class="sub-card">
-  <label class="field">
-    <span class="field-label">表示フィルター</span>
-    <select id="reservationFilter">
-      <option value="productionTarget">製造対象のみ</option>
-      <option value="all">全件</option>
-      <option value="notSent">未送信</option>
-      <option value="batched">バッチ化済み</option>
-      <option value="wedding">婚礼</option>
-      <option value="anniversary">アニバーサリー</option>
-      <option value="banquet">宴会</option>
-      <option value="delivered">納品済み</option>
-    </select>
-  </label>
-</div>
+          <div class="sub-card">
+            <label class="field">
+              <span class="field-label">表示フィルター</span>
+              <select id="reservationFilter">
+                <option value="productionTarget">製造対象のみ</option>
+                <option value="all">全件</option>
+                <option value="notSent">未送信</option>
+                <option value="batched">バッチ化済み</option>
+                <option value="wedding">婚礼</option>
+                <option value="anniversary">アニバーサリー</option>
+                <option value="banquet">宴会</option>
+                <option value="delivered">納品済み</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">カテゴリ</span>
+              <select id="reservationCategoryFilter">
+                <option value="all">全カテゴリ</option>
+                <option value="宴会">宴会</option>
+                <option value="婚礼">婚礼</option>
+                <option value="アニバーサリー">アニバーサリー</option>
+                <option value="アフタヌーンティー">アフタヌーンティー</option>
+              </select>
+            </label>
+
+            <div class="micro-row">
+              <label class="field">
+                <span class="field-label">開始日</span>
+                <input type="date" id="reservationFromDate">
+              </label>
+
+              <label class="field">
+                <span class="field-label">終了日</span>
+                <input type="date" id="reservationToDate">
+              </label>
+            </div>
+
+            <button class="btn btn-secondary btn-inline" type="button" id="clearReservationDateFilterBtn">
+              日付クリア
+            </button>
+          </div>
           <div class="list" id="reservationList"></div>
         </section>
 
@@ -679,7 +733,7 @@
     </div>
   </nav>
   <script src="./assets/js/utils.js"></script>
-<script src="./assets/js/db.js"></script>
+  <script src="./assets/js/db.js"></script>
   <script>
 
     const els = {};
@@ -701,11 +755,16 @@
       'productComponentRectangleSizeRow',
       'productComponentSizeRow',
       'mergeReservationBtn',
-'replaceReservationBtn',
-'clearReservationBtn','reservationFilter',
+      'replaceReservationBtn',
+      'clearReservationBtn', 'reservationFilter', 'reservationCategoryFilter',
+      'reservationFromDate',
+      'reservationToDate',
+      'clearReservationDateFilterBtn','productKind',
+'productUseReservationSize',
+'productAliases',
     ].forEach(id => els[id] = document.getElementById(id));
 
-     function getRecipeYieldPresetValues() {
+    function getRecipeYieldPresetValues() {
       return Array.from(els.recipeYieldUnit.options).map(option => option.value);
     }
     function formatDateLabel(dateStr) { const d = parseDate(dateStr); return `${d.getMonth() + 1}/${d.getDate()}`; }
@@ -714,19 +773,19 @@
     function findProduct(id) { return db.productMasters.find(p => p.id === id); }
     function findTask(id) { return db.taskMasters.find(t => t.id === id); }
     function expandProduct(productId, multiplier = 1, eventDate = '', order = null) {
-  const product = findProduct(productId);
-  if (!product) return [];
+      const product = findProduct(productId);
+      if (!product) return [];
 
-  return (product.components || []).map(component => ({
-    productId,
-    componentId: component.refId || '',
-    sourceType: component.sourceType || '',
-    quantity: Number(component.quantity || 0) * Number(multiplier || 1),
-    unit: component.unit || '',
-    eventDate,
-    order
-  }));
-}
+      return (product.components || []).map(component => ({
+        productId,
+        componentId: component.refId || '',
+        sourceType: component.sourceType || '',
+        quantity: Number(component.quantity || 0) * Number(multiplier || 1),
+        unit: component.unit || '',
+        eventDate,
+        order
+      }));
+    }
     function unitCostFromMaterial(mat) { const amount = Number(mat.baseAmount || 0), price = Number(mat.basePrice || 0); return amount ? price / amount : 0; }
     function calculateRecipeCost(recipe) { let total = 0; (recipe.materials || []).forEach(m => { if (!m.materialId) return; const mat = db.materialsMaster.find(x => x.id === m.materialId); if (mat) total += unitCostFromMaterial(mat) * Number(m.amountValue || 0); }); return round2(total); }
     function mergeById(currentList, importedList, prefix) {
@@ -808,11 +867,24 @@
       els.recipeBaseShape.addEventListener('change', toggleRecipeBaseSizeFields);
       els.productComponentShape.addEventListener('change', toggleproductConponentSizeFields);
       els.reservationList.addEventListener('change', handleReservationProductLinkChange);
-els.mergeReservationBtn.addEventListener('click', () => handleImportReservationJson('merge'));
-els.replaceReservationBtn.addEventListener('click', () => handleImportReservationJson('replace'));
-els.clearReservationBtn.addEventListener('click', clearReservationData);
-els.reservationFilter.addEventListener('change', renderReservations); 
-}
+      els.mergeReservationBtn.addEventListener('click', () => handleImportReservationJson('merge'));
+      els.replaceReservationBtn.addEventListener('click', () => handleImportReservationJson('replace'));
+      els.clearReservationBtn.addEventListener('click', clearReservationData);
+      els.reservationFilter.addEventListener('change', renderReservations);
+      els.reservationCategoryFilter.addEventListener('change', renderReservations);
+      els.reservationFromDate.addEventListener('change', renderReservations);
+      els.reservationToDate.addEventListener('change', renderReservations);
+
+      els.clearReservationDateFilterBtn.addEventListener('click', () => {
+        els.reservationFromDate.value = '';
+        els.reservationToDate.value = '';
+        renderReservations();
+      });
+      els.rebuildReservationBtn.addEventListener(
+        'click',
+        rebuildReservationData
+      );
+    }
     function initialize() { loadDb(); bindEvents(); resetMaterialMasterEditor(); resetRecipeEditor(); resetProductEditor(); resetOrderEditor(); resetPlanEditor(); els.plannerStartDate.value = getTodayString(); refreshAll(); }
     function toggleRecipeYieldCustomField() {
       const isCustom = els.recipeYieldUnit.value === '自由入力';
@@ -843,70 +915,82 @@ els.reservationFilter.addEventListener('change', renderReservations);
         els.productComponentRectangleSizeRow.classList.toggle('is-hidden', !isRectangle);
       }
     }
-function importReservationData(payload, mode = 'merge') {
-  const orders = payload.orders || [];
-  const orderItems = payload.orderItems || [];
+    function importReservationData(payload, mode = 'merge') {
+      const orders = payload.orders || [];
+      const orderItems = payload.orderItems || [];
 
-  if (mode === 'replace') {
-    db.reservationOrders = orders;
-    db.reservationOrderItems = orderItems;
-  } else {
-    db.reservationOrders = mergeById(db.reservationOrders, orders, 'resord');
-    db.reservationOrderItems = mergeById(db.reservationOrderItems, orderItems, 'resitem');
-  }
+      if (mode === 'replace') {
+        db.reservationOrders = orders;
+        db.reservationOrderItems = orderItems;
+      } else {
+        db.reservationOrders = mergeById(db.reservationOrders, orders, 'resord');
+        db.reservationOrderItems = mergeById(db.reservationOrderItems, orderItems, 'resitem');
+      }
 
-  refreshAll();
-  renderReservations();
+      refreshAll();
+      renderReservations();
 
-  alert(mode === 'replace'
-    ? '予約データを上書きしました。'
-    : '予約データを追加読込しました。'
-  );
-}
-function clearReservationData() {
-  if (!confirm('予約データをすべて初期化しますか？')) return;
-
-  db.reservationOrders = [];
-  db.reservationOrderItems = [];
-
-  refreshAll();
-  renderReservations();
-
-  alert('予約データを初期化しました。');
-}
-function handleImportReservationJson(mode = 'merge') {
-  const text = els.reservationJsonArea.value.trim();
-
-  if (!text) {
-    alert('予約JSONを貼り付けてください。');
-    return;
-  }
-
-  try {
-    const parsed = JSON.parse(text);
-
-    let payload;
-
-    if (Array.isArray(parsed)) {
-      payload = convertReservationAppOrdersToPayload(parsed);
-    } else if (Array.isArray(parsed.orders) && Array.isArray(parsed.orderItems)) {
-      payload = parsed;
-    } else if (Array.isArray(parsed.orders)) {
-      payload = convertReservationAppOrdersToPayload(parsed.orders);
-    } else {
-      alert('予約JSONの形式を判定できません。');
-      return;
+      alert(mode === 'replace'
+        ? '予約データを上書きしました。'
+        : '予約データを追加読込しました。'
+      );
     }
+    function clearReservationData() {
+      if (!confirm('予約データをすべて初期化しますか？')) return;
 
-    importReservationData(payload, mode);
-  } catch (e) {
-  console.error(e);
-  alert('JSONエラー: ' + e.message);
-}
-}
+      db.reservationOrders = [];
+      db.reservationOrderItems = [];
+
+      refreshAll();
+      renderReservations();
+
+      alert('予約データを初期化しました。');
+    }
+    function handleImportReservationJson(mode = 'merge') {
+      const text = els.reservationJsonArea.value.trim();
+
+      if (!text) {
+        alert('予約JSONを貼り付けてください。');
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(text);
+
+        let payload;
+
+        if (Array.isArray(parsed)) {
+          payload = convertReservationAppOrdersToPayload(parsed);
+        } else if (Array.isArray(parsed.orders) && Array.isArray(parsed.orderItems)) {
+          payload = parsed;
+        } else if (Array.isArray(parsed.orders)) {
+          payload = convertReservationAppOrdersToPayload(parsed.orders);
+        } else {
+          alert('予約JSONの形式を判定できません。');
+          return;
+        }
+
+        importReservationData(payload, mode);
+      } catch (e) {
+        console.error(e);
+        alert('JSONエラー: ' + e.message);
+      }
+    }
 function findProductIdByReservationItem(item) {
   const name = String(item.name || item.productName || '').trim();
-  if (!name) return '';
+  const type = String(item.type || item.category || '').trim();
+
+  if (!name && !type) return '';
+
+  const byAlias = db.productMasters.find(product =>
+    (product.aliases || []).some(alias => {
+      const keyword = String(alias || '').trim();
+      if (!keyword) return false;
+      return name.includes(keyword) || keyword.includes(name) || type.includes(keyword);
+    })
+  );
+
+  if (byAlias) return byAlias.id;
 
   const exact = db.productMasters.find(product =>
     String(product.name || '').trim() === name
@@ -917,13 +1001,75 @@ function findProductIdByReservationItem(item) {
   const loose = db.productMasters.find(product => {
     const productName = String(product.name || '').trim();
     if (!productName) return false;
-
     return name.includes(productName) || productName.includes(name);
   });
 
   return loose ? loose.id : '';
 }
-function convertReservationAppOrdersToPayload(reservationOrders) {
+
+    function parseSquareSize(text) {
+      const raw = String(text || '').trim();
+      if (!raw) return null;
+
+      const nums = raw.match(/\d+(\.\d+)?/g);
+      if (!nums || nums.length < 2) return null;
+
+      return {
+        label: raw,
+        shape: 'rectangle',
+        width: Number(nums[0]) * 10,
+        depth: Number(nums[1]) * 10,
+        height: 45
+      };
+    }
+
+    function parseMultiSize(text) {
+      const raw = String(text || '').trim();
+      if (!raw) return [];
+
+      return raw
+        .split(/[+＋、,\/]/)
+        .map(s => s.trim())
+        .filter(Boolean)
+        .map(label => getCakeSizePreset(label))
+        .filter(Boolean);
+    }
+
+    function parseReservationSize(item) {
+      const size = String(item.size || '').trim();
+      const squareSize = String(item.squareSize || '').trim();
+      const multiSize = String(item.multiSize || '').trim();
+
+      if (multiSize) {
+        return {
+          mode: 'multi',
+          sizeInfoList: parseMultiSize(multiSize)
+        };
+      }
+
+      if (size === '四角') {
+        return {
+          mode: 'single',
+          sizeInfo: parseSquareSize(squareSize)
+        };
+      }
+
+      const preset = getCakeSizePreset(size);
+
+      if (preset) {
+        return {
+          mode: 'single',
+          sizeInfo: preset
+        };
+      }
+
+      return {
+        mode: 'unknown',
+        sizeInfo: null,
+        sizeInfoList: []
+      };
+    }
+    function convertReservationAppOrdersToPayload(reservationOrders) {
       const orders = [];
       const orderItems = [];
 
@@ -938,22 +1084,34 @@ function convertReservationAppOrdersToPayload(reservationOrders) {
           venue: order.venue || '',
           notes: order.orderNotes || order.notes || '',
           status: order.status || '',
-productionStatus: '未送信',
-isProductionTarget: isProductionTargetReservation(order),
+          productionStatus: '未送信',
+          isProductionTarget: isProductionTargetReservation(order)
         });
 
         (order.items || []).forEach(item => {
+          const parsedSize = parseReservationSize(item);
+
           orderItems.push({
             id: createId('resitem'),
             orderId,
-           productId: findProductIdByReservationItem(item),
-productName: item.name || item.productName || '',
+
+            productId: findProductIdByReservationItem(item),
+            productName: item.name || item.productName || '',
+
             quantity: Number(item.quantity || 1),
             unit: item.type === '皿盛りデザート' ? '人前' : '点',
+
             category: item.type || item.category || order.category || '',
+
             size: item.size || item.squareSize || '',
             multiSize: item.multiSize || '',
+
+            sizeInfo: parsedSize.sizeInfo || null,
+            sizeInfoList: parsedSize.sizeInfoList || [],
+            sizeMode: parsedSize.mode,
+
             options: Array.isArray(item.options) ? item.options : [],
+
             notes: [
               item.notes || '',
               item.plateMessage ? `プレート: ${item.plateMessage}` : '',
@@ -964,15 +1122,14 @@ productName: item.name || item.productName || '',
       });
 
       return { orders, orderItems };
+    } function isProductionTargetReservation(order) {
+      const status = order.status || '';
+
+      if (status === '納品済み') return false;
+      if (status === '完成') return false;
+
+      return true;
     }
-    function isProductionTargetReservation(order) {
-  const status = order.status || '';
-
-  if (status === '納品済み') return false;
-  if (status === '完成') return false;
-
-  return true;
-}
     function renderReservations() {
       if (!els.reservationList) return;
 
@@ -984,15 +1141,15 @@ productName: item.name || item.productName || '',
         return;
       }
 
-   const visibleOrders = getFilteredReservationOrders();
+      const visibleOrders = getFilteredReservationOrders();
 
-   visibleOrders.sort((a, b) =>
-  String(a.date || '').localeCompare(String(b.date || ''))
-);
-els.reservationCountBadge.textContent =
-  `${visibleOrders.length} / ${db.reservationOrders.length}件`;
+      visibleOrders.sort((a, b) =>
+        String(a.date || '').localeCompare(String(b.date || ''))
+      );
+      els.reservationCountBadge.textContent =
+        `${visibleOrders.length} / ${db.reservationOrders.length}件`;
 
-els.reservationList.innerHTML = visibleOrders.map(order => {
+      els.reservationList.innerHTML = visibleOrders.map(order => {
         const items = db.reservationOrderItems.filter(
           item => item.orderId === order.id
         );
@@ -1035,7 +1192,29 @@ els.reservationList.innerHTML = visibleOrders.map(order => {
                 ${item.multiSize
             ? ' / ' + escapeHtml(item.multiSize)
             : ''}
-
+${item.sizeMode
+            ? ' / サイズ解析済'
+            : ''}
+  ${item.sizeInfo
+            ? `
+    <div class="record-sub">
+      ${item.sizeInfo.shape === 'rectangle'
+              ? `${item.sizeInfo.width}×${item.sizeInfo.depth}`
+              : `${item.sizeInfo.diameter}φ`}
+    </div>
+  `
+            : ''}
+  ${item.sizeInfoList?.length
+            ? `
+    <div class="record-sub">
+      ${item.sizeInfoList.map(size =>
+              size.shape === 'rectangle'
+                ? `${size.width}×${size.depth}`
+                : `${size.diameter}φ`
+            ).join(' / ')}
+    </div>
+  `
+            : ''}
                 ${item.productId
             ? ' / 紐付け済み'
             : ' / 未紐付け'}
@@ -1073,7 +1252,7 @@ els.reservationList.innerHTML = visibleOrders.map(order => {
 
         <div class="item-actions">
 ${order.productionStatus === '製造バッチ化済み'
-  ? `
+            ? `
     <button
       class="btn btn-secondary btn-inline"
       type="button"
@@ -1081,7 +1260,7 @@ ${order.productionStatus === '製造バッチ化済み'
       製造バッチ化済み
     </button>
   `
-  : `
+            : `
     <button
       class="btn btn-primary btn-inline"
       type="button"
@@ -1091,7 +1270,7 @@ ${order.productionStatus === '製造バッチ化済み'
 
     </button>
   `
-}
+          }
         </div>
 
       </article>
@@ -1120,10 +1299,10 @@ ${order.productionStatus === '製造バッチ化済み'
     }
     function sendReservationToProduction(orderId) {
       const order = db.reservationOrders.find(o => o.id === orderId);
-    if (order.productionStatus === '製造バッチ化済み') {
-  alert('この予約はすでに製造へ送信済みです。');
-  return;
-}
+      if (order.productionStatus === '製造バッチ化済み') {
+        alert('この予約はすでに製造へ送信済みです。');
+        return;
+      }
       if (!order) {
         alert('予約が見つかりません。');
         return;
@@ -1459,7 +1638,9 @@ ${order.productionStatus === '製造バッチ化済み'
     function handleRecipeMasterListClick(e) { const load = e.target.closest('.load-recipe-btn'); const del = e.target.closest('.delete-recipe-btn'); if (load) loadRecipeMaster(load.dataset.id); if (del) deleteRecipeMaster(del.dataset.id); }
     function updateRecipeCostLabel() { els.recipeCostLabel.textContent = `原価: ¥${calculateRecipeCost({ materials: appState.currentRecipeMaterials })}`; }
 
-    function resetProductEditor() { appState.currentProductId = null; appState.currentProductComponents = []; appState.editingProductComponentIndex = null; els.productName.value = ''; els.productCategory.value = ''; els.productUnitLabel.value = ''; els.productNote.value = ''; closeProductComponentForm(); renderProductComponents(); }
+    function resetProductEditor() { appState.currentProductId = null; appState.currentProductComponents = []; appState.editingProductComponentIndex = null; els.productName.value = ''; els.productCategory.value = ''; els.productUnitLabel.value = ''; els.productNote.value = ''; closeProductComponentForm(); renderProductComponents(); els.productKind.value = 'other';
+els.productUseReservationSize.value = 'false';
+els.productAliases.value = '';}
     function refreshProductComponentRefSelect() { const type = els.productComponentSourceType.value; let options = ['<option value="">選択してください</option>']; if (type === 'recipe') options = options.concat(db.recipeMasters.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)); if (type === 'product') options = options.concat(db.productMasters.filter(x => x.id !== appState.currentProductId).map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)); if (type === 'task') options = options.concat(db.taskMasters.map(x => `<option value="${x.id}">${escapeHtml(x.name)}</option>`)); els.productComponentRefSelect.innerHTML = options.join(''); }
     function openAddProductComponentForm() {
       appState.editingProductComponentIndex = null; els.productComponentSourceType.value = 'recipe'; refreshProductComponentRefSelect(); els.productComponentRefSelect.value = ''; els.productComponentQuantity.value = '1'; els.productComponentUnit.value = ''; els.productComponentFormCard.classList.remove('is-hidden'); els.productComponentDiameter.value = '';
@@ -1538,8 +1719,55 @@ ${order.productionStatus === '製造バッチ化済み'
       const edit = e.target.closest('.edit-productcomponent-btn'); const del = e.target.closest('.delete-productcomponent-btn'); if (edit) { const idx = Number(edit.dataset.index); const item = appState.currentProductComponents[idx]; if (!item) return; appState.editingProductComponentIndex = idx; els.productComponentSourceType.value = item.sourceType; refreshProductComponentRefSelect(); els.productComponentRefSelect.value = item.refId || ''; els.productComponentQuantity.value = item.quantity ?? 1; els.productComponentUnit.value = item.unit || ''; els.productComponentFormCard.classList.remove('is-hidden'); } if (del) { appState.currentProductComponents.splice(Number(del.dataset.index), 1); renderProductComponents(); } els.productComponentDiameter.value = item.size?.diameter || '';
       els.productComponentHeight.value = item.size?.height || '';
     }
-    function saveProductMaster() { const name = els.productName.value.trim(); if (!name) { alert('商品名を入力してください。'); return; } const product = { id: appState.currentProductId || createId('product'), name, category: els.productCategory.value.trim(), unitLabel: els.productUnitLabel.value.trim(), components: deepCopy(appState.currentProductComponents), note: els.productNote.value.trim() }; const idx = db.productMasters.findIndex(x => x.id === product.id); if (idx === -1) db.productMasters.unshift(product); else db.productMasters[idx] = product; appState.currentProductId = product.id; refreshAll(); alert('商品を保存しました。'); }
-    function loadProductMaster(id) { const product = findProduct(id); if (!product) return; appState.currentProductId = product.id; els.productName.value = product.name || ''; els.productCategory.value = product.category || ''; els.productUnitLabel.value = product.unitLabel || ''; els.productNote.value = product.note || ''; appState.currentProductComponents = deepCopy(product.components || []); renderProductComponents(); activateTab('products'); }
+  function saveProductMaster() {
+  const name = els.productName.value.trim();
+
+  if (!name) {
+    alert('商品名を入力してください。');
+    return;
+  }
+
+  const product = {
+    id: appState.currentProductId || createId('product'),
+    name,
+    category: els.productCategory.value.trim(),
+    unitLabel: els.productUnitLabel.value.trim(),
+
+    productKind: els.productKind.value,
+    useReservationSize: els.productUseReservationSize.value === 'true',
+    aliases: els.productAliases.value
+      .split('\n')
+      .map(s => s.trim())
+      .filter(Boolean),
+
+    components: deepCopy(appState.currentProductComponents),
+    note: els.productNote.value.trim()
+  };
+
+  const idx = db.productMasters.findIndex(x => x.id === product.id);
+
+  if (idx === -1) {
+    db.productMasters.unshift(product);
+  } else {
+    db.productMasters[idx] = product;
+  }
+
+  appState.currentProductId = product.id;
+
+  refreshAll();
+  alert('商品を保存しました。');
+}   function loadProductMaster(id) { const product = findProduct(id); if (!product) return; appState.currentProductId = product.id; els.productName.value = product.name || ''; els.productCategory.value = product.category || ''; els.productUnitLabel.value = product.unitLabel || '';els.productName.value = product.name || '';
+els.productCategory.value = product.category || '';
+
+els.productKind.value = product.productKind || 'other';
+
+els.productUseReservationSize.value =
+  product.useReservationSize ? 'true' : 'false';
+
+els.productAliases.value =
+  (product.aliases || []).join('\n');
+
+els.productNote.value = product.note || ''; els.productNote.value = product.note || ''; appState.currentProductComponents = deepCopy(product.components || []); renderProductComponents(); activateTab('products'); }
     function deleteProductMaster(id) { if (!confirm('この商品を削除しますか？')) return; db.productMasters = db.productMasters.filter(x => x.id !== id); if (appState.currentProductId === id) resetProductEditor(); refreshAll(); }
     function renderProductList() { els.productCountBadge.textContent = `${db.productMasters.length}件`; els.productList.innerHTML = ''; if (!db.productMasters.length) { els.productList.innerHTML = '<div class="empty-box">まだ商品がありません。</div>'; return; } db.productMasters.forEach(product => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(product.name)}</div><div class="record-sub">${escapeHtml(product.category || '')} / 単位: ${escapeHtml(product.unitLabel || '')}</div><div class="record-sub">構成 ${product.components?.length || 0}件</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-product-btn" type="button" data-id="${product.id}">開く</button><button class="btn btn-danger btn-inline delete-product-btn" type="button" data-id="${product.id}">削除</button></div>`; els.productList.appendChild(card); }); }
     function handleProductListClick(e) { const load = e.target.closest('.load-product-btn'); const del = e.target.closest('.delete-product-btn'); if (load) loadProductMaster(load.dataset.id); if (del) deleteProductMaster(del.dataset.id); }
@@ -2635,42 +2863,72 @@ ${order.productionStatus === '製造バッチ化済み'
     }
     initialize();
     function getFilteredReservationOrders() {
-  const filter = els.reservationFilter?.value || 'productionTarget';
+      const filter = els.reservationFilter?.value || 'productionTarget';
+      const categoryFilter = els.reservationCategoryFilter?.value || 'all';
+      const fromDate = els.reservationFromDate?.value || '';
+      const toDate = els.reservationToDate?.value || '';
 
-  return db.reservationOrders.filter(order => {
-    const status = order.status || '';
-    const productionStatus = order.productionStatus || '未送信';
-    const category = order.category || '';
+      return db.reservationOrders.filter(order => {
+        const status = order.status || '';
+        const productionStatus = order.productionStatus || '未送信';
+        const category = order.category || '';
+        const date = order.date || '';
 
-    if (filter === 'all') return true;
-    if (filter === 'productionTarget') return order.isProductionTarget !== false;
-    if (filter === 'notSent') return productionStatus === '未送信';
-    if (filter === 'batched') return productionStatus === '製造バッチ化済み';
-    if (filter === 'wedding') return category === '婚礼';
-    if (filter === 'anniversary') return category === 'アニバーサリー';
-    if (filter === 'banquet') return category === '宴会';
-    if (filter === 'delivered') return status === '納品済み';
+        if (filter === 'all') {
+          // OK
+        } else if (filter === 'productionTarget' && order.isProductionTarget === false) {
+          return false;
+        } else if (filter === 'notSent' && productionStatus !== '未送信') {
+          return false;
+        } else if (filter === 'batched' && productionStatus !== '製造バッチ化済み') {
+          return false;
+        } else if (filter === 'delivered' && status !== '納品済み') {
+          return false;
+        }
 
-    return true;
-  });
-  function findProductIdByReservationItem(item) {
-  const name = String(item.name || item.productName || '').trim();
-  if (!name) return '';
+        if (categoryFilter !== 'all' && category !== categoryFilter) {
+          return false;
+        }
 
-  const exact = db.productMasters.find(product =>
-    String(product.name || '').trim() === name
-  );
+        if (fromDate && date < fromDate) {
+          return false;
+        }
 
-  if (exact) return exact.id;
+        if (toDate && date > toDate) {
+          return false;
+        }
 
-  const loose = db.productMasters.find(product =>
-    name.includes(product.name) || product.name.includes(name)
-  );
+        return true;
+      });
+      function rebuildReservationData() {
+        if (!confirm('予約データを現在の解析ルールで再解析しますか？')) {
+          return;
+        }
 
-  return loose ? loose.id : '';
-}
-}
-  </script>
+        const rebuiltItems = db.reservationOrderItems.map(item => {
+          const parsedSize = parseReservationSize(item);
+
+          return {
+            ...item,
+
+            productId:
+              item.productId ||
+              findProductIdByReservationItem(item),
+
+            sizeInfo: parsedSize.sizeInfo || null,
+            sizeInfoList: parsedSize.sizeInfoList || [],
+            sizeMode: parsedSize.mode
+          };
+        });
+
+        db.reservationOrderItems = rebuiltItems;
+
+        persistDb();
+        renderReservations();
+
+        alert('予約解析を再実行しました。');
+      }
+    }  </script>
 </body>
 
 </html>
