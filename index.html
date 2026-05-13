@@ -321,7 +321,7 @@
             <div class="stack-form">
               <label class="field"><span class="field-label">種類</span><select id="productComponentSourceType">
                   <option value="recipe">レシピ</option>
-                   <option value="material">材料</option>
+                  <option value="material">材料</option>
                   <option value="product">商品</option>
                   <option value="task">作業</option>
                 </select></label>
@@ -1793,35 +1793,35 @@ ${order.productionStatus === '製造バッチ化済み'
       els.productNote.value = product.note || ''; els.productNote.value = product.note || ''; appState.currentProductComponents = deepCopy(product.components || []); renderProductComponents(); activateTab('products');
     }
     function mergeMaterialsByName(currentList, importedList) {
-  const map = new Map();
+      const map = new Map();
 
-  currentList.forEach(item => {
-    const key = String(item.name || '').trim();
-    if (key) map.set(key, item);
-  });
-
-  importedList.forEach(item => {
-    const key = String(item.name || '').trim();
-    if (!key) return;
-
-    const existing = map.get(key);
-
-    if (existing) {
-      map.set(key, {
-        ...existing,
-        ...item,
-        id: existing.id
+      currentList.forEach(item => {
+        const key = String(item.name || '').trim();
+        if (key) map.set(key, item);
       });
-    } else {
-      map.set(key, {
-        ...item,
-        id: item.id || createId('mat')
+
+      importedList.forEach(item => {
+        const key = String(item.name || '').trim();
+        if (!key) return;
+
+        const existing = map.get(key);
+
+        if (existing) {
+          map.set(key, {
+            ...existing,
+            ...item,
+            id: existing.id
+          });
+        } else {
+          map.set(key, {
+            ...item,
+            id: item.id || createId('mat')
+          });
+        }
       });
+
+      return Array.from(map.values());
     }
-  });
-
-  return Array.from(map.values());
-}
     function deleteProductMaster(id) { if (!confirm('この商品を削除しますか？')) return; db.productMasters = db.productMasters.filter(x => x.id !== id); if (appState.currentProductId === id) resetProductEditor(); refreshAll(); }
     function renderProductList() {
       els.productCountBadge.textContent = `${db.productMasters.length}件`;
@@ -1863,6 +1863,10 @@ ${order.productionStatus === '製造バッチ化済み'
           開く
         </button>
 
+        <button class="btn btn-secondary btn-inline duplicate-product-btn" type="button" data-id="${product.id}">
+  複製
+</button>
+
         <button class="btn btn-danger btn-inline delete-product-btn" type="button" data-id="${product.id}">
           削除
         </button>
@@ -1871,7 +1875,49 @@ ${order.productionStatus === '製造バッチ化済み'
 
         els.productList.appendChild(card);
       });
-    } function handleProductListClick(e) { const load = e.target.closest('.load-product-btn'); const del = e.target.closest('.delete-product-btn'); if (load) loadProductMaster(load.dataset.id); if (del) deleteProductMaster(del.dataset.id); }
+    }
+    function handleProductListClick(e) {
+      const load = e.target.closest('.load-product-btn'); const duplicate = e.target.closest('.duplicate-product-btn'); const del = e.target.closest('.delete-product-btn'); if (load) loadProductMaster(load.dataset.id); if (duplicate) {
+        duplicateProductToEditor(duplicate.dataset.id);
+      } if (del) deleteProductMaster(del.dataset.id);
+    }
+    function duplicateProductToEditor(productId) {
+      const product = db.productMasters.find(p => p.id === productId);
+      if (!product) return;
+
+      appState.currentProductId = null;
+
+      els.productName.value = `${product.name || ''} コピー`;
+      els.productCategory.value = product.category || '';
+      els.productUnitLabel.value = product.unitLabel || '';
+
+      if (els.productKind) {
+        els.productKind.value = product.productKind || 'other';
+      }
+
+      if (els.productUseReservationSize) {
+        els.productUseReservationSize.value =
+          product.useReservationSize ? 'true' : 'false';
+      }
+
+      if (els.productAliases) {
+        els.productAliases.value = (product.aliases || []).join('\n');
+      }
+
+      if (els.productSalePrice) {
+        els.productSalePrice.value = product.salePrice || '';
+      }
+
+      els.productNote.value = product.note || '';
+
+      appState.currentProductComponents =
+        deepCopy(product.components || []);
+
+      renderProductComponents();
+      activateTab('products');
+
+      alert('商品を複製しました。名前を変更して保存してください。');
+    }
     function calcSizeScale(baseSize, targetSize) {
       const shape = targetSize?.shape || baseSize?.shape || 'round';
 
@@ -2749,46 +2795,46 @@ ${order.productionStatus === '製造バッチ化済み'
       alert('予約JSONを読み込みました。');
     }
     function mergeProductsByName(currentList, importedList) {
-  const map = new Map();
+      const map = new Map();
 
-  currentList.forEach(product => {
-    const key = String(product.name || '').trim();
-    if (key) map.set(key, product);
-  });
-
-  importedList.forEach(product => {
-    const key = String(product.name || '').trim();
-    if (!key) return;
-
-    const existing = map.get(key);
-
-    if (existing) {
-      map.set(key, {
-        ...existing,
-        ...product,
-
-        id: existing.id,
-
-        components:
-          Array.isArray(product.components)
-            ? product.components
-            : existing.components,
-
-        aliases:
-          Array.isArray(product.aliases)
-            ? product.aliases
-            : existing.aliases
+      currentList.forEach(product => {
+        const key = String(product.name || '').trim();
+        if (key) map.set(key, product);
       });
-    } else {
-      map.set(key, {
-        ...product,
-        id: product.id || createId('product')
+
+      importedList.forEach(product => {
+        const key = String(product.name || '').trim();
+        if (!key) return;
+
+        const existing = map.get(key);
+
+        if (existing) {
+          map.set(key, {
+            ...existing,
+            ...product,
+
+            id: existing.id,
+
+            components:
+              Array.isArray(product.components)
+                ? product.components
+                : existing.components,
+
+            aliases:
+              Array.isArray(product.aliases)
+                ? product.aliases
+                : existing.aliases
+          });
+        } else {
+          map.set(key, {
+            ...product,
+            id: product.id || createId('product')
+          });
+        }
       });
+
+      return Array.from(map.values());
     }
-  });
-
-  return Array.from(map.values());
-}
     function importParsedJson(parsed, mode = 'merge') {
       if (!parsed || typeof parsed !== 'object') {
         alert('読み込めるJSONではありません。');
@@ -2858,10 +2904,10 @@ ${order.productionStatus === '製造バッチ化済み'
           db.reservationOrders = Array.isArray(parsed.reservationOrders) ? parsed.reservationOrders : [];
           db.reservationOrderItems = Array.isArray(parsed.reservationOrderItems) ? parsed.reservationOrderItems : [];
         } else {
- db.materialsMaster = mergeMaterialsByName(
-  db.materialsMaster,
-  Array.isArray(parsed.materialsMaster) ? parsed.materialsMaster : []
-);
+          db.materialsMaster = mergeMaterialsByName(
+            db.materialsMaster,
+            Array.isArray(parsed.materialsMaster) ? parsed.materialsMaster : []
+          );
 
           db.recipeMasters = mergeById(
             db.recipeMasters,
@@ -2869,12 +2915,12 @@ ${order.productionStatus === '製造バッチ化済み'
             'recipe'
           );
 
-db.productMasters = mergeProductsByName(
-  db.productMasters,
-  Array.isArray(parsed.productMasters)
-    ? parsed.productMasters
-    : []
-);
+          db.productMasters = mergeProductsByName(
+            db.productMasters,
+            Array.isArray(parsed.productMasters)
+              ? parsed.productMasters
+              : []
+          );
 
           db.orders = mergeById(
             db.orders,
@@ -3071,45 +3117,45 @@ db.productMasters = mergeProductsByName(
         alert('予約解析を再実行しました。');
       }
     }
-      function calcProductCost(product) {
-        let totalCost = 0;
+    function calcProductCost(product) {
+      let totalCost = 0;
 
-        (product.components || []).forEach(component => {
-          if (component.sourceType !== 'recipe') return;
+      (product.components || []).forEach(component => {
+        if (component.sourceType !== 'recipe') return;
 
-          const recipe = findRecipe(component.refId);
-          if (!recipe) return;
+        const recipe = findRecipe(component.refId);
+        if (!recipe) return;
 
-          const recipeCost = calculateRecipeCost(recipe);
-          const quantity = Number(component.quantity || 1);
+        const recipeCost = calculateRecipeCost(recipe);
+        const quantity = Number(component.quantity || 1);
 
-          totalCost += recipeCost * quantity;
-        });
+        totalCost += recipeCost * quantity;
+      });
 
-        const salePrice = Number(product.salePrice || els.productSalePrice?.value || 0);
+      const salePrice = Number(product.salePrice || els.productSalePrice?.value || 0);
 
-        return {
-          cost: totalCost,
-          salePrice,
-          costRate: salePrice > 0 ? (totalCost / salePrice) * 100 : 0,
-          profit: salePrice - totalCost
-        };
-      }
-      function previewCurrentProductCost() {
-        const product = {
-          components: deepCopy(appState.currentProductComponents)
-        };
+      return {
+        cost: totalCost,
+        salePrice,
+        costRate: salePrice > 0 ? (totalCost / salePrice) * 100 : 0,
+        profit: salePrice - totalCost
+      };
+    }
+    function previewCurrentProductCost() {
+      const product = {
+        components: deepCopy(appState.currentProductComponents)
+      };
 
-        const result = calcTemporaryProductCost(product);
+      const result = calcTemporaryProductCost(product);
 
-        alert(
-          `概算原価: ${round2(result.cost)}円\n` +
-          `売価: ${round2(result.salePrice)}円\n` +
-          `原価率: ${round2(result.costRate)}%\n` +
-          `粗利: ${round2(result.profit)}円`
-        );
-      }
-     </script>
+      alert(
+        `概算原価: ${round2(result.cost)}円\n` +
+        `売価: ${round2(result.salePrice)}円\n` +
+        `原価率: ${round2(result.costRate)}%\n` +
+        `粗利: ${round2(result.profit)}円`
+      );
+    }
+  </script>
 </body>
 
 </html>
