@@ -84,6 +84,60 @@
               <p class="section-kicker">レシピ</p>
               <h2>基本情報</h2>
             </div>
+            <div class="sub-card">
+  <button class="btn btn-secondary" type="button" id="toggleRecipeCalcBtn">
+    レシピ換算ナビ
+  </button>
+
+  <div id="recipeCalcPanel" class="stack-form is-hidden" style="margin-top:14px;">
+    <label class="field">
+      <span class="field-label">作りたい形状</span>
+      <select id="recipeCalcTargetShape">
+        <option value="round">丸</option>
+        <option value="rectangle">四角</option>
+      </select>
+    </label>
+
+    <div class="micro-row" id="recipeCalcRoundRow">
+      <label class="field">
+        <span class="field-label">直径(mm)</span>
+        <input type="number" id="recipeCalcTargetDiameter">
+      </label>
+      <label class="field">
+        <span class="field-label">高さ(mm)</span>
+        <input type="number" id="recipeCalcTargetHeight">
+      </label>
+    </div>
+
+    <div class="micro-row is-hidden" id="recipeCalcRectangleRow">
+      <label class="field">
+        <span class="field-label">横幅(mm)</span>
+        <input type="number" id="recipeCalcTargetWidth">
+      </label>
+      <label class="field">
+        <span class="field-label">奥行(mm)</span>
+        <input type="number" id="recipeCalcTargetDepth">
+      </label>
+            <label class="field">
+        <span class="field-label">高さ（ｍｍ）</span>
+        <input type="number" id="recipeCalcTargetRectHeight">
+      </label>
+    </div>
+
+    <label class="field">
+      <span class="field-label">必要数量</span>
+      <input type="number" id="recipeCalcQuantity" value="1" min="0" step="0.01">
+    </label>
+
+    <button class="btn btn-primary" type="button" id="runRecipeCalcBtn">
+      換算する
+    </button>
+
+    <div id="recipeCalcResult" class="empty-box">
+      換算結果がここに出ます。
+    </div>
+  </div>
+</div>
           </div>
           <div class="stack-form">
             <label class="field"><span class="field-label">名称</span><input type="text" id="recipeName"></label>

@@ -63,14 +63,23 @@ function findMaterialMasterByName(name) {
 
 function attachMaterialIdsToRecipeMaterials(materials) {
       return (materials || []).map(item => {
-        if (item.materialId) return item;
+        const currentId = item.materialId || '';
+
+        const exists = currentId
+        ? db.materialsMaster.some(mat => mat.id === currentId)
+        : false;
+
+        if (exists) {
+          return item;
+        }
 
         const matched = findMaterialMasterByName(item.name);
 
         return {
           ...item,
-          materialId: matched ? matched.id : null,
-          name: item.name || matched?.name || ""
+          materialId: matched ? matched.id :null,
+          name: item.name || matched?.name || ''
+
         };
       });
     }

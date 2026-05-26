@@ -153,9 +153,18 @@ function loadRecipeMaster(id) {
 
 function deleteRecipeMaster(id) { if (!confirm('このレシピを削除しますか？')) return; db.recipeMasters = db.recipeMasters.filter(x => x.id !== id); if (appState.currentRecipeId === id) resetRecipeEditor(); refreshAll(); }
 
-function renderRecipeMasterList() { els.recipeCountBadge.textContent = `${db.recipeMasters.length}件`; els.recipeMasterList.innerHTML = ''; if (!db.recipeMasters.length) { els.recipeMasterList.innerHTML = '<div class="empty-box">まだレシピがありません。</div>'; return; } db.recipeMasters.forEach(recipe => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(recipe.name)}</div><div class="record-sub">${escapeHtml(recipe.type)} / 出来高 ${round2(recipe.yieldQuantity || 0)}${escapeHtml(recipe.yieldUnit || '')}</div><div class="record-sub">原価: ¥${calculateRecipeCost(recipe)}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-recipe-btn" type="button" data-id="${recipe.id}">開く</button><button class="btn btn-danger btn-inline delete-recipe-btn" type="button" data-id="${recipe.id}">削除</button></div>`; els.recipeMasterList.appendChild(card); }); }
+function renderRecipeMasterList() { els.recipeCountBadge.textContent = `${db.recipeMasters.length}件`; els.recipeMasterList.innerHTML = ''; if (!db.recipeMasters.length) { els.recipeMasterList.innerHTML = '<div class="empty-box">まだレシピがありません。</div>'; return; } db.recipeMasters.forEach(recipe => { const card = document.createElement('article'); card.className = 'item-card'; card.innerHTML = `<div class="item-main"><div class="item-title">${escapeHtml(recipe.name)}</div><div class="record-sub">${escapeHtml(recipe.type)} / 出来高 ${round2(recipe.yieldQuantity || 0)}${escapeHtml(recipe.yieldUnit || '')}</div><div class="record-sub">原価: ¥${calculateRecipeCost(recipe)}</div></div><div class="item-actions"><button class="btn btn-secondary btn-inline load-recipe-btn" type="button" data-id="${recipe.id}">開く</button><button
+  class="btn btn-secondary btn-inline duplicate-recipe-btn"
+  type="button"
+  data-id="${recipe.id}">
 
-function handleRecipeMasterListClick(e) { const load = e.target.closest('.load-recipe-btn'); const del = e.target.closest('.delete-recipe-btn'); if (load) loadRecipeMaster(load.dataset.id); if (del) deleteRecipeMaster(del.dataset.id); }
+  複製
+
+</button><button class="btn btn-danger btn-inline delete-recipe-btn" type="button" data-id="${recipe.id}">削除</button></div>`; els.recipeMasterList.appendChild(card); }); }
+
+function handleRecipeMasterListClick(e) { const load = e.target.closest('.load-recipe-btn');const duplicate = e.target.closest('.duplicate-recipe-btn');if (duplicate) {
+  duplicateRecipeToEditor(duplicate.dataset.id);
+} const del = e.target.closest('.delete-recipe-btn'); if (load) loadRecipeMaster(load.dataset.id); if (del) deleteRecipeMaster(del.dataset.id); }
 
 function updateRecipeCostLabel() { els.recipeCostLabel.textContent = `原価: ¥${calculateRecipeCost({ materials: appState.currentRecipeMaterials })}`; }
 
@@ -202,4 +211,197 @@ function scaleRecipeBySize() {
   renderRecipeMaterials();
   updateRecipeCostLabel();
   alert(`倍率 ${scale.toFixed(2)}倍 に変換しました`);
+}
+function relinkAllRecipeMaterials() {
+  db.recipeMasters = db.recipeMasters.map(recipe => ({
+    ...recipe,
+    materials: attachMaterialIdsToRecipeMaterials(recipe.materials || [])
+  }));
+
+  appState.currentRecipeMaterials =
+  attachMaterialIdsToRecipeMaterials(appState.currentRecipeMaterials || []);
+
+  refreshAll();
+  alert('レシピ材料を原価マスターと再照合しました。');
+}
+window.relinkAllRecipeMaterials = relinkAllRecipeMaterials;
+function duplicateRecipeToEditor(recipeId) {
+
+  const recipe = findRecipe(recipeId);
+
+  if (!recipe) return;
+
+  appState.currentRecipeId = null;
+
+  els.recipeName.value =
+    `${recipe.name || ''} コピー`;
+
+  els.recipeType.value =
+    recipe.type || '試作';
+
+  els.recipeDate.value =
+    getTodayString();
+
+  els.recipeOwner.value =
+    recipe.owner || '';
+
+  els.recipeYieldQuantity.value =
+    recipe.yieldQuantity || '';
+
+  const presetUnits =
+    getRecipeYieldPresetValues();
+
+  if (presetUnits.includes(recipe.yieldUnit)) {
+
+    els.recipeYieldUnit.value =
+      recipe.yieldUnit || '個';
+
+    els.recipeYieldCustomUnit.value = '';
+
+  } else {
+
+    els.recipeYieldUnit.value = '自由入力';
+
+    els.recipeYieldCustomUnit.value =
+      recipe.yieldUnit || '';
+  }
+
+  els.recipeMemo.value =
+    recipe.memo || '';
+
+  els.recipeBaseShape.value =
+    recipe.baseShape || 'round';
+
+  els.recipeBaseDiameter.value =
+    recipe.baseDiameter || '';
+
+  els.recipeBaseHeight.value =
+    recipe.baseHeight || '';
+
+  els.recipeBaseWidth.value =
+    recipe.baseWidth || '';
+
+  els.recipeBaseDepth.value =
+    recipe.baseDepth || '';
+
+  appState.currentRecipeMaterials =
+    deepCopy(recipe.materials || []);
+
+  appState.currentRecipeFlows =
+    deepCopy(recipe.flows || []);
+
+  renderRecipeMaterials();
+  renderFlows();
+
+  toggleRecipeBaseSizeFields();
+  toggleRecipeYieldCustomField();
+
+  updateEditingLabel();
+  updateRecipeCostLabel();
+
+  activateTab('recipes');
+
+  alert(
+    'レシピを複製しました。名前を変更して保存してください。'
+  );
+}
+
+window.duplicateRecipeToEditor =
+  duplicateRecipeToEditor;
+
+function calcShapeVolumeScale(baseSize, targetSize) {
+  const baseShape = baseSize.shape || 'round';
+  const targetShape = targetSize.shape || 'round';
+
+  const baseHeight = Number(baseSize.height || 1);
+  const targetHeight = Number(targetSize.height || baseHeight || 1);
+
+  let baseArea = 0;
+  let targetArea = 0;
+
+  if (baseShape === 'rectangle') {
+    baseArea =
+      Number(baseSize.width || 0) *
+      Number(baseSize.depth || 0);
+  } else {
+    const d = Number(baseSize.diameter || 0);
+    baseArea = Math.PI * Math.pow(d / 2, 2);
+  }
+
+  if (targetShape === 'rectangle') {
+    targetArea =
+      Number(targetSize.width || 0) *
+      Number(targetSize.depth || 0);
+  } else {
+    const d = Number(targetSize.diameter || 0);
+    targetArea = Math.PI * Math.pow(d / 2, 2);
+  }
+
+  if (!baseArea || !targetArea) return 1;
+
+  return round2((targetArea * targetHeight) / (baseArea * baseHeight));
+}
+function toggleRecipeCalcShapeRows() {
+  const isRectangle = els.recipeCalcTargetShape.value === 'rectangle';
+
+  els.recipeCalcRoundRow.classList.toggle('is-hidden', isRectangle);
+  els.recipeCalcRectangleRow.classList.toggle('is-hidden', !isRectangle);
+}
+
+function getCurrentRecipeBaseSize() {
+  return {
+    shape: els.recipeBaseShape.value || 'round',
+    diameter: Number(els.recipeBaseDiameter.value || 0),
+    width: Number(els.recipeBaseWidth.value || 0),
+    depth: Number(els.recipeBaseDepth.value || 0),
+    height: Number(els.recipeBaseHeight.value || 1)
+  };
+}
+
+function getRecipeCalcTargetSize() {
+  const shape = els.recipeCalcTargetShape.value || 'round';
+
+  if (shape === 'rectangle') {
+    return {
+      shape: 'rectangle',
+      width: Number(els.recipeCalcTargetWidth.value || 0),
+      depth: Number(els.recipeCalcTargetDepth.value || 0),
+      height: Number(els.recipeCalcTargetHeight.value || els.recipeBaseHeight.value || 1)
+    };
+  }
+
+  return {
+    shape: 'round',
+    diameter: Number(els.recipeCalcTargetDiameter.value || 0),
+    height: Number(els.recipeCalcTargetHeight.value || els.recipeBaseHeight.value || 1)
+  };
+}
+
+function runRecipeCalcNavigator() {
+  const baseSize = getCurrentRecipeBaseSize();
+  const targetSize = getRecipeCalcTargetSize();
+  const quantity = Number(els.recipeCalcQuantity.value || 1);
+
+  const sizeScale = calcShapeVolumeScale(baseSize, targetSize);
+  const finalScale = round2(sizeScale * quantity);
+
+  if (!appState.currentRecipeMaterials.length) {
+    alert('換算するレシピ材料がありません。');
+    return;
+  }
+
+  const rows = appState.currentRecipeMaterials.map(m => `
+    <div class="record-sub">
+      ${escapeHtml(m.name)}：
+      ${round2(Number(m.amountValue || 0) * finalScale)}
+      ${escapeHtml(m.amountUnit || '')}
+    </div>
+  `).join('');
+
+  els.recipeCalcResult.innerHTML = `
+    <div class="item-title">換算結果</div>
+    <div class="record-sub">サイズ倍率：${sizeScale}倍</div>
+    <div class="record-sub">数量込み倍率：${finalScale}倍</div>
+    <div class="sub-card">${rows}</div>
+  `;
 }

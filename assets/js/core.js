@@ -28,7 +28,19 @@ var els = window.els;
       'clearReservationDateFilterBtn', 'productKind',
       'productUseReservationSize',
       'productAliases', 'productSalePrice',
-      'calcProductCostBtn','matSubCategory',
+      'calcProductCostBtn','matSubCategory','toggleRecipeCalcBtn',
+'recipeCalcPanel',
+'recipeCalcTargetShape',
+'recipeCalcRoundRow',
+'recipeCalcRectangleRow',
+'recipeCalcTargetDiameter',
+'recipeCalcTargetHeight',
+'recipeCalcTargetRectHeight',
+'recipeCalcTargetWidth',
+'recipeCalcTargetDepth',
+'recipeCalcQuantity',
+'runRecipeCalcBtn',
+'recipeCalcResult',
     ].forEach(id => els[id] = document.getElementById(id));
 ['rebuildReservationBtn','createUnlinkedBatchesBtn','saveMaterialMasterBtn','newMaterialMasterBtn','saveProductBtn','newProductBtn','addProductComponentBtn','saveProductComponentBtn','cancelProductComponentBtn','saveRecipeBtn','newRecipeBtn','addRecipeMaterialBtn','saveRecipeMaterialBtn','cancelRecipeMaterialBtn','addFlowBtn','saveFlowBtn','cancelFlowBtn','saveOrderBtn','newOrderBtn','runAggregateBtn','createBatchesFromAggregateBtn','loadScheduleCandidatesBtn','newPlanBtn','savePlanBtn','renderPlannerBtn','exportJsonBtn','mergeJsonBtn','replaceJsonBtn','clearJsonPasteBtn','confirmAssignBtn','cancelAssignBtn'].forEach(id => {
   if (!els[id]) els[id] = document.getElementById(id);
@@ -176,6 +188,13 @@ els.productComponentSubCategoryFilter.addEventListener(
   'change',
   refreshProductComponentRefSelect
 );
+els.toggleRecipeCalcBtn.addEventListener('click', () => {
+  els.recipeCalcPanel.classList.toggle('is-hidden');
+});
+
+els.recipeCalcTargetShape.addEventListener('change', toggleRecipeCalcShapeRows);
+
+els.runRecipeCalcBtn.addEventListener('click', runRecipeCalcNavigator);
     }
 
 function initialize() { loadDb(); bindEvents(); resetMaterialMasterEditor(); resetRecipeEditor(); resetProductEditor(); resetOrderEditor(); resetPlanEditor(); els.plannerStartDate.value = getTodayString(); refreshAll(); }
