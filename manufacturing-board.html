@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>製造ボード</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      background: #f5f7fb;
+      color: #111827;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 16px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 16px;
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-main {
+      background: #111827;
+      color: white;
+    }
+
+    .btn-light {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      box-sizing: border-box;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 8px;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f3f4f6;
+    }
+
+    .summary-item {
+      padding: 10px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 16px;
+    }
+
+    .print-check {
+      font-size: 18px;
+      margin-right: 8px;
+    }
+
+    @media print {
+      header,
+      .no-print {
+        display: none;
+      }
+
+      body {
+        background: white;
+      }
+
+      .card {
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>製造ボード</header>
+
+<main>
+  <section class="card no-print">
+    <h2>① 予約JSON読込</h2>
+    <textarea id="jsonInput" placeholder="予約管理アプリから書き出したJSONを貼り付け"></textarea>
+    <div class="button-row">
+      <button class="btn-main" onclick="loadReservationJson()">読み込む</button>
+      <button class="btn-light" onclick="window.print()">印刷</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>② 製造対象一覧</h2>
+    <div id="productionList"></div>
+  </section>
+
+  <section class="card">
+    <h2>③ 商品別集計</h2>
+    <div id="summaryList"></div>
+  </section>
+</main>
+
+<script>
+  let reservationOrders = [];
+  let reservationOrderItems = [];
+
+  function loadReservationJson() {
+    const text = document.getElementById("jsonInput").value.trim();
+
+    if (!text) {
+      alert("JSONを貼り付けてください");
+      return;
+    }
+
+    try {
+      const data = JSON.parse(text);
+
+      reservationOrders = data.orders || data.reservationOrders || [];
+      reservationOrderItems = data.orderItems || data.reservationOrderItems || [];
+
+      renderProductionList();
+      renderSummaryList();
+
+      alert("読み込みました");
+    } catch (e) {
+      alert("JSONの形式が正しくありません");
+      console.error(e);
+    }
+  }
+
+  function getOrder(orderId) {
+    return reservationOrders.find(order => order.id === orderId) || {};
+  }
+
+  function isProductionTarget(order, item) {
+    if (order.isProductionTarget === false) return false;
+    if (item.isProductionTarget === false) return false;
+    return true;
+  }
+
+  function renderProductionList() {
+    const area = document.getElementById("productionList");
+
+    const rows = reservationOrderItems
+      .map(item => {
+        const order = getOrder(item.orderId);
+        return { order, item };
+      })
+      .filter(({ order, item }) => isProductionTarget(order, item))
+      .sort((a, b) => {
+        const da = a.order.date || "";
+        const db = b.order.date || "";
+        return da.localeCompare(db);
+      });
+
+    if (!rows.length) {
+      area.innerHTML = "<p>製造対象がありません。</p>";
+      return;
+    }
+
+    area.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>日付</th>
+            <th>会場</th>
+            <th>区分</th>
+            <th>商品</th>
+            <th>数量</th>
+            <th>サイズ</th>
+            <th>備考</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(({ order, item }) => `
+            <tr>
+              <td>${order.date || ""}</td>
+              <td>${order.venue || ""}</td>
+              <td>${order.category || ""}</td>
+              <td>${item.productName || ""}</td>
+              <td>${item.quantity || ""} ${item.unit || ""}</td>
+              <td>${item.size || item.multiSize || ""}</td>
+              <td>${item.notes || order.notes || ""}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+  }
+
+  function renderSummaryList() {
+    const area = document.getElementById("summaryList");
+    const map = new Map();
+
+    reservationOrderItems.forEach(item => {
+      const order = getOrder(item.orderId);
+      if (!isProductionTarget(order, item)) return;
+
+      const name = item.productName || "未名称商品";
+      const size = item.size || item.multiSize || "";
+      const unit = item.unit || "個";
+      const key = `${name}__${size}__${unit}`;
+
+      if (!map.has(key)) {
+        map.set(key, {
+          name,
+          size,
+          unit,
+          quantity: 0
+        });
+      }
+
+      map.get(key).quantity += Number(item.quantity || 0);
+    });
+
+    const list = Array.from(map.values());
+
+    if (!list.length) {
+      area.innerHTML = "<p>集計対象がありません。</p>";
+      return;
+    }
+
+    area.innerHTML = list.map(item => `
+      <div class="summary-item">
+        <span class="print-check">□</span>
+        ${item.name}
+        ${item.size ? ` / ${item.size}` : ""}
+        ：${item.quantity} ${item.unit}
+      </div>
+    `).join("");
+  }
+</script>
+
+</body>
+</html>
