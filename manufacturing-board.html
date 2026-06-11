@@ -5,34 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>製造ボード</title>
   <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --dark: #111827;
+      --soft: #f3f4f6;
+      --danger: #fee2e2;
+      --warning: #ffedd5;
+      --success: #dcfce7;
+      --radius: 18px;
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+    }
+
+    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      background: #f5f7fb;
-      color: #111827;
+      background: var(--bg);
+      color: var(--text);
     }
 
     header {
-      background: #111827;
+      background: var(--dark);
       color: white;
-      padding: 16px;
-      font-size: 20px;
-      font-weight: bold;
+      padding: 18px 20px;
+      font-size: 22px;
+      font-weight: 800;
     }
 
     main {
       padding: 16px;
-      max-width: 1000px;
+      max-width: 1100px;
       margin: auto;
     }
 
     .card {
-      background: white;
-      border-radius: 16px;
+      background: var(--card);
+      border-radius: var(--radius);
       padding: 16px;
       margin-bottom: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.08);
+      box-shadow: var(--shadow);
     }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 22px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 180px;
+      border-radius: 14px;
+      border: 1px solid #d1d5db;
+      padding: 12px;
+      font-size: 14px;
+      resize: vertical;
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 16px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .btn-main { background: var(--dark); color: white; }
+    .btn-light { background: #e5e7eb; color: var(--text); }
+    .btn-danger { background: #991b1b; color: white; }
 
     .button-row {
       display: flex;
@@ -41,31 +86,41 @@
       margin-top: 12px;
     }
 
-    button {
-      border: none;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .btn-main {
-      background: #111827;
-      color: white;
-    }
-
-    .btn-light {
-      background: #e5e7eb;
-      color: #111827;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 160px;
+    .notice {
       padding: 12px;
       border-radius: 12px;
-      border: 1px solid #d1d5db;
-      box-sizing: border-box;
+      margin-top: 12px;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+
+    .notice.success { background: var(--success); }
+    .notice.warning { background: var(--warning); }
+    .notice.error { background: var(--danger); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .stat {
+      background: var(--soft);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .stat .value {
+      font-size: 22px;
+      font-weight: 900;
+      margin-top: 4px;
     }
 
     table {
@@ -75,40 +130,83 @@
     }
 
     th, td {
-      border-bottom: 1px solid #e5e7eb;
-      padding: 8px;
+      border-bottom: 1px solid var(--line);
+      padding: 9px 7px;
       text-align: left;
-      font-size: 14px;
+      font-size: 13px;
+      vertical-align: top;
     }
 
     th {
-      background: #f3f4f6;
+      background: var(--soft);
+      font-size: 12px;
+      color: #374151;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
     }
 
     .summary-item {
-      padding: 10px;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 12px 8px;
+      border-bottom: 1px solid var(--line);
       font-size: 16px;
+      line-height: 1.5;
     }
 
-    .print-check {
-      font-size: 18px;
-      margin-right: 8px;
+    .summary-sub {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .check {
+      font-size: 20px;
+      margin-right: 6px;
+    }
+
+    .empty {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px) {
+      header { font-size: 20px; }
+      h2 { font-size: 21px; }
+      th, td { font-size: 12px; }
+      .card { padding: 14px; }
     }
 
     @media print {
       header,
       .no-print {
-        display: none;
+        display: none !important;
       }
 
       body {
         background: white;
       }
 
+      main {
+        padding: 0;
+        max-width: none;
+      }
+
       .card {
         box-shadow: none;
-        border: none;
+        border-radius: 0;
+        margin-bottom: 10px;
+        page-break-inside: avoid;
+      }
+
+      .summary-item {
+        font-size: 15px;
       }
     }
   </style>
@@ -121,152 +219,534 @@
   <section class="card no-print">
     <h2>① 予約JSON読込</h2>
     <textarea id="jsonInput" placeholder="予約管理アプリから書き出したJSONを貼り付け"></textarea>
+
     <div class="button-row">
       <button class="btn-main" onclick="loadReservationJson()">読み込む</button>
+      <button class="btn-light" onclick="loadSample()">サンプル読込</button>
       <button class="btn-light" onclick="window.print()">印刷</button>
+      <button class="btn-danger" onclick="clearAll()">クリア</button>
+    </div>
+
+    <div id="messageArea"></div>
+
+    <p class="small">
+      対応形式：orders[].items / orderItems / reservationOrders / reservationOrderItems<br>
+      商品名：productName / name / itemName に対応<br>
+      日付：date / eventDate / useDate に対応
+    </p>
+  </section>
+
+  <section class="card">
+    <h2>② 読込状況</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="label">予約件数</div>
+        <div class="value" id="orderCount">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">商品件数</div>
+        <div class="value" id="itemCount">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">製造対象</div>
+        <div class="value" id="targetCount">0</div>
+      </div>
+      <div class="stat">
+        <div class="label">集計商品</div>
+        <div class="value" id="summaryCount">0</div>
+      </div>
     </div>
   </section>
 
   <section class="card">
-    <h2>② 製造対象一覧</h2>
+    <h2>③ 製造対象一覧</h2>
     <div id="productionList"></div>
   </section>
 
   <section class="card">
-    <h2>③ 商品別集計</h2>
+    <h2>④ 商品別集計</h2>
     <div id="summaryList"></div>
+  </section>
+
+  <section class="card">
+    <h2>⑤ 未集計・確認メモ</h2>
+    <div id="warningList"></div>
   </section>
 </main>
 
 <script>
   let reservationOrders = [];
   let reservationOrderItems = [];
+  let normalizedRows = [];
+  let summaryRows = [];
+  let warnings = [];
+
+  function showMessage(type, text) {
+    const area = document.getElementById("messageArea");
+    area.innerHTML = `<div class="notice ${type}">${escapeHtml(text)}</div>`;
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function toNumber(value) {
+    if (value === null || value === undefined || value === "") return 0;
+
+    const normalized = String(value)
+      .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 65248))
+      .replace(/,/g, "")
+      .replace(/[^\d.-]/g, "");
+
+    const n = Number(normalized);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  function pick(obj, keys, fallback = "") {
+    for (const key of keys) {
+      if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
+        return obj[key];
+      }
+    }
+    return fallback;
+  }
+
+  function getDate(order, item) {
+    return pick(item, ["date", "eventDate", "useDate", "deliveryDate"], 
+      pick(order, ["date", "eventDate", "useDate", "deliveryDate"], "")
+    );
+  }
+
+  function getVenue(order) {
+    return pick(order, ["venue", "place", "room", "hall"], "");
+  }
+
+  function getCategory(order, item) {
+    return pick(item, ["category", "type"], pick(order, ["category", "type"], ""));
+  }
+
+  function getProductName(item) {
+    return pick(item, ["productName", "name", "itemName", "title", "menuName"], "未名称商品");
+  }
+
+  function getQuantity(item) {
+    return toNumber(pick(item, ["quantity", "qty", "count", "guestCount", "people"], 0));
+  }
+
+  function getUnit(item) {
+    return pick(item, ["unit", "unitLabel"], "個");
+  }
+
+  function getSize(item) {
+    const direct = pick(item, ["size", "multiSize", "sizeText"], "");
+    if (typeof direct === "string") return direct;
+    if (direct && typeof direct === "object") {
+      return [
+        direct.shape,
+        direct.diameter ? direct.diameter + "mm" : "",
+        direct.width && direct.depth ? direct.width + "×" + direct.depth : "",
+        direct.height ? "H" + direct.height : ""
+      ].filter(Boolean).join(" ");
+    }
+
+    const sizeInfo = item.sizeInfo || {};
+    if (sizeInfo && typeof sizeInfo === "object") {
+      return [
+        sizeInfo.label,
+        sizeInfo.shape,
+        sizeInfo.diameter ? sizeInfo.diameter + "mm" : "",
+        sizeInfo.width && sizeInfo.depth ? sizeInfo.width + "×" + sizeInfo.depth : ""
+      ].filter(Boolean).join(" ");
+    }
+
+    return "";
+  }
+
+  function getNotes(order, item) {
+    const itemNotes = pick(item, ["notes", "note", "memo", "remarks"], "");
+    const orderNotes = pick(order, ["notes", "note", "memo", "remarks", "orderNotes"], "");
+    return [itemNotes, orderNotes].filter(Boolean).join(" / ");
+  }
+
+  function getOrderId(order, index) {
+    return pick(order, ["id", "orderId", "_id"], "order_" + index);
+  }
+
+  function getItemId(item, index) {
+    return pick(item, ["id", "itemId", "_id"], "item_" + index);
+  }
+
+  function isProductionTarget(order, item) {
+    if (order && order.isProductionTarget === false) return false;
+    if (item && item.isProductionTarget === false) return false;
+
+    const status = String(pick(order, ["status", "productionStatus"], "")).trim();
+    if (status === "完了" || status === "キャンセル" || status === "取消") return false;
+
+    return true;
+  }
 
   function loadReservationJson() {
     const text = document.getElementById("jsonInput").value.trim();
 
+    resetData();
+
     if (!text) {
-      alert("JSONを貼り付けてください");
+      showMessage("warning", "JSONが空です。予約管理アプリから書き出したJSONを貼り付けてください。");
+      renderAll();
       return;
     }
 
     try {
       const data = JSON.parse(text);
 
-      reservationOrders = data.orders || data.reservationOrders || [];
-      reservationOrderItems = data.orderItems || data.reservationOrderItems || [];
+      parseData(data);
+      normalizeData();
+      renderAll();
 
-      renderProductionList();
-      renderSummaryList();
+      const msg =
+        "読み込み成功\n" +
+        "予約件数：" + reservationOrders.length + "件\n" +
+        "商品件数：" + reservationOrderItems.length + "件\n" +
+        "製造対象：" + normalizedRows.length + "件";
 
-      alert("読み込みました");
+      showMessage("success", msg);
+
     } catch (e) {
-      alert("JSONの形式が正しくありません");
       console.error(e);
+      showMessage(
+        "error",
+        "JSONの形式が正しくありません。\n\nよくある原因：\n・先頭や末尾に余計な文字がある\n・カンマが抜けている\n・途中までしかコピーできていない\n\nエラー内容：\n" + e.message
+      );
+      renderAll();
     }
   }
 
-  function getOrder(orderId) {
-    return reservationOrders.find(order => order.id === orderId) || {};
+  function parseData(data) {
+    if (Array.isArray(data)) {
+      reservationOrders = data;
+    } else {
+      reservationOrders =
+        data.orders ||
+        data.reservationOrders ||
+        data.data?.orders ||
+        data.data?.reservationOrders ||
+        [];
+
+      reservationOrderItems =
+        data.orderItems ||
+        data.reservationOrderItems ||
+        data.items ||
+        data.data?.orderItems ||
+        data.data?.reservationOrderItems ||
+        [];
+    }
+
+    if (!Array.isArray(reservationOrders)) {
+      warnings.push("orders / reservationOrders が配列ではありません。");
+      reservationOrders = [];
+    }
+
+    if (!Array.isArray(reservationOrderItems)) {
+      warnings.push("orderItems / reservationOrderItems が配列ではありません。");
+      reservationOrderItems = [];
+    }
+
+    if (!reservationOrderItems.length && reservationOrders.length) {
+      reservationOrders.forEach((order, orderIndex) => {
+        const orderId = getOrderId(order, orderIndex);
+        const items = order.items || order.orderItems || order.products || [];
+
+        if (!Array.isArray(items)) {
+          warnings.push("予約「" + (order.customer || order.clientName || orderId) + "」の items が配列ではありません。");
+          return;
+        }
+
+        items.forEach((item, itemIndex) => {
+          reservationOrderItems.push({
+            ...item,
+            orderId: orderId,
+            id: getItemId(item, itemIndex)
+          });
+        });
+      });
+    }
+
+    reservationOrders = reservationOrders.map((order, index) => ({
+      ...order,
+      id: getOrderId(order, index)
+    }));
   }
 
-  function isProductionTarget(order, item) {
-    if (order.isProductionTarget === false) return false;
-    if (item.isProductionTarget === false) return false;
-    return true;
+  function getOrder(orderId) {
+    return reservationOrders.find(order => String(order.id) === String(orderId)) || {};
+  }
+
+  function normalizeData() {
+    normalizedRows = [];
+
+    reservationOrderItems.forEach((item, index) => {
+      const order = getOrder(item.orderId);
+
+      if (!isProductionTarget(order, item)) return;
+
+      const name = getProductName(item);
+      const quantity = getQuantity(item);
+      const unit = getUnit(item);
+      const date = getDate(order, item);
+      const venue = getVenue(order);
+      const category = getCategory(order, item);
+      const size = getSize(item);
+      const notes = getNotes(order, item);
+
+      if (!name || name === "未名称商品") {
+        warnings.push("商品名がない商品があります。行番号：" + (index + 1));
+      }
+
+      if (!quantity) {
+        warnings.push("数量が0または未入力の商品があります：「" + name + "」");
+      }
+
+      if (!date) {
+        warnings.push("日付がない商品があります：「" + name + "」");
+      }
+
+      normalizedRows.push({
+        date,
+        venue,
+        category,
+        name,
+        quantity,
+        unit,
+        size,
+        notes,
+        order,
+        item
+      });
+    });
+
+    normalizedRows.sort((a, b) => {
+      const d = String(a.date || "").localeCompare(String(b.date || ""));
+      if (d !== 0) return d;
+      return String(a.venue || "").localeCompare(String(b.venue || ""));
+    });
+
+    buildSummary();
+  }
+
+  function buildSummary() {
+    const map = new Map();
+
+    normalizedRows.forEach(row => {
+      const key = [
+        row.name || "未名称商品",
+        row.size || "",
+        row.unit || "個"
+      ].join("__");
+
+      if (!map.has(key)) {
+        map.set(key, {
+          name: row.name || "未名称商品",
+          size: row.size || "",
+          unit: row.unit || "個",
+          quantity: 0,
+          dates: new Set(),
+          venues: new Set(),
+          details: []
+        });
+      }
+
+      const target = map.get(key);
+      target.quantity += row.quantity;
+      if (row.date) target.dates.add(row.date);
+      if (row.venue) target.venues.add(row.venue);
+      target.details.push(row);
+    });
+
+    summaryRows = Array.from(map.values()).sort((a, b) => {
+      return a.name.localeCompare(b.name, "ja");
+    });
+  }
+
+  function renderAll() {
+    renderStats();
+    renderProductionList();
+    renderSummaryList();
+    renderWarnings();
+  }
+
+  function renderStats() {
+    document.getElementById("orderCount").textContent = reservationOrders.length;
+    document.getElementById("itemCount").textContent = reservationOrderItems.length;
+    document.getElementById("targetCount").textContent = normalizedRows.length;
+    document.getElementById("summaryCount").textContent = summaryRows.length;
   }
 
   function renderProductionList() {
     const area = document.getElementById("productionList");
 
-    const rows = reservationOrderItems
-      .map(item => {
-        const order = getOrder(item.orderId);
-        return { order, item };
-      })
-      .filter(({ order, item }) => isProductionTarget(order, item))
-      .sort((a, b) => {
-        const da = a.order.date || "";
-        const db = b.order.date || "";
-        return da.localeCompare(db);
-      });
-
-    if (!rows.length) {
-      area.innerHTML = "<p>製造対象がありません。</p>";
+    if (!normalizedRows.length) {
+      area.innerHTML = `
+        <p class="empty">
+          製造対象がありません。<br>
+          考えられる原因：<br>
+          ・JSON内に商品 items がない<br>
+          ・isProductionTarget が false になっている<br>
+          ・status が 完了 / キャンセル になっている<br>
+          ・予約JSONの形式が想定外
+        </p>
+      `;
       return;
     }
 
     area.innerHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>日付</th>
-            <th>会場</th>
-            <th>区分</th>
-            <th>商品</th>
-            <th>数量</th>
-            <th>サイズ</th>
-            <th>備考</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rows.map(({ order, item }) => `
+      <div class="table-wrap">
+        <table>
+          <thead>
             <tr>
-              <td>${order.date || ""}</td>
-              <td>${order.venue || ""}</td>
-              <td>${order.category || ""}</td>
-              <td>${item.productName || ""}</td>
-              <td>${item.quantity || ""} ${item.unit || ""}</td>
-              <td>${item.size || item.multiSize || ""}</td>
-              <td>${item.notes || order.notes || ""}</td>
+              <th>日付</th>
+              <th>会場</th>
+              <th>区分</th>
+              <th>商品</th>
+              <th>数量</th>
+              <th>サイズ</th>
+              <th>備考</th>
             </tr>
-          `).join("")}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            ${normalizedRows.map(row => `
+              <tr>
+                <td>${escapeHtml(row.date)}</td>
+                <td>${escapeHtml(row.venue)}</td>
+                <td>${escapeHtml(row.category)}</td>
+                <td>${escapeHtml(row.name)}</td>
+                <td>${escapeHtml(row.quantity)} ${escapeHtml(row.unit)}</td>
+                <td>${escapeHtml(row.size)}</td>
+                <td>${escapeHtml(row.notes)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
     `;
   }
 
   function renderSummaryList() {
     const area = document.getElementById("summaryList");
-    const map = new Map();
 
-    reservationOrderItems.forEach(item => {
-      const order = getOrder(item.orderId);
-      if (!isProductionTarget(order, item)) return;
-
-      const name = item.productName || "未名称商品";
-      const size = item.size || item.multiSize || "";
-      const unit = item.unit || "個";
-      const key = `${name}__${size}__${unit}`;
-
-      if (!map.has(key)) {
-        map.set(key, {
-          name,
-          size,
-          unit,
-          quantity: 0
-        });
-      }
-
-      map.get(key).quantity += Number(item.quantity || 0);
-    });
-
-    const list = Array.from(map.values());
-
-    if (!list.length) {
-      area.innerHTML = "<p>集計対象がありません。</p>";
+    if (!summaryRows.length) {
+      area.innerHTML = `<p class="empty">集計対象がありません。</p>`;
       return;
     }
 
-    area.innerHTML = list.map(item => `
-      <div class="summary-item">
-        <span class="print-check">□</span>
-        ${item.name}
-        ${item.size ? ` / ${item.size}` : ""}
-        ：${item.quantity} ${item.unit}
-      </div>
-    `).join("");
+    area.innerHTML = summaryRows.map(row => {
+      const dates = Array.from(row.dates).sort().join(" / ");
+      const venues = Array.from(row.venues).join(" / ");
+
+      return `
+        <div class="summary-item">
+          <span class="check">□</span>
+          <strong>${escapeHtml(row.name)}</strong>
+          ${row.size ? ` / ${escapeHtml(row.size)}` : ""}
+          ：${escapeHtml(row.quantity)} ${escapeHtml(row.unit)}
+          <div class="summary-sub">
+            ${dates ? `日付：${escapeHtml(dates)}` : ""}
+            ${venues ? `　会場：${escapeHtml(venues)}` : ""}
+          </div>
+        </div>
+      `;
+    }).join("");
   }
+
+  function renderWarnings() {
+    const area = document.getElementById("warningList");
+
+    if (!warnings.length) {
+      area.innerHTML = `<p class="empty">大きな問題は見つかりませんでした。</p>`;
+      return;
+    }
+
+    const unique = Array.from(new Set(warnings));
+
+    area.innerHTML = `
+      <div class="notice warning">
+        ${unique.map(w => "・" + escapeHtml(w)).join("<br>")}
+      </div>
+    `;
+  }
+
+  function resetData() {
+    reservationOrders = [];
+    reservationOrderItems = [];
+    normalizedRows = [];
+    summaryRows = [];
+    warnings = [];
+  }
+
+  function clearAll() {
+    document.getElementById("jsonInput").value = "";
+    document.getElementById("messageArea").innerHTML = "";
+    resetData();
+    renderAll();
+  }
+
+  function loadSample() {
+    const sample = {
+      orders: [
+        {
+          id: "o1",
+          date: "2026-06-15",
+          venue: "千曲",
+          category: "婚礼",
+          customer: "山田・佐藤",
+          status: "製造待ち",
+          isProductionTarget: true,
+          items: [
+            {
+              id: "i1",
+              name: "ショートケーキ",
+              quantity: 2,
+              unit: "台",
+              size: "5号",
+              notes: "苺多め"
+            },
+            {
+              id: "i2",
+              name: "皿盛りデザート",
+              quantity: 80,
+              unit: "人前"
+            }
+          ]
+        },
+        {
+          id: "o2",
+          date: "2026-06-15",
+          venue: "レストラン",
+          category: "宴会",
+          status: "製造待ち",
+          items: [
+            {
+              id: "i3",
+              name: "ショートケーキ",
+              quantity: 3,
+              unit: "台",
+              size: "5号"
+            }
+          ]
+        }
+      ]
+    };
+
+    document.getElementById("jsonInput").value = JSON.stringify(sample, null, 2);
+    loadReservationJson();
+  }
+
+  renderAll();
 </script>
 
 </body>
