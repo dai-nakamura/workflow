@@ -1,772 +1,519 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>製造ボード</title>
-  <style>
-    :root {
-      --bg: #f5f7fb;
-      --card: #ffffff;
-      --text: #111827;
-      --muted: #6b7280;
-      --line: #e5e7eb;
-      --dark: #111827;
-      --soft: #f3f4f6;
-      --danger: #fee2e2;
-      --warning: #ffedd5;
-      --success: #dcfce7;
-      --radius: 18px;
-      --shadow: 0 8px 24px rgba(0,0,0,.08);
-    }
-
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-
-    header {
-      background: var(--dark);
-      color: white;
-      padding: 18px 20px;
-      font-size: 22px;
-      font-weight: 800;
-    }
-
-    main {
-      padding: 16px;
-      max-width: 1100px;
-      margin: auto;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: var(--shadow);
-    }
-
-    h2 {
-      margin: 0 0 14px;
-      font-size: 22px;
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 180px;
-      border-radius: 14px;
-      border: 1px solid #d1d5db;
-      padding: 12px;
-      font-size: 14px;
-      resize: vertical;
-    }
-
-    button {
-      border: none;
-      border-radius: 12px;
-      padding: 11px 16px;
-      font-weight: 800;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    .btn-main { background: var(--dark); color: white; }
-    .btn-light { background: #e5e7eb; color: var(--text); }
-    .btn-danger { background: #991b1b; color: white; }
-
-    .button-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 12px;
-    }
-
-    .notice {
-      padding: 12px;
-      border-radius: 12px;
-      margin-top: 12px;
-      font-size: 14px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-    }
-
-    .notice.success { background: var(--success); }
-    .notice.warning { background: var(--warning); }
-    .notice.error { background: var(--danger); }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-
-    .stat {
-      background: var(--soft);
-      border-radius: 14px;
-      padding: 12px;
-    }
-
-    .stat .label {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .stat .value {
-      font-size: 22px;
-      font-weight: 900;
-      margin-top: 4px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-    }
-
-    th, td {
-      border-bottom: 1px solid var(--line);
-      padding: 9px 7px;
-      text-align: left;
-      font-size: 13px;
-      vertical-align: top;
-    }
-
-    th {
-      background: var(--soft);
-      font-size: 12px;
-      color: #374151;
-    }
-
-    .table-wrap {
-      overflow-x: auto;
-    }
-
-    .summary-item {
-      padding: 12px 8px;
-      border-bottom: 1px solid var(--line);
-      font-size: 16px;
-      line-height: 1.5;
-    }
-
-    .summary-sub {
-      color: var(--muted);
-      font-size: 12px;
-      margin-top: 3px;
-    }
-
-    .check {
-      font-size: 20px;
-      margin-right: 6px;
-    }
-
-    .empty {
-      color: var(--muted);
-      line-height: 1.7;
-    }
-
-    .small {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.6;
-    }
-
-    @media (max-width: 640px) {
-      header { font-size: 20px; }
-      h2 { font-size: 21px; }
-      th, td { font-size: 12px; }
-      .card { padding: 14px; }
-    }
-
-    @media print {
-      header,
-      .no-print {
-        display: none !important;
-      }
-
-      body {
-        background: white;
-      }
-
-      main {
-        padding: 0;
-        max-width: none;
-      }
-
-      .card {
-        box-shadow: none;
-        border-radius: 0;
-        margin-bottom: 10px;
-        page-break-inside: avoid;
-      }
-
-      .summary-item {
-        font-size: 15px;
-      }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>製造ボード v2</title>
+<style>
+:root{
+  --bg:#f5f7fb;--card:#fff;--text:#111827;--muted:#6b7280;
+  --line:#e5e7eb;--dark:#111827;--soft:#f3f4f6;
+  --success:#dcfce7;--warning:#ffedd5;--danger:#fee2e2;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;background:var(--bg);color:var(--text)}
+header{background:var(--dark);color:white;padding:18px;font-size:22px;font-weight:900}
+main{padding:14px;max-width:760px;margin:auto}
+.card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:14px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+h2{margin:0 0 12px;font-size:22px}
+textarea{width:100%;min-height:150px;border:1px solid #d1d5db;border-radius:14px;padding:12px;font-size:14px}
+button{border:0;border-radius:12px;padding:11px 14px;font-weight:800}
+.btn-main{background:var(--dark);color:white}
+.btn-light{background:#e5e7eb;color:var(--text)}
+.btn-danger{background:#991b1b;color:white}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.option{font-size:14px;color:var(--muted);margin-top:10px}
+.notice{padding:10px;border-radius:12px;margin-top:10px;white-space:pre-wrap;font-size:13px;line-height:1.5}
+.success{background:var(--success)}.warning{background:var(--warning)}.error{background:var(--danger)}
+.task{border-bottom:1px solid var(--line);padding:12px 0;display:flex;gap:10px;align-items:flex-start}
+.task input{width:22px;height:22px;margin-top:2px}
+.title{font-size:17px;font-weight:900;line-height:1.4}
+.meta{font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
+.note{font-size:13px;margin-top:5px;color:#374151}
+.empty{color:var(--muted);line-height:1.7}
+.summary-item{padding:10px 0;border-bottom:1px solid var(--line)}
+.small{font-size:12px;color:var(--muted);line-height:1.6}
+details summary{font-weight:900;cursor:pointer}
+@media print{
+  header,.no-print{display:none!important}
+  body{background:white}
+  main{padding:0}
+  .card{box-shadow:none;border-radius:0;margin-bottom:8px;page-break-inside:avoid}
+}
+</style>
 </head>
 <body>
-
-<header>製造ボード</header>
+<header>製造ボード v2</header>
 
 <main>
   <section class="card no-print">
-    <h2>① 予約JSON読込</h2>
+    <h2>予約JSON読込</h2>
     <textarea id="jsonInput" placeholder="予約管理アプリから書き出したJSONを貼り付け"></textarea>
-
-    <div class="button-row">
+    <div class="row">
       <button class="btn-main" onclick="loadReservationJson()">読み込む</button>
-      <button class="btn-light" onclick="loadSample()">サンプル読込</button>
+      <button class="btn-light" onclick="loadSample()">サンプル</button>
       <button class="btn-light" onclick="window.print()">印刷</button>
       <button class="btn-danger" onclick="clearAll()">クリア</button>
     </div>
-
+    <label class="option">
+      <input type="checkbox" id="hideCompleted" checked onchange="renderAll()">
+      完了済みを隠す
+    </label>
     <div id="messageArea"></div>
-
-    <p class="small">
-      対応形式：orders[].items / orderItems / reservationOrders / reservationOrderItems<br>
-      商品名：productName / name / itemName に対応<br>
-      日付：date / eventDate / useDate に対応
-    </p>
-  </section>
-  <div class="button-row">
-  <button onclick="setFilter(0)">今日</button>
-  <button onclick="setFilter(3)">3日以内</button>
-  <button onclick="setFilter(7)">7日以内</button>
-  <button onclick="setFilter(9999)">全件</button>
-</div>
-<label>
-  <input
-    type="checkbox"
-    id="hideCompleted"
-    checked
-    onchange="renderAll()"
-  >
-  完了済みを隠す
-</label>
-
-  <section class="card">
-    <h2>② 読込状況</h2>
-    <div class="stats">
-      <div class="stat">
-        <div class="label">予約件数</div>
-        <div class="value" id="orderCount">0</div>
-      </div>
-      <div class="stat">
-        <div class="label">商品件数</div>
-        <div class="value" id="itemCount">0</div>
-      </div>
-      <div class="stat">
-        <div class="label">製造対象</div>
-        <div class="value" id="targetCount">0</div>
-      </div>
-      <div class="stat">
-        <div class="label">集計商品</div>
-        <div class="value" id="summaryCount">0</div>
-      </div>
-    </div>
+    <p class="small">orders[].items / orderItems / reservationOrders / reservationOrderItems 対応</p>
   </section>
 
   <section class="card">
-    <h2>③ 製造対象一覧</h2>
-    <div id="productionList"></div>
+    <h2>今日</h2>
+    <div id="todayList"></div>
   </section>
 
   <section class="card">
-    <h2>④ 商品別集計</h2>
+    <h2>明日</h2>
+    <div id="tomorrowList"></div>
+  </section>
+
+  <section class="card">
+    <h2>今週</h2>
+    <div id="weekList"></div>
+  </section>
+
+  <section class="card">
+    <h2>商品別集計</h2>
     <div id="summaryList"></div>
-    <input
-  type="checkbox"
-  onchange="toggleComplete('${key}')"
->
   </section>
 
   <section class="card">
-    <h2>⑤ 未集計・確認メモ</h2>
-    <div id="warningList"></div>
+    <h2>完了済み</h2>
+    <div id="completedList"></div>
+  </section>
+
+  <section class="card no-print">
+    <details>
+      <summary>確認メモ</summary>
+      <div id="warningList"></div>
+    </details>
   </section>
 </main>
 
 <script>
-  let reservationOrders = [];
-  let reservationOrderItems = [];
-  let normalizedRows = [];
-  let summaryRows = [];
-  let warnings = [];
+let reservationOrders = [];
+let reservationOrderItems = [];
+let rows = [];
+let warnings = [];
 
-  function showMessage(type, text) {
-    const area = document.getElementById("messageArea");
-    area.innerHTML = `<div class="notice ${type}">${escapeHtml(text)}</div>`;
+function escapeHtml(v){
+  return String(v ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+}
+
+function showMessage(type,text){
+  document.getElementById("messageArea").innerHTML =
+    `<div class="notice ${type}">${escapeHtml(text)}</div>`;
+}
+
+function pick(obj, keys, fallback=""){
+  for(const k of keys){
+    if(obj && obj[k] !== undefined && obj[k] !== null && obj[k] !== "") return obj[k];
+  }
+  return fallback;
+}
+
+function toNumber(v){
+  if(v === null || v === undefined || v === "") return 0;
+  const s = String(v)
+    .replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0)-65248))
+    .replace(/,/g,"")
+    .replace(/[^\d.-]/g,"");
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function getDate(order,item){
+  return pick(item,["date","eventDate","useDate","deliveryDate"],
+    pick(order,["date","eventDate","useDate","deliveryDate"],""));
+}
+
+function getVenue(order){
+  return pick(order,["venue","place","room","hall"],"");
+}
+
+function getCategory(order,item){
+  return pick(item,["category","type"],pick(order,["category","type"],""));
+}
+
+function getName(item){
+  return pick(item,["productName","name","itemName","title","menuName"],"未名称商品");
+}
+
+function getUnit(item){
+  return pick(item,["unit","unitLabel"],"個");
+}
+
+function getQty(item){
+  return toNumber(pick(item,["quantity","qty","count","guestCount","people"],0));
+}
+
+function getSize(item){
+  const direct = pick(item,["size","multiSize","sizeText"],"");
+  if(typeof direct === "string") return direct;
+
+  if(direct && typeof direct === "object"){
+    return [
+      direct.label,
+      direct.shape,
+      direct.diameter ? direct.diameter + "mm" : "",
+      direct.width && direct.depth ? direct.width + "×" + direct.depth : "",
+      direct.height ? "H" + direct.height : ""
+    ].filter(Boolean).join(" ");
   }
 
-  function escapeHtml(value) {
-    return String(value ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+  const s = item.sizeInfo || {};
+  if(s && typeof s === "object"){
+    return [
+      s.label,
+      s.shape,
+      s.diameter ? s.diameter + "mm" : "",
+      s.width && s.depth ? s.width + "×" + s.depth : ""
+    ].filter(Boolean).join(" ");
   }
 
-  function toNumber(value) {
-    if (value === null || value === undefined || value === "") return 0;
+  return "";
+}
 
-    const normalized = String(value)
-      .replace(/[０-９]/g, s => String.fromCharCode(s.charCodeAt(0) - 65248))
-      .replace(/,/g, "")
-      .replace(/[^\d.-]/g, "");
+function getNotes(order,item){
+  return [
+    pick(item,["notes","note","memo","remarks"],""),
+    pick(order,["notes","note","memo","remarks","orderNotes"],"")
+  ].filter(Boolean).join(" / ");
+}
 
-    const n = Number(normalized);
-    return Number.isFinite(n) ? n : 0;
+function isTarget(order,item){
+  if(order?.isProductionTarget === false) return false;
+  if(item?.isProductionTarget === false) return false;
+
+  const status = String(pick(order,["status","productionStatus"],"")).trim();
+  if(["完了","キャンセル","取消"].includes(status)) return false;
+
+  return true;
+}
+
+function makeKey(row){
+  return [row.date,row.name,row.size,row.unit,row.venue,row.category].join("__");
+}
+
+function getCompleted(){
+  try{
+    return JSON.parse(localStorage.getItem("manufacturingBoardCompletedV2") || "{}");
+  }catch(e){
+    return {};
+  }
+}
+
+function saveCompleted(obj){
+  localStorage.setItem("manufacturingBoardCompletedV2", JSON.stringify(obj));
+}
+
+function toggleComplete(key){
+  const completed = getCompleted();
+  completed[key] = !completed[key];
+  saveCompleted(completed);
+  renderAll();
+}
+
+function dateOnly(d){
+  const x = new Date(d);
+  if(Number.isNaN(x.getTime())) return null;
+  x.setHours(0,0,0,0);
+  return x;
+}
+
+function diffDays(dateText){
+  const d = dateOnly(dateText);
+  if(!d) return null;
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  return Math.round((d - today) / 86400000);
+}
+
+function parseData(data){
+  reservationOrders = [];
+  reservationOrderItems = [];
+
+  if(Array.isArray(data)){
+    reservationOrders = data;
+  }else{
+    reservationOrders =
+      data.orders || data.reservationOrders || data.data?.orders || data.data?.reservationOrders || [];
+
+    reservationOrderItems =
+      data.orderItems || data.reservationOrderItems || data.items ||
+      data.data?.orderItems || data.data?.reservationOrderItems || [];
   }
 
-  function pick(obj, keys, fallback = "") {
-    for (const key of keys) {
-      if (obj && obj[key] !== undefined && obj[key] !== null && obj[key] !== "") {
-        return obj[key];
+  if(!Array.isArray(reservationOrders)) reservationOrders = [];
+  if(!Array.isArray(reservationOrderItems)) reservationOrderItems = [];
+
+  reservationOrders = reservationOrders.map((o,i)=>({
+    ...o,
+    id: pick(o,["id","orderId","_id"],"order_"+i)
+  }));
+
+  if(!reservationOrderItems.length){
+    reservationOrders.forEach((order,oi)=>{
+      const items = order.items || order.orderItems || order.products || [];
+      if(!Array.isArray(items)){
+        warnings.push("items が配列ではない予約があります。");
+        return;
       }
-    }
-    return fallback;
-  }
-
-  function getDate(order, item) {
-    return pick(item, ["date", "eventDate", "useDate", "deliveryDate"], 
-      pick(order, ["date", "eventDate", "useDate", "deliveryDate"], "")
-    );
-  }
-
-  function getVenue(order) {
-    return pick(order, ["venue", "place", "room", "hall"], "");
-  }
-
-  function getCategory(order, item) {
-    return pick(item, ["category", "type"], pick(order, ["category", "type"], ""));
-  }
-
-  function getProductName(item) {
-    return pick(item, ["productName", "name", "itemName", "title", "menuName"], "未名称商品");
-  }
-
-  function getQuantity(item) {
-    return toNumber(pick(item, ["quantity", "qty", "count", "guestCount", "people"], 0));
-  }
-
-  function getUnit(item) {
-    return pick(item, ["unit", "unitLabel"], "個");
-  }
-
-  function getSize(item) {
-    const direct = pick(item, ["size", "multiSize", "sizeText"], "");
-    if (typeof direct === "string") return direct;
-    if (direct && typeof direct === "object") {
-      return [
-        direct.shape,
-        direct.diameter ? direct.diameter + "mm" : "",
-        direct.width && direct.depth ? direct.width + "×" + direct.depth : "",
-        direct.height ? "H" + direct.height : ""
-      ].filter(Boolean).join(" ");
-    }
-
-    const sizeInfo = item.sizeInfo || {};
-    if (sizeInfo && typeof sizeInfo === "object") {
-      return [
-        sizeInfo.label,
-        sizeInfo.shape,
-        sizeInfo.diameter ? sizeInfo.diameter + "mm" : "",
-        sizeInfo.width && sizeInfo.depth ? sizeInfo.width + "×" + sizeInfo.depth : ""
-      ].filter(Boolean).join(" ");
-    }
-
-    return "";
-  }
-
-  function getNotes(order, item) {
-    const itemNotes = pick(item, ["notes", "note", "memo", "remarks"], "");
-    const orderNotes = pick(order, ["notes", "note", "memo", "remarks", "orderNotes"], "");
-    return [itemNotes, orderNotes].filter(Boolean).join(" / ");
-  }
-
-  function getOrderId(order, index) {
-    return pick(order, ["id", "orderId", "_id"], "order_" + index);
-  }
-
-  function getItemId(item, index) {
-    return pick(item, ["id", "itemId", "_id"], "item_" + index);
-  }
-
-  function isProductionTarget(order, item) {
-    if (order && order.isProductionTarget === false) return false;
-    if (item && item.isProductionTarget === false) return false;
-
-    const status = String(pick(order, ["status", "productionStatus"], "")).trim();
-    if (status === "完了" || status === "キャンセル" || status === "取消") return false;
-
-    return true;
-  }
-
-  function loadReservationJson() {
-    const text = document.getElementById("jsonInput").value.trim();
-
-    resetData();
-
-    if (!text) {
-      showMessage("warning", "JSONが空です。予約管理アプリから書き出したJSONを貼り付けてください。");
-      renderAll();
-      return;
-    }
-
-    try {
-      const data = JSON.parse(text);
-
-      parseData(data);
-      normalizeData();
-      renderAll();
-
-      const msg =
-        "読み込み成功\n" +
-        "予約件数：" + reservationOrders.length + "件\n" +
-        "商品件数：" + reservationOrderItems.length + "件\n" +
-        "製造対象：" + normalizedRows.length + "件";
-
-      showMessage("success", msg);
-
-    } catch (e) {
-      console.error(e);
-      showMessage(
-        "error",
-        "JSONの形式が正しくありません。\n\nよくある原因：\n・先頭や末尾に余計な文字がある\n・カンマが抜けている\n・途中までしかコピーできていない\n\nエラー内容：\n" + e.message
-      );
-      renderAll();
-    }
-  }
-
-  function parseData(data) {
-    if (Array.isArray(data)) {
-      reservationOrders = data;
-    } else {
-      reservationOrders =
-        data.orders ||
-        data.reservationOrders ||
-        data.data?.orders ||
-        data.data?.reservationOrders ||
-        [];
-
-      reservationOrderItems =
-        data.orderItems ||
-        data.reservationOrderItems ||
-        data.items ||
-        data.data?.orderItems ||
-        data.data?.reservationOrderItems ||
-        [];
-    }
-
-    if (!Array.isArray(reservationOrders)) {
-      warnings.push("orders / reservationOrders が配列ではありません。");
-      reservationOrders = [];
-    }
-
-    if (!Array.isArray(reservationOrderItems)) {
-      warnings.push("orderItems / reservationOrderItems が配列ではありません。");
-      reservationOrderItems = [];
-    }
-
-    if (!reservationOrderItems.length && reservationOrders.length) {
-      reservationOrders.forEach((order, orderIndex) => {
-        const orderId = getOrderId(order, orderIndex);
-        const items = order.items || order.orderItems || order.products || [];
-
-        if (!Array.isArray(items)) {
-          warnings.push("予約「" + (order.customer || order.clientName || orderId) + "」の items が配列ではありません。");
-          return;
-        }
-
-        items.forEach((item, itemIndex) => {
-          reservationOrderItems.push({
-            ...item,
-            orderId: orderId,
-            id: getItemId(item, itemIndex)
-          });
+      items.forEach((item,ii)=>{
+        reservationOrderItems.push({
+          ...item,
+          id: pick(item,["id","itemId","_id"],"item_"+oi+"_"+ii),
+          orderId: order.id
         });
       });
-    }
-
-    reservationOrders = reservationOrders.map((order, index) => ({
-      ...order,
-      id: getOrderId(order, index)
-    }));
-  }
-
-  function getOrder(orderId) {
-    return reservationOrders.find(order => String(order.id) === String(orderId)) || {};
-  }
-
-  function normalizeData() {
-    normalizedRows = [];
-
-    reservationOrderItems.forEach((item, index) => {
-      const order = getOrder(item.orderId);
-
-      if (!isProductionTarget(order, item)) return;
-
-      const name = getProductName(item);
-      const quantity = getQuantity(item);
-      const unit = getUnit(item);
-      const date = getDate(order, item);
-      const venue = getVenue(order);
-      const category = getCategory(order, item);
-      const size = getSize(item);
-      const notes = getNotes(order, item);
-
-      if (!name || name === "未名称商品") {
-        warnings.push("商品名がない商品があります。行番号：" + (index + 1));
-      }
-
-      if (!quantity) {
-        warnings.push("数量が0または未入力の商品があります：「" + name + "」");
-      }
-
-      if (!date) {
-        warnings.push("日付がない商品があります：「" + name + "」");
-      }
-
-      normalizedRows.push({
-        date,
-        venue,
-        category,
-        name,
-        quantity,
-        unit,
-        size,
-        notes,
-        order,
-        item
-      });
-    });
-
-    normalizedRows.sort((a, b) => {
-      const d = String(a.date || "").localeCompare(String(b.date || ""));
-      if (d !== 0) return d;
-      return String(a.venue || "").localeCompare(String(b.venue || ""));
-    });
-
-    buildSummary();
-  }
-
-  function buildSummary() {
-    const map = new Map();
-
-    normalizedRows.forEach(row => {
-      const key = [
-        row.name || "未名称商品",
-        row.size || "",
-        row.unit || "個"
-      ].join("__");
-
-      if (!map.has(key)) {
-        map.set(key, {
-          name: row.name || "未名称商品",
-          size: row.size || "",
-          unit: row.unit || "個",
-          quantity: 0,
-          dates: new Set(),
-          venues: new Set(),
-          details: []
-        });
-      }
-
-      const target = map.get(key);
-      target.quantity += row.quantity;
-      if (row.date) target.dates.add(row.date);
-      if (row.venue) target.venues.add(row.venue);
-      target.details.push(row);
-    });
-
-    summaryRows = Array.from(map.values()).sort((a, b) => {
-      return a.name.localeCompare(b.name, "ja");
     });
   }
+}
 
-  function renderAll() {
-    renderStats();
-    renderProductionList();
-    renderSummaryList();
-    renderWarnings();
-  }
+function getOrder(orderId){
+  return reservationOrders.find(o => String(o.id) === String(orderId)) || {};
+}
 
-  function renderStats() {
-    document.getElementById("orderCount").textContent = reservationOrders.length;
-    document.getElementById("itemCount").textContent = reservationOrderItems.length;
-    document.getElementById("targetCount").textContent = normalizedRows.length;
-    document.getElementById("summaryCount").textContent = summaryRows.length;
-  }
+function normalize(){
+  rows = [];
 
-  function renderProductionList() {
-    const area = document.getElementById("productionList");
+  reservationOrderItems.forEach((item,i)=>{
+    const order = getOrder(item.orderId);
+    if(!isTarget(order,item)) return;
 
-    if (!normalizedRows.length) {
-      area.innerHTML = `
-        <p class="empty">
-          製造対象がありません。<br>
-          考えられる原因：<br>
-          ・JSON内に商品 items がない<br>
-          ・isProductionTarget が false になっている<br>
-          ・status が 完了 / キャンセル になっている<br>
-          ・予約JSONの形式が想定外
-        </p>
-      `;
-      return;
-    }
-
-    area.innerHTML = `
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>日付</th>
-              <th>会場</th>
-              <th>区分</th>
-              <th>商品</th>
-              <th>数量</th>
-              <th>サイズ</th>
-              <th>備考</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${normalizedRows.map(row => `
-              <tr>
-                <td>${escapeHtml(row.date)}</td>
-                <td>${escapeHtml(row.venue)}</td>
-                <td>${escapeHtml(row.category)}</td>
-                <td>${escapeHtml(row.name)}</td>
-                <td>${escapeHtml(row.quantity)} ${escapeHtml(row.unit)}</td>
-                <td>${escapeHtml(row.size)}</td>
-                <td>${escapeHtml(row.notes)}</td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  function renderSummaryList() {
-    const area = document.getElementById("summaryList");
-
-    if (!summaryRows.length) {
-      area.innerHTML = `<p class="empty">集計対象がありません。</p>`;
-      return;
-    }
-
-    area.innerHTML = summaryRows.map(row => {
-      const dates = Array.from(row.dates).sort().join(" / ");
-      const venues = Array.from(row.venues).join(" / ");
-
-      return `
-        <div class="summary-item">
-          <span class="check">□</span>
-          <strong>${escapeHtml(row.name)}</strong>
-          ${row.size ? ` / ${escapeHtml(row.size)}` : ""}
-          ：${escapeHtml(row.quantity)} ${escapeHtml(row.unit)}
-          <div class="summary-sub">
-            ${dates ? `日付：${escapeHtml(dates)}` : ""}
-            ${venues ? `　会場：${escapeHtml(venues)}` : ""}
-          </div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  function renderWarnings() {
-    const area = document.getElementById("warningList");
-
-    if (!warnings.length) {
-      area.innerHTML = `<p class="empty">大きな問題は見つかりませんでした。</p>`;
-      return;
-    }
-
-    const unique = Array.from(new Set(warnings));
-
-    area.innerHTML = `
-      <div class="notice warning">
-        ${unique.map(w => "・" + escapeHtml(w)).join("<br>")}
-      </div>
-    `;
-  }
-
-  function resetData() {
-    reservationOrders = [];
-    reservationOrderItems = [];
-    normalizedRows = [];
-    summaryRows = [];
-    warnings = [];
-  }
-
-  function clearAll() {
-    document.getElementById("jsonInput").value = "";
-    document.getElementById("messageArea").innerHTML = "";
-    resetData();
-    renderAll();
-  }
-
-  function loadSample() {
-    const sample = {
-      orders: [
-        {
-          id: "o1",
-          date: "2026-06-15",
-          venue: "千曲",
-          category: "婚礼",
-          customer: "山田・佐藤",
-          status: "製造待ち",
-          isProductionTarget: true,
-          items: [
-            {
-              id: "i1",
-              name: "ショートケーキ",
-              quantity: 2,
-              unit: "台",
-              size: "5号",
-              notes: "苺多め"
-            },
-            {
-              id: "i2",
-              name: "皿盛りデザート",
-              quantity: 80,
-              unit: "人前"
-            }
-          ]
-        },
-        {
-          id: "o2",
-          date: "2026-06-15",
-          venue: "レストラン",
-          category: "宴会",
-          status: "製造待ち",
-          items: [
-            {
-              id: "i3",
-              name: "ショートケーキ",
-              quantity: 3,
-              unit: "台",
-              size: "5号"
-            }
-          ]
-        }
-      ]
+    const row = {
+      date: getDate(order,item),
+      venue: getVenue(order),
+      category: getCategory(order,item),
+      name: getName(item),
+      qty: getQty(item),
+      unit: getUnit(item),
+      size: getSize(item),
+      notes: getNotes(order,item)
     };
 
-    document.getElementById("jsonInput").value = JSON.stringify(sample, null, 2);
-    loadReservationJson();
+    row.key = makeKey(row);
+
+    if(!row.date) warnings.push("日付がない商品：" + row.name);
+    if(!row.qty) warnings.push("数量が0または未入力：" + row.name);
+
+    rows.push(row);
+  });
+
+  rows.sort((a,b)=>
+    String(a.date).localeCompare(String(b.date)) ||
+    String(a.venue).localeCompare(String(b.venue))
+  );
+}
+
+function loadReservationJson(){
+  const text = document.getElementById("jsonInput").value.trim();
+  rows = [];
+  warnings = [];
+
+  if(!text){
+    showMessage("warning","JSONが空です。");
+    renderAll();
+    return;
   }
 
-  renderAll();
-</script>
+  try{
+    const data = JSON.parse(text);
+    parseData(data);
+    normalize();
+    renderAll();
+    showMessage("success",`読み込み成功\n予約：${reservationOrders.length}件\n商品：${reservationOrderItems.length}件\n製造対象：${rows.length}件`);
+  }catch(e){
+    console.error(e);
+    showMessage("error","JSON形式が正しくありません。\n\n" + e.message);
+    renderAll();
+  }
+}
 
+function renderTaskList(id, list){
+  const completed = getCompleted();
+  const hideCompleted = document.getElementById("hideCompleted")?.checked;
+
+  let display = list;
+  if(hideCompleted){
+    display = display.filter(r => !completed[r.key]);
+  }
+
+  const area = document.getElementById(id);
+
+  if(!display.length){
+    area.innerHTML = `<p class="empty">対象なし</p>`;
+    return;
+  }
+
+  area.innerHTML = display.map(r=>`
+    <div class="task">
+      <input type="checkbox"
+        ${completed[r.key] ? "checked" : ""}
+        onchange="toggleComplete('${escapeHtml(r.key)}')">
+      <div>
+        <div class="title">
+          ${escapeHtml(r.name)}
+          ${r.size ? " / " + escapeHtml(r.size) : ""}
+          ：${escapeHtml(r.qty)} ${escapeHtml(r.unit)}
+        </div>
+        <div class="meta">
+          ${escapeHtml(r.date)} / ${escapeHtml(r.category)} / ${escapeHtml(r.venue)}
+        </div>
+        ${r.notes ? `<div class="note">${escapeHtml(r.notes)}</div>` : ""}
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderBoard(){
+  const today = [];
+  const tomorrow = [];
+  const week = [];
+  const completed = [];
+  const completedMap = getCompleted();
+
+  rows.forEach(r=>{
+    if(completedMap[r.key]){
+      completed.push(r);
+      return;
+    }
+
+    const diff = diffDays(r.date);
+
+    if(diff === 0) today.push(r);
+    else if(diff === 1) tomorrow.push(r);
+    else if(diff !== null && diff >= 2 && diff <= 7) week.push(r);
+  });
+
+  renderTaskList("todayList", today);
+  renderTaskList("tomorrowList", tomorrow);
+  renderTaskList("weekList", week);
+  renderTaskList("completedList", completed);
+}
+
+function renderSummary(){
+  const map = new Map();
+  const completed = getCompleted();
+  const hideCompleted = document.getElementById("hideCompleted")?.checked;
+
+  rows.forEach(r=>{
+    if(hideCompleted && completed[r.key]) return;
+
+    const key = [r.name,r.size,r.unit].join("__");
+    if(!map.has(key)){
+      map.set(key,{name:r.name,size:r.size,unit:r.unit,qty:0,details:[]});
+    }
+    const t = map.get(key);
+    t.qty += r.qty;
+    t.details.push(r);
+  });
+
+  const list = Array.from(map.values()).sort((a,b)=>a.name.localeCompare(b.name,"ja"));
+  const area = document.getElementById("summaryList");
+
+  if(!list.length){
+    area.innerHTML = `<p class="empty">集計対象なし</p>`;
+    return;
+  }
+
+  area.innerHTML = list.map(s=>`
+    <div class="summary-item">
+      <div class="title">
+        ${escapeHtml(s.name)}
+        ${s.size ? " / " + escapeHtml(s.size) : ""}
+        ：${escapeHtml(s.qty)} ${escapeHtml(s.unit)}
+      </div>
+      <div class="meta">
+        ${s.details.map(d=>`${escapeHtml(d.date)} ${escapeHtml(d.venue)} ${escapeHtml(d.qty)}${escapeHtml(d.unit)}`).join(" / ")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function renderWarnings(){
+  const area = document.getElementById("warningList");
+  if(!warnings.length){
+    area.innerHTML = `<p class="empty">大きな問題なし</p>`;
+    return;
+  }
+  area.innerHTML = `<div class="notice warning">${[...new Set(warnings)].map(w=>"・"+escapeHtml(w)).join("<br>")}</div>`;
+}
+
+function renderAll(){
+  renderBoard();
+  renderSummary();
+  renderWarnings();
+}
+
+function clearAll(){
+  document.getElementById("jsonInput").value = "";
+  document.getElementById("messageArea").innerHTML = "";
+  reservationOrders = [];
+  reservationOrderItems = [];
+  rows = [];
+  warnings = [];
+  renderAll();
+}
+
+function loadSample(){
+  const today = new Date();
+  const tomorrow = new Date();
+  tomorrow.setDate(today.getDate()+1);
+  const week = new Date();
+  week.setDate(today.getDate()+4);
+
+  const fmt = d => d.toISOString().slice(0,10);
+
+  const sample = {
+    orders:[
+      {
+        id:"o1",
+        date:fmt(today),
+        venue:"千曲",
+        category:"婚礼",
+        status:"製造待ち",
+        items:[
+          {id:"i1",name:"ショートケーキ",quantity:2,unit:"台",size:"5号",notes:"苺多め"},
+          {id:"i2",name:"皿盛りデザート",quantity:80,unit:"人前"}
+        ]
+      },
+      {
+        id:"o2",
+        date:fmt(tomorrow),
+        venue:"レストラン",
+        category:"宴会",
+        status:"製造待ち",
+        items:[
+          {id:"i3",name:"ショートケーキ",quantity:3,unit:"台",size:"5号"}
+        ]
+      },
+      {
+        id:"o3",
+        date:fmt(week),
+        venue:"浅間",
+        category:"アニバーサリー",
+        status:"製造待ち",
+        items:[
+          {id:"i4",name:"アニバーサリーケーキ",quantity:1,unit:"台",size:"9cm"}
+        ]
+      }
+    ]
+  };
+
+  document.getElementById("jsonInput").value = JSON.stringify(sample,null,2);
+  loadReservationJson();
+}
+
+renderAll();
+</script>
 </body>
 </html>
