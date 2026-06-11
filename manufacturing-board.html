@@ -235,6 +235,21 @@
       日付：date / eventDate / useDate に対応
     </p>
   </section>
+  <div class="button-row">
+  <button onclick="setFilter(0)">今日</button>
+  <button onclick="setFilter(3)">3日以内</button>
+  <button onclick="setFilter(7)">7日以内</button>
+  <button onclick="setFilter(9999)">全件</button>
+</div>
+<label>
+  <input
+    type="checkbox"
+    id="hideCompleted"
+    checked
+    onchange="renderAll()"
+  >
+  完了済みを隠す
+</label>
 
   <section class="card">
     <h2>② 読込状況</h2>
@@ -266,6 +281,10 @@
   <section class="card">
     <h2>④ 商品別集計</h2>
     <div id="summaryList"></div>
+    <input
+  type="checkbox"
+  onchange="toggleComplete('${key}')"
+>
   </section>
 
   <section class="card">
