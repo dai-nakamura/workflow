@@ -380,11 +380,19 @@ function getRecipeCalcTargetSize() {
 function runRecipeCalcNavigator() {
   const baseSize = getCurrentRecipeBaseSize();
   const targetSize = getRecipeCalcTargetSize();
-  const quantity = Number(els.recipeCalcQuantity.value || 1);
+ const targetOutputQuantity =
+  Number(els.recipeCalcQuantity.value || 1);
 
-  const sizeScale = calcShapeVolumeScale(baseSize, targetSize);
-  const finalScale = round2(sizeScale * quantity);
+const baseYieldQuantity =
+  Number(els.recipeYieldQuantity.value || 1);
 
+const sizeScale =
+  calcShapeVolumeScale(baseSize, targetSize);
+
+const finalScale =
+  baseYieldQuantity > 0
+    ? round2((sizeScale * targetOutputQuantity) / baseYieldQuantity)
+    : 0;
   if (!appState.currentRecipeMaterials.length) {
     alert('換算するレシピ材料がありません。');
     return;

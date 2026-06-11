@@ -157,7 +157,12 @@ function renderProductComponents() {
     }
 
 function handleProductComponentsListClick(e) {
-      const edit = e.target.closest('.edit-productcomponent-btn'); const del = e.target.closest('.delete-productcomponent-btn'); if (edit) { const idx = Number(edit.dataset.index); const item = appState.currentProductComponents[idx]; if (!item) return; appState.editingProductComponentIndex = idx; els.productComponentSourceType.value = item.sourceType; refreshProductComponentRefSelect(); els.productComponentRefSelect.value = item.refId || ''; els.productComponentQuantity.value = item.quantity ?? 1; els.productComponentUnit.value = item.unit || ''; els.productComponentFormCard.classList.remove('is-hidden'); } if (del) { appState.currentProductComponents.splice(Number(del.dataset.index), 1); renderProductComponents(); } els.productComponentDiameter.value = item.size?.diameter || '';
+      const edit = e.target.closest('.edit-productcomponent-btn'); const del = e.target.closest('.delete-productcomponent-btn'); if (edit) { const idx = Number(edit.dataset.index); const item = appState.currentProductComponents[idx]; if (!item) return; appState.editingProductComponentIndex = idx; els.productComponentSourceType.value = item.sourceType; const editRecipe = e.target.closest('.edit-component-recipe-btn');
+
+if (editRecipe) {
+  editRecipeFromProductComponent(editRecipe.dataset.id);
+  return;
+}refreshProductComponentRefSelect(); els.productComponentRefSelect.value = item.refId || ''; els.productComponentQuantity.value = item.quantity ?? 1; els.productComponentUnit.value = item.unit || ''; els.productComponentFormCard.classList.remove('is-hidden'); } if (del) { appState.currentProductComponents.splice(Number(del.dataset.index), 1); renderProductComponents(); } els.productComponentDiameter.value = item.size?.diameter || '';
       els.productComponentHeight.value = item.size?.height || '';
     }
 
