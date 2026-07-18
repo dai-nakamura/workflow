@@ -107,11 +107,11 @@ function saveProductComponent() {
         quantity,
         unit,
         size: {
-          shape: els.productComponentshape.value || 'round',
+          shape: els.productComponentShape.value || 'round',
           diameter: Number(els.productComponentDiameter.value || 0),
-          width: Number(els.productComponentwidth.value || 0),
-          depth: Number(els.productComponentdepth.value || 0),
-          height: Number(els.productComponentheight.value || 0)
+          width: Number(els.productComponentWidth.value || 0),
+          depth: Number(els.productComponentDepth.value || 0),
+          height: Number(els.productComponentHeight.value || 0)
         }
       };
 
