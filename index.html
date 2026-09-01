@@ -10,6 +10,11 @@
 <style id="material-master-ui-v2">
 .material-master-card{max-width:980px;margin:0 auto}.material-toolbar{display:grid;gap:10px;margin:12px 0 8px}.material-toolbar-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.material-search{width:100%;min-height:44px;border:1px solid var(--line,#d8dee8);border-radius:12px;padding:0 13px;font:inherit;background:#fff}.material-add-btn{white-space:nowrap}.material-quick-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}.material-mode-btn,.material-filter-toggle,.material-category-chip{border:1px solid var(--line,#d8dee8);background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;white-space:nowrap}.material-mode-btn.is-active,.material-category-chip.is-active{background:#1f2937;color:#fff;border-color:#1f2937}.material-category-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 0 4px;-webkit-overflow-scrolling:touch}.material-advanced-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--line,#d8dee8);border-radius:12px;background:#f8fafc}.material-advanced-filters.is-hidden{display:none}.material-result-line{min-height:22px;font-size:12px;color:#64748b;margin:4px 2px}.material-compact-list{display:grid;gap:5px}.material-compact-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;min-height:42px;padding:7px 8px 7px 11px;border:1px solid var(--line,#e2e8f0);border-radius:10px;background:#fff;cursor:pointer}.material-compact-row:active{background:#f8fafc}.material-row-name{min-width:0;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.material-row-cost{font-size:12px;font-variant-numeric:tabular-nums;color:#475569;text-align:right;white-space:nowrap}.material-compact-row.cost-mode .material-row-cost{font-size:14px;font-weight:800;color:#111827}.material-delete-btn{border:0;background:transparent;color:#b91c1c;font:inherit;font-size:12px;padding:7px 5px;cursor:pointer}.material-editor-modal{display:none;position:fixed;inset:0;z-index:9000}.material-editor-modal.is-open{display:block}.material-editor-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.48)}.material-editor-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:min(720px,100%);max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom));box-sizing:border-box;box-shadow:0 -14px 35px rgba(15,23,42,.18)}.material-editor-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;position:sticky;top:-16px;z-index:2;background:inherit;padding:16px 0 8px}.material-editor-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom));background:inherit;padding:10px 0 calc(20px + env(safe-area-inset-bottom));margin-top:8px}.material-empty{padding:24px;text-align:center;color:#64748b;border:1px dashed var(--line,#d8dee8);border-radius:12px}.material-cost-missing{color:#b45309}.material-count-muted{color:#94a3b8}.material-master-heading{align-items:center}@media(max-width:640px){.material-toolbar-top{grid-template-columns:1fr}.material-add-btn{width:100%}.material-advanced-filters{grid-template-columns:1fr}.material-compact-row{grid-template-columns:minmax(0,1fr) auto auto}.material-editor-sheet{max-height:92vh}}
 </style>
+
+<style id="recipe-master-ui-v2">
+.recipe-list-card{max-width:980px;margin:0 auto;grid-column:1/-1}.recipe-toolbar{display:grid;gap:10px;margin:12px 0 8px}.recipe-toolbar-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.recipe-search{width:100%;min-height:44px;border:1px solid var(--line,#d8dee8);border-radius:12px;padding:0 13px;font:inherit;background:#fff}.recipe-add-btn{white-space:nowrap}.recipe-type-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 0 4px;-webkit-overflow-scrolling:touch}.recipe-type-chip,.recipe-filter-toggle{border:1px solid var(--line,#d8dee8);background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;white-space:nowrap}.recipe-type-chip.is-active{background:#1f2937;color:#fff;border-color:#1f2937}.recipe-advanced-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--line,#d8dee8);border-radius:12px;background:#f8fafc}.recipe-advanced-filters.is-hidden{display:none}.recipe-result-line{min-height:22px;font-size:12px;color:#64748b;margin:4px 2px}.recipe-compact-list{display:grid;gap:5px}.recipe-compact-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;min-height:48px;padding:7px 8px 7px 11px;border:1px solid var(--line,#e2e8f0);border-radius:10px;background:#fff;cursor:pointer}.recipe-compact-row:active{background:#f8fafc}.recipe-row-main{min-width:0}.recipe-row-name{font-weight:750;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.recipe-row-meta{font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}.recipe-row-cost{font-size:12px;font-variant-numeric:tabular-nums;color:#334155;text-align:right;white-space:nowrap}.recipe-delete-btn{border:0;background:transparent;color:#b91c1c;font:inherit;font-size:12px;padding:7px 5px;cursor:pointer}.recipe-empty{padding:24px;text-align:center;color:#64748b;border:1px dashed var(--line,#d8dee8);border-radius:12px}.recipe-count-muted{color:#94a3b8}.recipe-dup-badge{display:inline-block;margin-left:6px;padding:1px 5px;border-radius:999px;background:#fff7ed;color:#c2410c;font-size:10px;font-weight:700}.recipe-editor-modal{display:none;position:fixed;inset:0;z-index:9050}.recipe-editor-modal.is-open{display:block}.recipe-editor-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.52)}.recipe-editor-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:min(920px,100%);max-height:94vh;overflow:auto;border-radius:20px 20px 0 0;padding:14px 14px calc(22px + env(safe-area-inset-bottom));box-sizing:border-box;background:var(--bg,#f6f7f9);box-shadow:0 -14px 35px rgba(15,23,42,.2)}.recipe-editor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;position:sticky;top:-14px;z-index:5;background:var(--bg,#f6f7f9);padding:14px 0 10px}.recipe-editor-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.recipe-editor-body>.card:nth-child(3){grid-column:1/-1}.recipe-editor-body>.card{margin:0}.recipe-editor-title{min-width:0}.recipe-editor-title h2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65vw}.recipe-modal-close{white-space:nowrap}@media(max-width:720px){.recipe-toolbar-top{grid-template-columns:1fr}.recipe-add-btn{width:100%}.recipe-advanced-filters{grid-template-columns:1fr 1fr}.recipe-editor-body{grid-template-columns:1fr}.recipe-editor-body>.card:nth-child(3){grid-column:auto}.recipe-compact-row{grid-template-columns:minmax(0,1fr) auto auto}.recipe-editor-sheet{max-height:96vh;padding-left:10px;padding-right:10px}.recipe-editor-title h2{max-width:68vw}}@media(max-width:430px){.recipe-advanced-filters{grid-template-columns:1fr}.recipe-row-cost{font-size:11px}}
+</style>
+
 </head>
 
 <body>
@@ -44,7 +49,7 @@
 
         <div class="material-toolbar">
           <div class="material-toolbar-top">
-            <input id="materialSearchInput" class="material-search" type="search" placeholder="材料名・仕入先を検索">
+            <input id="materialSearchInput" class="material-search" type="search" placeholder="材料名・分類・仕入先を検索">
             <button class="btn btn-primary material-add-btn" type="button" id="openNewMaterialBtn">＋ 材料追加</button>
           </div>
 
@@ -346,14 +351,33 @@
             </div>
           </div>
         </section>
-        <section class="card" style="grid-column:1 / -1;">
+        <section class="card recipe-list-card">
           <div class="section-heading">
             <div>
-              <p class="section-kicker">一覧</p>
+              <p class="section-kicker">レシピマスター</p>
               <h2>レシピ一覧</h2>
             </div><span class="badge" id="recipeCountBadge">0件</span>
           </div>
-          <div class="list" id="recipeMasterList"></div>
+          <div class="recipe-toolbar">
+            <div class="recipe-toolbar-top">
+              <input id="recipeSearchInput" class="recipe-search" type="search" placeholder="レシピ名・材料・工程を検索">
+              <button class="btn btn-primary recipe-add-btn" type="button" id="openNewRecipeBtn">＋ レシピ追加</button>
+            </div>
+            <div style="display:flex;gap:7px;align-items:center;overflow-x:auto">
+              <div id="recipeTypeChips" class="recipe-type-chips" style="flex:1"></div>
+              <button class="recipe-filter-toggle" type="button" id="recipeFilterToggleBtn">絞り込み</button>
+            </div>
+            <div id="recipeAdvancedFilters" class="recipe-advanced-filters is-hidden">
+              <label class="field"><span class="field-label">材料カテゴリー</span><select id="recipeMaterialCategoryFilter"><option value="">すべて</option></select></label>
+              <label class="field"><span class="field-label">出来高単位</span><select id="recipeYieldUnitFilter"><option value="">すべて</option></select></label>
+              <label class="field"><span class="field-label">工程</span><select id="recipeFlowFilter"><option value="all">すべて</option><option value="with">工程あり</option><option value="without">工程なし</option></select></label>
+              <label class="field"><span class="field-label">関連商品</span><select id="recipeProductFilter"><option value="">すべて</option></select></label>
+              <label class="field"><span class="field-label">並び順</span><select id="recipeSortSelect"><option value="name">名前順</option><option value="updated-desc">更新が新しい順</option><option value="cost-desc">原価が高い順</option><option value="cost-asc">原価が安い順</option></select></label>
+              <button class="btn btn-secondary" type="button" id="clearRecipeFiltersBtn">絞り込みをクリア</button>
+            </div>
+          </div>
+          <div class="recipe-result-line" id="recipeResultLine"></div>
+          <div class="recipe-compact-list" id="recipeMasterList"></div>
         </section>
       </div>
     </section>
@@ -1003,6 +1027,130 @@
     $('materialsMasterList')?.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const row=e.target.closest('[data-material-row-id]');if(!row)return;e.preventDefault();const mat=getMaterials().find(x=>x.id===row.dataset.materialRowId);if(mat){fillEditor(mat);openEditor();}});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEditor();});
     renderMaterialListV2();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
+  </script>
+
+  <script id="recipe-master-ui-v2-script">
+(function(){
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const state={query:'',type:'',materialCategory:'',yieldUnit:'',flow:'all',productId:'',sort:'name'};
+  const norm=v=>String(v??'').normalize('NFKC').toLowerCase().trim();
+  const unique=a=>[...new Set(a.filter(Boolean))].sort((x,y)=>String(x).localeCompare(String(y),'ja'));
+  const recipes=()=>Array.isArray(window.db?.recipeMasters)?window.db.recipeMasters:(typeof db!=='undefined'&&Array.isArray(db.recipeMasters)?db.recipeMasters:[]);
+  const materials=()=>Array.isArray(window.db?.materialsMaster)?window.db.materialsMaster:(typeof db!=='undefined'&&Array.isArray(db.materialsMaster)?db.materialsMaster:[]);
+  const products=()=>Array.isArray(window.db?.productMasters)?window.db.productMasters:(typeof db!=='undefined'&&Array.isArray(db.productMasters)?db.productMasters:[]);
+
+  function recipeCost(r){
+    try{return typeof calculateRecipeCost==='function'?Number(calculateRecipeCost(r))||0:0}catch(e){return 0}
+  }
+  function linkedProductIds(recipeId){
+    return products().filter(p=>(p.components||[]).some(c=>(c.sourceType==='recipe'||c.type==='recipe')&&(c.refId===recipeId||c.recipeId===recipeId))).map(p=>p.id);
+  }
+  function linkedProductNames(recipeId){
+    const ids=linkedProductIds(recipeId);return products().filter(p=>ids.includes(p.id)).map(p=>p.name).filter(Boolean);
+  }
+  function recipeMaterialCategories(r){
+    const byId=new Map(materials().map(m=>[m.id,m]));
+    return unique((r.materials||[]).map(x=>byId.get(x.materialId)?.category||'').filter(Boolean));
+  }
+  function refreshOptions(){
+    const all=recipes();
+    const types=unique(all.map(r=>r.type||''));
+    const chips=$('recipeTypeChips');
+    if(chips) chips.innerHTML=['',...types].map(t=>`<button type="button" class="recipe-type-chip ${state.type===t?'is-active':''}" data-recipe-type="${esc(t)}">${t?esc(t):'すべて'}</button>`).join('');
+    const matCat=$('recipeMaterialCategoryFilter');
+    if(matCat){const vals=unique(materials().map(m=>m.category||''));const cur=state.materialCategory;matCat.innerHTML='<option value="">すべて</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');matCat.value=vals.includes(cur)?cur:'';if(matCat.value!==cur)state.materialCategory='';}
+    const yieldSel=$('recipeYieldUnitFilter');
+    if(yieldSel){const vals=unique(all.map(r=>r.yieldUnit||''));const cur=state.yieldUnit;yieldSel.innerHTML='<option value="">すべて</option>'+vals.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');yieldSel.value=vals.includes(cur)?cur:'';if(yieldSel.value!==cur)state.yieldUnit='';}
+    const prodSel=$('recipeProductFilter');
+    if(prodSel){const vals=products().filter(p=>(p.components||[]).some(c=>c.sourceType==='recipe'||c.type==='recipe'));const cur=state.productId;prodSel.innerHTML='<option value="">すべて</option>'+vals.map(p=>`<option value="${esc(p.id)}">${esc(p.name||'名称未設定')}</option>`).join('');prodSel.value=vals.some(p=>p.id===cur)?cur:'';if(prodSel.value!==cur)state.productId='';}
+  }
+  function filtered(){
+    const q=norm(state.query);
+    let list=recipes().filter(r=>{
+      if(q){
+        const productText=linkedProductNames(r.id).join(' ');
+        const ingredientText=(r.materials||[]).map(m=>m.name||'').join(' ');
+        const flowText=(r.flows||[]).map(f=>[f.title,f.description,f.equipment].join(' ')).join(' ');
+        const hay=norm([r.name,r.type,r.owner,r.memo,r.yieldUnit,ingredientText,flowText,productText].join(' '));
+        if(!hay.includes(q))return false;
+      }
+      if(state.type&&r.type!==state.type)return false;
+      if(state.materialCategory&&!recipeMaterialCategories(r).includes(state.materialCategory))return false;
+      if(state.yieldUnit&&r.yieldUnit!==state.yieldUnit)return false;
+      if(state.flow==='with'&&!(r.flows||[]).length)return false;
+      if(state.flow==='without'&&(r.flows||[]).length)return false;
+      if(state.productId&&!linkedProductIds(r.id).includes(state.productId))return false;
+      return true;
+    });
+    list=list.slice().sort((a,b)=>{
+      if(state.sort==='updated-desc')return String(b.updatedAt||b.date||'').localeCompare(String(a.updatedAt||a.date||''))||String(a.name||'').localeCompare(String(b.name||''),'ja');
+      if(state.sort==='cost-desc')return recipeCost(b)-recipeCost(a)||String(a.name||'').localeCompare(String(b.name||''),'ja');
+      if(state.sort==='cost-asc')return recipeCost(a)-recipeCost(b)||String(a.name||'').localeCompare(String(b.name||''),'ja');
+      return String(a.name||'').localeCompare(String(b.name||''),'ja');
+    });
+    return list;
+  }
+  function dupCount(r){const n=norm(r.name);return recipes().filter(x=>norm(x.name)===n).length;}
+  function renderRecipeListV2(){
+    const all=recipes(),list=filtered(),host=$('recipeMasterList');
+    if($('recipeCountBadge'))$('recipeCountBadge').textContent=`${all.length}件`;
+    refreshOptions();
+    if($('recipeResultLine'))$('recipeResultLine').innerHTML=`表示 ${list.length}件 <span class="recipe-count-muted">/ 全${all.length}件</span>`;
+    if(!host)return;
+    if(!list.length){host.innerHTML='<div class="recipe-empty">条件に合うレシピがありません。</div>';return;}
+    host.innerHTML=list.map(r=>{
+      const d=dupCount(r),products=linkedProductNames(r.id),meta=[r.type||'未分類',`出来高 ${Number(r.yieldQuantity||0)}${r.yieldUnit||''}`];
+      if(products.length)meta.push(products.slice(0,2).join('・'));
+      return `<article class="recipe-compact-row" data-recipe-row-id="${esc(r.id)}" tabindex="0">
+        <div class="recipe-row-main"><div class="recipe-row-name">${esc(r.name||'名称未設定')}${d>1?`<span class="recipe-dup-badge">同名${d}件</span>`:''}</div><div class="recipe-row-meta">${esc(meta.join(' / '))}</div></div>
+        <div class="recipe-row-cost">原価 ¥${recipeCost(r).toLocaleString('ja-JP',{maximumFractionDigits:2})}</div>
+        <button class="recipe-delete-btn delete-recipe-btn" type="button" data-id="${esc(r.id)}">削除</button>
+      </article>`;
+    }).join('');
+  }
+  function makeModal(){
+    const tab=document.querySelector('section[data-tab="recipes"]');
+    const grid=tab?.querySelector(':scope > .layout-grid.two-cols');
+    if(!tab||!grid||$('recipeEditorModal'))return;
+    const editorCards=[...grid.children].filter(x=>x.matches('section.card')&&!x.classList.contains('recipe-list-card'));
+    if(editorCards.length<3)return;
+    const modal=document.createElement('div');modal.id='recipeEditorModal';modal.className='recipe-editor-modal';modal.setAttribute('aria-hidden','true');
+    modal.innerHTML=`<div class="recipe-editor-backdrop" id="recipeEditorBackdrop"></div><section class="recipe-editor-sheet" role="dialog" aria-modal="true" aria-labelledby="recipeEditorTitle"><div class="recipe-editor-head"><div class="recipe-editor-title"><p class="section-kicker">レシピマスター</p><h2 id="recipeEditorTitle">レシピ編集</h2></div><button class="btn btn-secondary btn-inline recipe-modal-close" type="button" id="closeRecipeEditorBtn">閉じる</button></div><div class="recipe-editor-body" id="recipeEditorBody"></div></section>`;
+    tab.appendChild(modal);const body=$('recipeEditorBody');editorCards.slice(0,3).forEach(c=>body.appendChild(c));
+  }
+  function openModal(){const m=$('recipeEditorModal');if(m){m.classList.add('is-open');m.setAttribute('aria-hidden','false');setTimeout(()=>$('recipeName')?.focus(),80);}}
+  function closeModal(){const m=$('recipeEditorModal');if(m){m.classList.remove('is-open');m.setAttribute('aria-hidden','true');}}
+  function titleFromEditor(){const name=$('recipeName')?.value.trim();$('recipeEditorTitle').textContent=name||'レシピを追加';}
+  function openExisting(id){if(typeof loadRecipeMaster==='function')loadRecipeMaster(id);titleFromEditor();openModal();}
+  function openNew(){if(typeof resetRecipeEditor==='function')resetRecipeEditor();titleFromEditor();openModal();}
+  window.renderRecipeMasterList=renderRecipeListV2;try{renderRecipeMasterList=renderRecipeListV2}catch(e){}
+
+  function bind(){
+    makeModal();
+    $('recipeSearchInput')?.addEventListener('input',e=>{state.query=e.target.value;renderRecipeListV2();});
+    $('recipeTypeChips')?.addEventListener('click',e=>{const b=e.target.closest('[data-recipe-type]');if(!b)return;state.type=b.dataset.recipeType||'';renderRecipeListV2();});
+    $('recipeFilterToggleBtn')?.addEventListener('click',()=>$('recipeAdvancedFilters')?.classList.toggle('is-hidden'));
+    $('recipeMaterialCategoryFilter')?.addEventListener('change',e=>{state.materialCategory=e.target.value;renderRecipeListV2();});
+    $('recipeYieldUnitFilter')?.addEventListener('change',e=>{state.yieldUnit=e.target.value;renderRecipeListV2();});
+    $('recipeFlowFilter')?.addEventListener('change',e=>{state.flow=e.target.value;renderRecipeListV2();});
+    $('recipeProductFilter')?.addEventListener('change',e=>{state.productId=e.target.value;renderRecipeListV2();});
+    $('recipeSortSelect')?.addEventListener('change',e=>{state.sort=e.target.value;renderRecipeListV2();});
+    $('clearRecipeFiltersBtn')?.addEventListener('click',()=>{Object.assign(state,{query:'',type:'',materialCategory:'',yieldUnit:'',flow:'all',productId:'',sort:'name'});if($('recipeSearchInput'))$('recipeSearchInput').value='';if($('recipeFlowFilter'))$('recipeFlowFilter').value='all';if($('recipeSortSelect'))$('recipeSortSelect').value='name';renderRecipeListV2();});
+    $('openNewRecipeBtn')?.addEventListener('click',openNew);
+    $('closeRecipeEditorBtn')?.addEventListener('click',closeModal);
+    $('recipeEditorBackdrop')?.addEventListener('click',closeModal);
+    $('recipeName')?.addEventListener('input',titleFromEditor);
+    $('recipeMasterList')?.addEventListener('click',e=>{if(e.target.closest('.delete-recipe-btn'))return;const row=e.target.closest('[data-recipe-row-id]');if(row){e.preventDefault();e.stopPropagation();openExisting(row.dataset.recipeRowId);}},true);
+    $('recipeMasterList')?.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const row=e.target.closest('[data-recipe-row-id]');if(!row)return;e.preventDefault();openExisting(row.dataset.recipeRowId);});
+    $('saveRecipeBtn')?.addEventListener('click',()=>setTimeout(()=>{renderRecipeListV2();if($('recipeName')?.value.trim()&&appState.currentRecipeId)closeModal();},0));
+    $('newRecipeBtn')?.addEventListener('click',()=>setTimeout(()=>{titleFromEditor();},0));
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('recipeEditorModal')?.classList.contains('is-open'))closeModal();});
+    renderRecipeListV2();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
