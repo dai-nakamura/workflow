@@ -6,6 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>製造設計アプリ 完成版</title>
   <link rel="stylesheet" href="./assets/css/style.css">
+
+<style id="material-master-ui-v2">
+.material-master-card{max-width:980px;margin:0 auto}.material-toolbar{display:grid;gap:10px;margin:12px 0 8px}.material-toolbar-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.material-search{width:100%;min-height:44px;border:1px solid var(--line,#d8dee8);border-radius:12px;padding:0 13px;font:inherit;background:#fff}.material-add-btn{white-space:nowrap}.material-quick-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}.material-mode-btn,.material-filter-toggle,.material-category-chip{border:1px solid var(--line,#d8dee8);background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;white-space:nowrap}.material-mode-btn.is-active,.material-category-chip.is-active{background:#1f2937;color:#fff;border-color:#1f2937}.material-category-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 0 4px;-webkit-overflow-scrolling:touch}.material-advanced-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--line,#d8dee8);border-radius:12px;background:#f8fafc}.material-advanced-filters.is-hidden{display:none}.material-result-line{min-height:22px;font-size:12px;color:#64748b;margin:4px 2px}.material-compact-list{display:grid;gap:5px}.material-compact-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;min-height:42px;padding:7px 8px 7px 11px;border:1px solid var(--line,#e2e8f0);border-radius:10px;background:#fff;cursor:pointer}.material-compact-row:active{background:#f8fafc}.material-row-name{min-width:0;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.material-row-cost{font-size:12px;font-variant-numeric:tabular-nums;color:#475569;text-align:right;white-space:nowrap}.material-compact-row.cost-mode .material-row-cost{font-size:14px;font-weight:800;color:#111827}.material-delete-btn{border:0;background:transparent;color:#b91c1c;font:inherit;font-size:12px;padding:7px 5px;cursor:pointer}.material-editor-modal{display:none;position:fixed;inset:0;z-index:9000}.material-editor-modal.is-open{display:block}.material-editor-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.48)}.material-editor-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:min(720px,100%);max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom));box-sizing:border-box;box-shadow:0 -14px 35px rgba(15,23,42,.18)}.material-editor-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;position:sticky;top:-16px;z-index:2;background:inherit;padding:16px 0 8px}.material-editor-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom));background:inherit;padding:10px 0 calc(20px + env(safe-area-inset-bottom));margin-top:8px}.material-empty{padding:24px;text-align:center;color:#64748b;border:1px dashed var(--line,#d8dee8);border-radius:12px}.material-cost-missing{color:#b45309}.material-count-muted{color:#94a3b8}.material-master-heading{align-items:center}@media(max-width:640px){.material-toolbar-top{grid-template-columns:1fr}.material-add-btn{width:100%}.material-advanced-filters{grid-template-columns:1fr}.material-compact-row{grid-template-columns:minmax(0,1fr) auto auto}.material-editor-sheet{max-height:92vh}}
+</style>
 </head>
 
 <body>
@@ -29,55 +33,89 @@
     </header>
 
     <section class="tab-panel is-active" data-tab="materials">
-      <div class="layout-grid two-cols">
-        <section class="card">
-          <div class="section-heading">
+      <section class="card material-master-card">
+        <div class="section-heading material-master-heading">
+          <div>
+            <p class="section-kicker">材料マスター</p>
+            <h2>材料一覧</h2>
+          </div>
+          <span class="badge" id="materialsMasterCountBadge">0件</span>
+        </div>
+
+        <div class="material-toolbar">
+          <div class="material-toolbar-top">
+            <input id="materialSearchInput" class="material-search" type="search" placeholder="材料名・仕入先を検索">
+            <button class="btn btn-primary material-add-btn" type="button" id="openNewMaterialBtn">＋ 材料追加</button>
+          </div>
+
+          <div class="material-quick-row">
+            <button class="material-mode-btn is-active" type="button" data-material-mode="normal">通常</button>
+            <button class="material-mode-btn" type="button" data-material-mode="cost">原価一覧</button>
+            <button class="material-filter-toggle" type="button" id="materialFilterToggleBtn">絞り込み</button>
+          </div>
+
+          <div id="materialCategoryChips" class="material-category-chips"></div>
+
+          <div id="materialAdvancedFilters" class="material-advanced-filters is-hidden">
+            <label class="field">
+              <span class="field-label">仕入先</span>
+              <select id="materialSupplierFilter"><option value="">すべて</option></select>
+            </label>
+            <label class="field">
+              <span class="field-label">原価</span>
+              <select id="materialPriceFilter">
+                <option value="all">すべて</option>
+                <option value="missing">原価未入力</option>
+                <option value="1000">換算原価 1,000円以上</option>
+                <option value="5000">換算原価 5,000円以上</option>
+                <option value="10000">換算原価 10,000円以上</option>
+              </select>
+            </label>
+            <label class="field">
+              <span class="field-label">並び順</span>
+              <select id="materialSortSelect">
+                <option value="name">名前順</option>
+                <option value="price-desc">原価が高い順</option>
+                <option value="price-asc">原価が安い順</option>
+                <option value="category">カテゴリー順</option>
+              </select>
+            </label>
+            <button class="btn btn-secondary" type="button" id="clearMaterialFiltersBtn">絞り込みをクリア</button>
+          </div>
+        </div>
+
+        <div class="material-result-line" id="materialResultLine"></div>
+        <div class="material-compact-list" id="materialsMasterList"></div>
+      </section>
+
+      <div class="material-editor-modal" id="materialEditorModal" aria-hidden="true">
+        <div class="material-editor-backdrop" id="materialEditorBackdrop"></div>
+        <section class="card material-editor-sheet" role="dialog" aria-modal="true" aria-labelledby="materialEditorTitle">
+          <div class="material-editor-head">
             <div>
               <p class="section-kicker">材料マスター</p>
-              <h2>材料登録</h2>
+              <h2 id="materialEditorTitle">材料編集</h2>
             </div>
+            <button class="btn btn-secondary btn-inline" type="button" id="closeMaterialEditorBtn">閉じる</button>
           </div>
-          <div class="stack-form">
+          <div class="stack-form material-editor-form">
             <label class="field"><span class="field-label">材料名</span><input type="text" id="matName"></label>
             <div class="micro-row">
-              <label class="field"><span class="field-label">規格量</span><input type="number" id="matBaseAmount"
-                  step="0.01" min="0"></label>
+              <label class="field"><span class="field-label">規格量</span><input type="number" id="matBaseAmount" step="0.01" min="0"></label>
               <label class="field"><span class="field-label">単位</span><select id="matBaseUnit">
-                  <option>g</option>
-                  <option>kg</option>
-                  <option>ml</option>
-                  <option>L</option>
-                  <option>個</option>
-                  <option>枚</option>
-                  <option>本</option>
-                  <option>pc</option>
-                  <option>袋</option>
-                </select></label>
+                <option>g</option><option>kg</option><option>ml</option><option>L</option><option>個</option><option>枚</option><option>本</option><option>pc</option><option>袋</option>
+              </select></label>
             </div>
-            <label class="field"><span class="field-label">規格価格</span><input type="number" id="matBasePrice" step="0.01"
-                min="0"></label>
+            <label class="field"><span class="field-label">規格価格</span><input type="number" id="matBasePrice" step="0.01" min="0"></label>
             <label class="field"><span class="field-label">カテゴリ</span><input type="text" id="matCategory"></label>
-           <label class="field">
-  <span class="field-label">サブカテゴリ</span>
-  <input type="text" id="matSubCategory">
-</label>
+            <label class="field"><span class="field-label">サブカテゴリ</span><input type="text" id="matSubCategory"></label>
             <label class="field"><span class="field-label">仕入先</span><input type="text" id="matSupplier"></label>
             <label class="field"><span class="field-label">メモ</span><textarea id="matNote"></textarea></label>
           </div>
-          <div class="sub-card">
-            <div class="inline-actions"><button class="btn btn-primary" type="button"
-                id="saveMaterialMasterBtn">保存</button><button class="btn btn-secondary" type="button"
-                id="newMaterialMasterBtn">新規</button></div>
+          <div class="material-editor-actions">
+            <button class="btn btn-primary" type="button" id="saveMaterialMasterBtn">保存</button>
+            <button class="btn btn-secondary" type="button" id="newMaterialMasterBtn">入力をクリア</button>
           </div>
-        </section>
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">一覧</p>
-              <h2>材料一覧</h2>
-            </div><span class="badge" id="materialsMasterCountBadge">0件</span>
-          </div>
-          <div class="list" id="materialsMasterList"></div>
         </section>
       </div>
     </section>
@@ -830,6 +868,146 @@
   <script src="./assets/js/schedule.js"></script>
   <script src="./assets/js/importExport.js"></script>
   <script src="./assets/js/app.js"></script>
+  <script id="material-master-ui-v2-script">
+(function(){
+  'use strict';
+  const filterState={query:'',category:'',supplier:'',price:'all',sort:'name',mode:'normal'};
+  const $=id=>document.getElementById(id);
+  const esc2=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const n=v=>Number(v)||0;
+  const yen=v=>new Intl.NumberFormat('ja-JP',{maximumFractionDigits:2}).format(Number(v)||0);
+
+  function normalizedUnitCost(mat){
+    const amount=n(mat.baseAmount),price=n(mat.basePrice),unit=String(mat.baseUnit||'').trim();
+    if(amount<=0||price<0)return null;
+    const per=price/amount;
+    if(unit==='g')return {value:per*1000,label:'kg'};
+    if(unit==='kg')return {value:per,label:'kg'};
+    if(unit==='ml'||unit==='mL')return {value:per*1000,label:'L'};
+    if(unit==='L'||unit==='l')return {value:per,label:'L'};
+    return {value:per,label:unit||'単位'};
+  }
+  function rawCostLabel(mat){
+    const c=normalizedUnitCost(mat);
+    if(!c||!Number.isFinite(c.value)||n(mat.basePrice)<=0)return '原価未入力';
+    return `¥${yen(c.value)}/${esc2(c.label)}`;
+  }
+  function unique(list){return [...new Set(list.filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b),'ja'));}
+  function getMaterials(){return (typeof db!=='undefined'&&Array.isArray(db.materialsMaster))?db.materialsMaster:[];}
+
+  function refreshFilterOptions(){
+    const mats=getMaterials();
+    const categories=unique(mats.map(x=>x.category||''));
+    const suppliers=unique(mats.map(x=>x.supplier||''));
+    const chips=$('materialCategoryChips');
+    if(chips){
+      chips.innerHTML=['',...categories].map(c=>`<button type="button" class="material-category-chip ${filterState.category===c?'is-active':''}" data-material-category="${esc2(c)}">${c?esc2(c):'すべて'}</button>`).join('');
+    }
+    const supplier=$('materialSupplierFilter');
+    if(supplier){
+      const current=filterState.supplier;
+      supplier.innerHTML='<option value="">すべて</option>'+suppliers.map(s=>`<option value="${esc2(s)}">${esc2(s)}</option>`).join('');
+      supplier.value=suppliers.includes(current)?current:'';
+      if(supplier.value!==current)filterState.supplier='';
+    }
+  }
+
+  function filteredMaterials(){
+    const q=filterState.query.trim().normalize('NFKC').toLowerCase();
+    let list=getMaterials().filter(mat=>{
+      if(q){
+        const hay=[mat.name,mat.category,mat.subCategory,mat.supplier,mat.note].join(' ').normalize('NFKC').toLowerCase();
+        if(!hay.includes(q))return false;
+      }
+      if(filterState.category&&mat.category!==filterState.category)return false;
+      if(filterState.supplier&&mat.supplier!==filterState.supplier)return false;
+      const c=normalizedUnitCost(mat);
+      if(filterState.price==='missing'&&n(mat.basePrice)>0&&n(mat.baseAmount)>0)return false;
+      if(['1000','5000','10000'].includes(filterState.price)){
+        if(!c||c.value<Number(filterState.price))return false;
+      }
+      return true;
+    });
+    list=list.slice().sort((a,b)=>{
+      const ca=normalizedUnitCost(a)?.value??-Infinity,cb=normalizedUnitCost(b)?.value??-Infinity;
+      if(filterState.sort==='price-desc')return cb-ca||String(a.name).localeCompare(String(b.name),'ja');
+      if(filterState.sort==='price-asc')return (ca<0?Infinity:ca)-(cb<0?Infinity:cb)||String(a.name).localeCompare(String(b.name),'ja');
+      if(filterState.sort==='category')return String(a.category||'').localeCompare(String(b.category||''),'ja')||String(a.name).localeCompare(String(b.name),'ja');
+      return String(a.name||'').localeCompare(String(b.name||''),'ja');
+    });
+    return list;
+  }
+
+  function renderMaterialListV2(){
+    const all=getMaterials(),list=filteredMaterials(),host=$('materialsMasterList');
+    if($('materialsMasterCountBadge'))$('materialsMasterCountBadge').textContent=`${all.length}件`;
+    refreshFilterOptions();
+    if($('materialResultLine'))$('materialResultLine').innerHTML=`表示 ${list.length}件 <span class="material-count-muted">/ 全${all.length}件</span>`;
+    if(!host)return;
+    if(!list.length){host.innerHTML='<div class="material-empty">条件に合う材料がありません。</div>';return;}
+    host.innerHTML=list.map(mat=>{
+      const cost=rawCostLabel(mat),missing=cost==='原価未入力';
+      return `<article class="material-compact-row ${filterState.mode==='cost'?'cost-mode':''}" data-material-row-id="${esc2(mat.id)}" tabindex="0">
+        <div class="material-row-name">${esc2(mat.name||'名称未設定')}</div>
+        <div class="material-row-cost ${missing?'material-cost-missing':''}">${cost}</div>
+        <button class="material-delete-btn delete-matmaster-btn" type="button" data-id="${esc2(mat.id)}">削除</button>
+      </article>`;
+    }).join('');
+  }
+
+  function fillEditor(mat){
+    if(!mat)return;
+    appState.currentMaterialMasterId=mat.id;
+    $('matName').value=mat.name||'';
+    $('matBaseAmount').value=mat.baseAmount??'';
+    $('matBaseUnit').value=mat.baseUnit||'g';
+    $('matBasePrice').value=mat.basePrice??'';
+    $('matCategory').value=mat.category||'';
+    if($('matSubCategory'))$('matSubCategory').value=mat.subCategory||'';
+    $('matSupplier').value=mat.supplier||'';
+    $('matNote').value=mat.note||'';
+    $('materialEditorTitle').textContent=mat.name||'材料編集';
+  }
+  function openEditor(){const m=$('materialEditorModal');if(m){m.classList.add('is-open');m.setAttribute('aria-hidden','false');setTimeout(()=>$('matName')?.focus(),80);}}
+  function closeEditor(){const m=$('materialEditorModal');if(m){m.classList.remove('is-open');m.setAttribute('aria-hidden','true');}}
+  function newEditor(){
+    if(typeof resetMaterialMasterEditor==='function')resetMaterialMasterEditor();
+    else {appState.currentMaterialMasterId=null;['matName','matBaseAmount','matBasePrice','matCategory','matSubCategory','matSupplier','matNote'].forEach(id=>{if($(id))$(id).value=''});if($('matBaseUnit'))$('matBaseUnit').value='g';}
+    $('materialEditorTitle').textContent='材料を追加';
+    openEditor();
+  }
+
+  window.renderMaterialsMasterList=renderMaterialListV2;
+  try{renderMaterialsMasterList=renderMaterialListV2;}catch(e){}
+
+  function bind(){
+    $('materialSearchInput')?.addEventListener('input',e=>{filterState.query=e.target.value;renderMaterialListV2();});
+    $('materialCategoryChips')?.addEventListener('click',e=>{const b=e.target.closest('[data-material-category]');if(!b)return;filterState.category=b.dataset.materialCategory||'';renderMaterialListV2();});
+    $('materialSupplierFilter')?.addEventListener('change',e=>{filterState.supplier=e.target.value;renderMaterialListV2();});
+    $('materialPriceFilter')?.addEventListener('change',e=>{filterState.price=e.target.value;renderMaterialListV2();});
+    $('materialSortSelect')?.addEventListener('change',e=>{filterState.sort=e.target.value;renderMaterialListV2();});
+    $('materialFilterToggleBtn')?.addEventListener('click',()=>{$('materialAdvancedFilters')?.classList.toggle('is-hidden');});
+    $('clearMaterialFiltersBtn')?.addEventListener('click',()=>{filterState.query='';filterState.category='';filterState.supplier='';filterState.price='all';filterState.sort='name';if($('materialSearchInput'))$('materialSearchInput').value='';if($('materialPriceFilter'))$('materialPriceFilter').value='all';if($('materialSortSelect'))$('materialSortSelect').value='name';renderMaterialListV2();});
+    document.querySelectorAll('[data-material-mode]').forEach(btn=>btn.addEventListener('click',()=>{filterState.mode=btn.dataset.materialMode;document.querySelectorAll('[data-material-mode]').forEach(x=>x.classList.toggle('is-active',x===btn));renderMaterialListV2();}));
+    $('openNewMaterialBtn')?.addEventListener('click',newEditor);
+    $('closeMaterialEditorBtn')?.addEventListener('click',closeEditor);
+    $('materialEditorBackdrop')?.addEventListener('click',closeEditor);
+    $('newMaterialMasterBtn')?.addEventListener('click',()=>{setTimeout(()=>{$('materialEditorTitle').textContent='材料を追加';},0);});
+    $('saveMaterialMasterBtn')?.addEventListener('click',()=>{setTimeout(()=>{renderMaterialListV2();closeEditor();},0);});
+    $('materialsMasterList')?.addEventListener('click',e=>{
+      if(e.target.closest('.delete-matmaster-btn'))return;
+      const row=e.target.closest('[data-material-row-id]');if(!row)return;
+      const mat=getMaterials().find(x=>x.id===row.dataset.materialRowId);if(!mat)return;
+      fillEditor(mat);openEditor();
+    },true);
+    $('materialsMasterList')?.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const row=e.target.closest('[data-material-row-id]');if(!row)return;e.preventDefault();const mat=getMaterials().find(x=>x.id===row.dataset.materialRowId);if(mat){fillEditor(mat);openEditor();}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape')closeEditor();});
+    renderMaterialListV2();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
+  </script>
+
   <script src="./assets/tesseract/tesseract.min.js"></script>
   <script>
 /* 製造管理アプリ ローカルOCR取込。画像は端末外へ送信しません。 */
