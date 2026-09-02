@@ -18,6 +18,32 @@
 #recipeEditorModal:not(.is-open){display:none!important}
 #recipeEditorModal.is-open{display:block!important}
 @media(max-width:720px){[data-tab="recipes"] .section-heading{align-items:flex-start}.recipe-row-meta{white-space:normal}.recipe-compact-row{grid-template-columns:minmax(0,1fr) auto}.recipe-delete-btn{grid-column:2;grid-row:1/3}.recipe-row-cost{grid-column:1;justify-self:start}}
+</style><style id="recipe-material-nav-v6-style">
+/* v6: レシピ編集全体は通常表示、材料の追加/編集だけナビ化 */
+[data-tab="recipes"] .layout-grid.two-cols{align-items:start}
+.recipe-material-compact-list{display:grid;gap:4px}
+.recipe-material-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;gap:8px;align-items:center;min-height:40px;padding:5px 7px 5px 10px;border:1px solid var(--line,#e2e8f0);border-radius:9px;background:#fff;cursor:pointer}
+.recipe-material-row:active{background:#f8fafc}
+.recipe-material-name{min-width:0;font-size:14px;font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.recipe-material-amount,.recipe-material-cost{font-size:12px;white-space:nowrap;color:#475569;font-variant-numeric:tabular-nums}
+.recipe-material-delete{border:0;background:transparent;color:#b91c1c;font:inherit;font-size:11px;padding:6px 4px;cursor:pointer}
+.recipe-material-nav{display:none;position:fixed;inset:0;z-index:9300;background:var(--bg,#f6f7f9);overflow:auto;-webkit-overflow-scrolling:touch}
+.recipe-material-nav.is-open{display:block}
+.recipe-material-nav-sheet{width:min(680px,100%);min-height:100%;margin:0 auto;padding:0 12px calc(24px + env(safe-area-inset-bottom));box-sizing:border-box;background:var(--bg,#f6f7f9)}
+.recipe-material-nav-head{position:sticky;top:0;z-index:4;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:10px;padding:10px 0 9px;background:var(--bg,#f6f7f9);border-bottom:1px solid var(--line,#e2e8f0)}
+.recipe-material-nav-head h2{margin:0;font-size:18px}
+.recipe-material-nav-kicker{font-size:11px;color:#64748b;margin-bottom:1px}
+.recipe-material-nav-back{border:1px solid var(--line,#d8dee8);background:#fff;border-radius:10px;min-height:38px;padding:0 11px;font:inherit;font-weight:700}
+#recipeMaterialNav #recipeMaterialFormCard{display:block!important;margin:12px 0 0;padding:12px;border-radius:12px}
+#recipeMaterialNav .stack-form{gap:10px}
+#recipeMaterialNav .field{margin:0}
+#recipeMaterialNav .inline-actions{position:sticky;bottom:0;margin:10px -12px -12px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(to bottom,rgba(246,247,249,.92),var(--bg,#f6f7f9) 30%)}
+@media(max-width:720px){
+  [data-tab="recipes"] .layout-grid.two-cols{grid-template-columns:1fr}
+  .recipe-material-row{grid-template-columns:minmax(0,1fr) auto auto auto;gap:6px;min-height:38px;padding:4px 6px 4px 9px}
+  .recipe-material-name{font-size:13.5px}.recipe-material-amount,.recipe-material-cost{font-size:11.5px}
+}
+@media(max-width:390px){.recipe-material-cost{display:none}}
 </style></head>
 <body>
 <div class="app-shell">
@@ -125,7 +151,7 @@
 <div class="section-heading">
 <div>
 <p class="section-kicker">レシピマスター</p>
-<h2>レシピ一覧</h2><div class="recipe-mode-note">一覧モード：行をタップすると編集画面が開きます</div>
+<h2>レシピ一覧</h2>
 </div><span class="badge" id="recipeCountBadge">0件</span>
 </div>
 <div class="recipe-toolbar">
@@ -149,8 +175,7 @@
 <div class="recipe-result-line" id="recipeResultLine"></div>
 <div class="recipe-compact-list" id="recipeMasterList"></div>
 </section>
-</div>
-<div aria-hidden="true" class="recipe-editor-modal" id="recipeEditorModal"><div class="recipe-editor-backdrop" id="recipeEditorBackdrop"></div><section aria-labelledby="recipeEditorTitle" aria-modal="true" class="recipe-editor-sheet" role="dialog"><div class="recipe-editor-head"><div class="recipe-editor-title"><p class="section-kicker">レシピマスター</p><h2 id="recipeEditorTitle">レシピ編集</h2></div><button class="btn btn-secondary btn-inline recipe-modal-close" id="closeRecipeEditorBtn" type="button">閉じる</button></div><div class="recipe-editor-body" id="recipeEditorBody"><section class="card">
+<section class="card">
 <div class="section-heading">
 <div>
 <p class="section-kicker">レシピ</p>
@@ -297,27 +322,7 @@
 </div>
 <div class="list" id="recipeMaterialsList"></div>
 <p class="helper-text" id="recipeMaterialsEmpty">まだ材料がありません。</p>
-<div class="sub-card is-hidden" id="recipeMaterialFormCard">
-<div class="stack-form">
-<label class="field"><span class="field-label">カテゴリで絞り込み</span><select id="recipeMaterialFilterCategory">
-<option value="">すべて</option>
-</select></label>
-<label class="field"><span class="field-label">材料マスターから選択</span><select id="recipeMaterialSelect"></select></label>
-<div class="micro-row">
-<label class="field"><span class="field-label">数値</span><input id="recipeMaterialAmountValue" min="0" step="0.01" type="number"/></label>
-<label class="field"><span class="field-label">単位</span><select id="recipeMaterialAmountUnit">
-<option>g</option>
-<option>kg</option>
-<option>ml</option>
-<option>L</option>
-<option>個</option>
-<option>%</option>
-</select></label>
-</div>
-<label class="field"><span class="field-label">備考</span><input id="recipeMaterialNote" type="text"/></label>
-<div class="inline-actions"><button class="btn btn-primary" id="saveRecipeMaterialBtn" type="button">保存</button><button class="btn btn-secondary" id="cancelRecipeMaterialBtn" type="button">キャンセル</button></div>
-</div>
-</div>
+
 </section><section class="card" style="grid-column:1 / -1;">
 <div class="section-heading">
 <div>
@@ -351,7 +356,28 @@
 <div class="inline-actions"><button class="btn btn-primary" id="saveFlowBtn" type="button">保存</button><button class="btn btn-secondary" id="cancelFlowBtn" type="button">キャンセル</button></div>
 </div>
 </div>
-</section></div></section></div></section>
+</section></div>
+<div aria-hidden="true" class="recipe-material-nav" id="recipeMaterialNav"><section class="recipe-material-nav-sheet"><div class="recipe-material-nav-head"><button class="recipe-material-nav-back" id="recipeMaterialNavBack" type="button">← 戻る</button><div><div class="recipe-material-nav-kicker">配合</div><h2 id="recipeMaterialNavTitle">材料を追加</h2></div></div><div class="sub-card" id="recipeMaterialFormCard">
+<div class="stack-form">
+<label class="field"><span class="field-label">カテゴリで絞り込み</span><select id="recipeMaterialFilterCategory">
+<option value="">すべて</option>
+</select></label>
+<label class="field"><span class="field-label">材料マスターから選択</span><select id="recipeMaterialSelect"></select></label>
+<div class="micro-row">
+<label class="field"><span class="field-label">数値</span><input id="recipeMaterialAmountValue" min="0" step="0.01" type="number"/></label>
+<label class="field"><span class="field-label">単位</span><select id="recipeMaterialAmountUnit">
+<option>g</option>
+<option>kg</option>
+<option>ml</option>
+<option>L</option>
+<option>個</option>
+<option>%</option>
+</select></label>
+</div>
+<label class="field"><span class="field-label">備考</span><input id="recipeMaterialNote" type="text"/></label>
+<div class="inline-actions"><button class="btn btn-primary" id="saveRecipeMaterialBtn" type="button">保存</button><button class="btn btn-secondary" id="cancelRecipeMaterialBtn" type="button">キャンセル</button></div>
+</div>
+</div></section></div></section>
 <section class="tab-panel" data-tab="products">
 <div class="layout-grid two-cols">
 <section class="card">
@@ -1112,26 +1138,89 @@ function commit(){if(!confirm('原本と照合しましたか？ 選択データ
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ui);else ui();
 })();
   </script>
-<script id="recipe-v5-final-fallback">
+<script id="recipe-material-nav-v6-script">
 (function(){
-  const $=id=>document.getElementById(id);
-  function forceRecipeList(){
-    const sec=document.querySelector('[data-tab="recipes"]');
-    if(!sec)return;
-    // Only list card is visible in tab itself. Editor remains in modal.
-    sec.querySelectorAll(':scope > .layout-grid > .card').forEach(card=>{
-      card.style.display=card.classList.contains('recipe-list-card')?'block':'none';
-    });
-    if(typeof window.renderRecipeMasterList==='function'){
-      try{window.renderRecipeMasterList()}catch(e){}
-    }
-  }
-  document.addEventListener('click',e=>{
-    const b=e.target.closest('[data-tab-target="recipes"]');
-    if(b)setTimeout(forceRecipeList,0);
-  });
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(forceRecipeList,30));
-  window.addEventListener('load',()=>setTimeout(forceRecipeList,30));
+'use strict';
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function matDb(){return (typeof db!=='undefined'&&Array.isArray(db.materialsMaster))?db.materialsMaster:[]}
+function itemCost(item){
+  const mat=matDb().find(x=>x.id===item.materialId);
+  if(!mat)return 0;
+  try{return typeof unitCostFromMaterial==='function' ? Number(unitCostFromMaterial(mat)||0)*Number(item.amountValue||0) : 0}catch(e){return 0}
+}
+function renderCompactRecipeMaterials(){
+  const host=$('recipeMaterialsList'), empty=$('recipeMaterialsEmpty');
+  if(!host || typeof appState==='undefined')return;
+  const arr=Array.isArray(appState.currentRecipeMaterials)?appState.currentRecipeMaterials:[];
+  host.classList.add('recipe-material-compact-list');
+  if(!arr.length){host.innerHTML=''; if(empty)empty.classList.remove('is-hidden'); return;}
+  if(empty)empty.classList.add('is-hidden');
+  host.innerHTML=arr.map((item,index)=>{
+    const amount=`${Number(item.amountValue||0).toLocaleString('ja-JP',{maximumFractionDigits:2})}${esc(item.amountUnit||'')}`;
+    const cost=itemCost(item);
+    return `<article class="recipe-material-row" data-recipe-material-index="${index}" tabindex="0">
+      <div class="recipe-material-name">${esc(item.name||'名称未設定')}</div>
+      <div class="recipe-material-amount">${amount}</div>
+      <div class="recipe-material-cost">¥${cost.toLocaleString('ja-JP',{maximumFractionDigits:2})}</div>
+      <button class="recipe-material-delete" type="button" data-rm-delete="${index}">削除</button>
+    </article>`;
+  }).join('');
+}
+try{renderRecipeMaterials=renderCompactRecipeMaterials}catch(e){}
+window.renderRecipeMaterials=renderCompactRecipeMaterials;
+
+function openNav(title){
+  const nav=$('recipeMaterialNav'); if(!nav)return;
+  $('recipeMaterialNavTitle').textContent=title||'材料を追加';
+  nav.classList.add('is-open'); nav.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>$('recipeMaterialSelect')?.focus(),50);
+}
+function closeNav(){
+  const nav=$('recipeMaterialNav'); if(!nav)return;
+  nav.classList.remove('is-open'); nav.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+function openNewMaterial(){
+  if(typeof openAddRecipeMaterialForm==='function')openAddRecipeMaterialForm();
+  openNav('材料を追加');
+}
+function openExistingMaterial(index){
+  const item=appState.currentRecipeMaterials?.[index]; if(!item)return;
+  appState.editingRecipeMaterialIndex=index;
+  if(typeof initRecipeMaterialFilter==='function')initRecipeMaterialFilter();
+  const mat=matDb().find(x=>x.id===item.materialId);
+  if($('recipeMaterialFilterCategory'))$('recipeMaterialFilterCategory').value=mat?.category||'';
+  if(typeof renderRecipeMaterialOptions==='function')renderRecipeMaterialOptions();
+  if($('recipeMaterialSelect'))$('recipeMaterialSelect').value=item.materialId||'';
+  if($('recipeMaterialAmountValue'))$('recipeMaterialAmountValue').value=item.amountValue??'';
+  if($('recipeMaterialAmountUnit'))$('recipeMaterialAmountUnit').value=item.amountUnit||'g';
+  if($('recipeMaterialNote'))$('recipeMaterialNote').value=item.note||'';
+  $('recipeMaterialFormCard')?.classList.remove('is-hidden');
+  openNav(item.name||'材料を編集');
+}
+function bind(){
+  // material add: this navigation only; stop the old handler that would reveal the form below the list.
+  $('addRecipeMaterialBtn')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openNewMaterial();},true);
+  $('recipeMaterialNavBack')?.addEventListener('click',e=>{e.preventDefault();if(typeof closeRecipeMaterialForm==='function')closeRecipeMaterialForm();closeNav();});
+  $('cancelRecipeMaterialBtn')?.addEventListener('click',()=>setTimeout(closeNav,0));
+  $('saveRecipeMaterialBtn')?.addEventListener('click',()=>setTimeout(()=>{renderCompactRecipeMaterials();closeNav();},0));
+  $('recipeMaterialsList')?.addEventListener('click',e=>{
+    const del=e.target.closest('[data-rm-delete]');
+    if(del){e.preventDefault();e.stopImmediatePropagation();const i=Number(del.dataset.rmDelete);appState.currentRecipeMaterials.splice(i,1);renderCompactRecipeMaterials();if(typeof updateRecipeCostLabel==='function')updateRecipeCostLabel();return;}
+    const row=e.target.closest('[data-recipe-material-index]');
+    if(row){e.preventDefault();e.stopImmediatePropagation();openExistingMaterial(Number(row.dataset.recipeMaterialIndex));}
+  },true);
+  $('recipeMaterialsList')?.addEventListener('keydown',e=>{if(e.key!=='Enter'&&e.key!==' ')return;const row=e.target.closest('[data-recipe-material-index]');if(!row)return;e.preventDefault();openExistingMaterial(Number(row.dataset.recipeMaterialIndex));});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('recipeMaterialNav')?.classList.contains('is-open'))closeNav();});
+
+  // Recipe master rows load editor in-place, not in a whole-recipe modal.
+  $('recipeMasterList')?.addEventListener('click',e=>{if(e.target.closest('.delete-recipe-btn'))return;const row=e.target.closest('[data-recipe-row-id]');if(!row)return;setTimeout(()=>$('recipeName')?.scrollIntoView({behavior:'smooth',block:'start'}),0);},true);
+  $('openNewRecipeBtn')?.addEventListener('click',()=>setTimeout(()=>$('recipeName')?.scrollIntoView({behavior:'smooth',block:'start'}),0));
+  renderCompactRecipeMaterials();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
 </script></body>
 </html>
