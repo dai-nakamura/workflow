@@ -12,7 +12,13 @@
 <style id="recipe-master-ui-v2">
 .recipe-list-card{max-width:980px;margin:0 auto;grid-column:1/-1}.recipe-toolbar{display:grid;gap:10px;margin:12px 0 8px}.recipe-toolbar-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.recipe-search{width:100%;min-height:44px;border:1px solid var(--line,#d8dee8);border-radius:12px;padding:0 13px;font:inherit;background:#fff}.recipe-add-btn{white-space:nowrap}.recipe-type-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 0 4px;-webkit-overflow-scrolling:touch}.recipe-type-chip,.recipe-filter-toggle{border:1px solid var(--line,#d8dee8);background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;white-space:nowrap}.recipe-type-chip.is-active{background:#1f2937;color:#fff;border-color:#1f2937}.recipe-advanced-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--line,#d8dee8);border-radius:12px;background:#f8fafc}.recipe-advanced-filters.is-hidden{display:none}.recipe-result-line{min-height:22px;font-size:12px;color:#64748b;margin:4px 2px}.recipe-compact-list{display:grid;gap:5px}.recipe-compact-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;min-height:48px;padding:7px 8px 7px 11px;border:1px solid var(--line,#e2e8f0);border-radius:10px;background:#fff;cursor:pointer}.recipe-compact-row:active{background:#f8fafc}.recipe-row-main{min-width:0}.recipe-row-name{font-weight:750;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.recipe-row-meta{font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}.recipe-row-cost{font-size:12px;font-variant-numeric:tabular-nums;color:#334155;text-align:right;white-space:nowrap}.recipe-delete-btn{border:0;background:transparent;color:#b91c1c;font:inherit;font-size:12px;padding:7px 5px;cursor:pointer}.recipe-empty{padding:24px;text-align:center;color:#64748b;border:1px dashed var(--line,#d8dee8);border-radius:12px}.recipe-count-muted{color:#94a3b8}.recipe-dup-badge{display:inline-block;margin-left:6px;padding:1px 5px;border-radius:999px;background:#fff7ed;color:#c2410c;font-size:10px;font-weight:700}.recipe-editor-modal{display:none;position:fixed;inset:0;z-index:9050}.recipe-editor-modal.is-open{display:block}.recipe-editor-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.52)}.recipe-editor-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:min(920px,100%);max-height:94vh;overflow:auto;border-radius:20px 20px 0 0;padding:14px 14px calc(22px + env(safe-area-inset-bottom));box-sizing:border-box;background:var(--bg,#f6f7f9);box-shadow:0 -14px 35px rgba(15,23,42,.2)}.recipe-editor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;position:sticky;top:-14px;z-index:5;background:var(--bg,#f6f7f9);padding:14px 0 10px}.recipe-editor-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.recipe-editor-body>.card:nth-child(3){grid-column:1/-1}.recipe-editor-body>.card{margin:0}.recipe-editor-title{min-width:0}.recipe-editor-title h2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65vw}.recipe-modal-close{white-space:nowrap}@media(max-width:720px){.recipe-toolbar-top{grid-template-columns:1fr}.recipe-add-btn{width:100%}.recipe-advanced-filters{grid-template-columns:1fr 1fr}.recipe-editor-body{grid-template-columns:1fr}.recipe-editor-body>.card:nth-child(3){grid-column:auto}.recipe-compact-row{grid-template-columns:minmax(0,1fr) auto auto}.recipe-editor-sheet{max-height:96vh;padding-left:10px;padding-right:10px}.recipe-editor-title h2{max-width:68vw}}@media(max-width:430px){.recipe-advanced-filters{grid-template-columns:1fr}.recipe-row-cost{font-size:11px}}
 </style>
-</head>
+<style id="recipe-v5-force-css">
+[data-tab="recipes"] .recipe-mode-note{display:inline-block;margin-top:6px;padding:4px 8px;border-radius:999px;background:#e8f1ff;color:#2457a6;font-size:11px;font-weight:700}
+[data-tab="recipes"] .recipe-list-card{display:block!important;width:100%!important;max-width:none!important}
+#recipeEditorModal:not(.is-open){display:none!important}
+#recipeEditorModal.is-open{display:block!important}
+@media(max-width:720px){[data-tab="recipes"] .section-heading{align-items:flex-start}.recipe-row-meta{white-space:normal}.recipe-compact-row{grid-template-columns:minmax(0,1fr) auto}.recipe-delete-btn{grid-column:2;grid-row:1/3}.recipe-row-cost{grid-column:1;justify-self:start}}
+</style></head>
 <body>
 <div class="app-shell">
 <header class="page-header">
@@ -115,14 +121,11 @@
 </section>
 <section class="tab-panel" data-tab="recipes">
 <div class="layout-grid two-cols">
-
-
-
 <section class="card recipe-list-card">
 <div class="section-heading">
 <div>
 <p class="section-kicker">レシピマスター</p>
-<h2>レシピ一覧</h2>
+<h2>レシピ一覧</h2><div class="recipe-mode-note">一覧モード：行をタップすると編集画面が開きます</div>
 </div><span class="badge" id="recipeCountBadge">0件</span>
 </div>
 <div class="recipe-toolbar">
@@ -778,7 +781,7 @@
 <nav class="tabbar">
 <div class="tabbar-inner">
 <button class="tab-btn is-active" data-tab-target="materials" type="button"><span class="tab-icon">🧂</span><span class="tab-label">材料</span></button>
-<button class="tab-btn" data-tab-target="recipes" type="button"><span class="tab-icon">🍰</span><span class="tab-label">レシピ</span></button>
+<button class="tab-btn" data-tab-target="recipes" type="button"><span class="tab-icon">🍰</span><span class="tab-label">レシピ一覧</span></button>
 <button class="tab-btn" data-tab-target="products" type="button"><span class="tab-icon">📦</span><span class="tab-label">商品</span></button>
 <button class="tab-btn" data-tab-target="orders" type="button"><span class="tab-icon">🧾</span><span class="tab-label">受注</span></button>
 <button class="tab-btn" data-tab-target="reservations" type="button">
@@ -1109,5 +1112,26 @@ function commit(){if(!confirm('原本と照合しましたか？ 選択データ
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ui);else ui();
 })();
   </script>
-</body>
+<script id="recipe-v5-final-fallback">
+(function(){
+  const $=id=>document.getElementById(id);
+  function forceRecipeList(){
+    const sec=document.querySelector('[data-tab="recipes"]');
+    if(!sec)return;
+    // Only list card is visible in tab itself. Editor remains in modal.
+    sec.querySelectorAll(':scope > .layout-grid > .card').forEach(card=>{
+      card.style.display=card.classList.contains('recipe-list-card')?'block':'none';
+    });
+    if(typeof window.renderRecipeMasterList==='function'){
+      try{window.renderRecipeMasterList()}catch(e){}
+    }
+  }
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-tab-target="recipes"]');
+    if(b)setTimeout(forceRecipeList,0);
+  });
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(forceRecipeList,30));
+  window.addEventListener('load',()=>setTimeout(forceRecipeList,30));
+})();
+</script></body>
 </html>
