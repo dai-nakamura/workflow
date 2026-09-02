@@ -1,898 +1,810 @@
 <!DOCTYPE html>
+
 <html lang="ja">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>製造設計アプリ 完成版</title>
-  <link rel="stylesheet" href="./assets/css/style.css">
-
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>製造設計アプリ 完成版</title>
+<link href="./assets/css/style.css" rel="stylesheet"/>
 <style id="material-master-ui-v2">
 .material-master-card{max-width:980px;margin:0 auto}.material-toolbar{display:grid;gap:10px;margin:12px 0 8px}.material-toolbar-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.material-search{width:100%;min-height:44px;border:1px solid var(--line,#d8dee8);border-radius:12px;padding:0 13px;font:inherit;background:#fff}.material-add-btn{white-space:nowrap}.material-quick-row{display:flex;gap:7px;overflow-x:auto;padding-bottom:2px}.material-mode-btn,.material-filter-toggle,.material-category-chip{border:1px solid var(--line,#d8dee8);background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;white-space:nowrap}.material-mode-btn.is-active,.material-category-chip.is-active{background:#1f2937;color:#fff;border-color:#1f2937}.material-category-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 0 4px;-webkit-overflow-scrolling:touch}.material-advanced-filters{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--line,#d8dee8);border-radius:12px;background:#f8fafc}.material-advanced-filters.is-hidden{display:none}.material-result-line{min-height:22px;font-size:12px;color:#64748b;margin:4px 2px}.material-compact-list{display:grid;gap:5px}.material-compact-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;min-height:42px;padding:7px 8px 7px 11px;border:1px solid var(--line,#e2e8f0);border-radius:10px;background:#fff;cursor:pointer}.material-compact-row:active{background:#f8fafc}.material-row-name{min-width:0;font-weight:700;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.material-row-cost{font-size:12px;font-variant-numeric:tabular-nums;color:#475569;text-align:right;white-space:nowrap}.material-compact-row.cost-mode .material-row-cost{font-size:14px;font-weight:800;color:#111827}.material-delete-btn{border:0;background:transparent;color:#b91c1c;font:inherit;font-size:12px;padding:7px 5px;cursor:pointer}.material-editor-modal{display:none;position:fixed;inset:0;z-index:9000}.material-editor-modal.is-open{display:block}.material-editor-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.48)}.material-editor-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:min(720px,100%);max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom));box-sizing:border-box;box-shadow:0 -14px 35px rgba(15,23,42,.18)}.material-editor-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;position:sticky;top:-16px;z-index:2;background:inherit;padding:16px 0 8px}.material-editor-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;position:sticky;bottom:calc(-20px - env(safe-area-inset-bottom));background:inherit;padding:10px 0 calc(20px + env(safe-area-inset-bottom));margin-top:8px}.material-empty{padding:24px;text-align:center;color:#64748b;border:1px dashed var(--line,#d8dee8);border-radius:12px}.material-cost-missing{color:#b45309}.material-count-muted{color:#94a3b8}.material-master-heading{align-items:center}@media(max-width:640px){.material-toolbar-top{grid-template-columns:1fr}.material-add-btn{width:100%}.material-advanced-filters{grid-template-columns:1fr}.material-compact-row{grid-template-columns:minmax(0,1fr) auto auto}.material-editor-sheet{max-height:92vh}}
 </style>
-
 <style id="recipe-master-ui-v2">
 .recipe-list-card{max-width:980px;margin:0 auto;grid-column:1/-1}.recipe-toolbar{display:grid;gap:10px;margin:12px 0 8px}.recipe-toolbar-top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.recipe-search{width:100%;min-height:44px;border:1px solid var(--line,#d8dee8);border-radius:12px;padding:0 13px;font:inherit;background:#fff}.recipe-add-btn{white-space:nowrap}.recipe-type-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 0 4px;-webkit-overflow-scrolling:touch}.recipe-type-chip,.recipe-filter-toggle{border:1px solid var(--line,#d8dee8);background:#fff;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;white-space:nowrap}.recipe-type-chip.is-active{background:#1f2937;color:#fff;border-color:#1f2937}.recipe-advanced-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--line,#d8dee8);border-radius:12px;background:#f8fafc}.recipe-advanced-filters.is-hidden{display:none}.recipe-result-line{min-height:22px;font-size:12px;color:#64748b;margin:4px 2px}.recipe-compact-list{display:grid;gap:5px}.recipe-compact-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:8px;min-height:48px;padding:7px 8px 7px 11px;border:1px solid var(--line,#e2e8f0);border-radius:10px;background:#fff;cursor:pointer}.recipe-compact-row:active{background:#f8fafc}.recipe-row-main{min-width:0}.recipe-row-name{font-weight:750;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.recipe-row-meta{font-size:11px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}.recipe-row-cost{font-size:12px;font-variant-numeric:tabular-nums;color:#334155;text-align:right;white-space:nowrap}.recipe-delete-btn{border:0;background:transparent;color:#b91c1c;font:inherit;font-size:12px;padding:7px 5px;cursor:pointer}.recipe-empty{padding:24px;text-align:center;color:#64748b;border:1px dashed var(--line,#d8dee8);border-radius:12px}.recipe-count-muted{color:#94a3b8}.recipe-dup-badge{display:inline-block;margin-left:6px;padding:1px 5px;border-radius:999px;background:#fff7ed;color:#c2410c;font-size:10px;font-weight:700}.recipe-editor-modal{display:none;position:fixed;inset:0;z-index:9050}.recipe-editor-modal.is-open{display:block}.recipe-editor-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.52)}.recipe-editor-sheet{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:min(920px,100%);max-height:94vh;overflow:auto;border-radius:20px 20px 0 0;padding:14px 14px calc(22px + env(safe-area-inset-bottom));box-sizing:border-box;background:var(--bg,#f6f7f9);box-shadow:0 -14px 35px rgba(15,23,42,.2)}.recipe-editor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;position:sticky;top:-14px;z-index:5;background:var(--bg,#f6f7f9);padding:14px 0 10px}.recipe-editor-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.recipe-editor-body>.card:nth-child(3){grid-column:1/-1}.recipe-editor-body>.card{margin:0}.recipe-editor-title{min-width:0}.recipe-editor-title h2{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65vw}.recipe-modal-close{white-space:nowrap}@media(max-width:720px){.recipe-toolbar-top{grid-template-columns:1fr}.recipe-add-btn{width:100%}.recipe-advanced-filters{grid-template-columns:1fr 1fr}.recipe-editor-body{grid-template-columns:1fr}.recipe-editor-body>.card:nth-child(3){grid-column:auto}.recipe-compact-row{grid-template-columns:minmax(0,1fr) auto auto}.recipe-editor-sheet{max-height:96vh;padding-left:10px;padding-right:10px}.recipe-editor-title h2{max-width:68vw}}@media(max-width:430px){.recipe-advanced-filters{grid-template-columns:1fr}.recipe-row-cost{font-size:11px}}
 </style>
-
 </head>
-
 <body>
-  <div class="app-shell">
-    <header class="page-header">
-      <div>
-        <p class="eyebrow">Integrated Production Design App</p>
-        <h1>製造設計アプリ 完成版</h1>
-        <p class="lead">余計なUIを整理しつつ、材料・レシピ・商品・受注・集計・製造・段取り・計画までつなげた版です。</p>
-     <button onclick="location.href='manufacturing-board.html'">
+<div class="app-shell">
+<header class="page-header">
+<div>
+<p class="eyebrow">Integrated Production Design App</p>
+<h1>製造設計アプリ 完成版</h1>
+<p class="lead">余計なUIを整理しつつ、材料・レシピ・商品・受注・集計・製造・段取り・計画までつなげた版です。</p>
+<button onclick="location.href='manufacturing-board.html'">
   製造ボードを開く
 </button>
-             <button onclick="location.href='prep-calculator.html'">
+<button onclick="location.href='prep-calculator.html'">
   製造仕込み集計アプリを開く
 </button>
-       </div>
-      <div class="status-line">
-        <span class="badge badge-success" id="storageStatus">端末内保存中</span>
-        <span class="current-editing" id="currentEditingLabel">新規レシピ作成中</span>
-      </div>
-    </header>
+</div>
+<div class="status-line">
+<span class="badge badge-success" id="storageStatus">端末内保存中</span>
+<span class="current-editing" id="currentEditingLabel">新規レシピ作成中</span>
+</div>
+</header>
+<section class="tab-panel is-active" data-tab="materials">
+<section class="card material-master-card">
+<div class="section-heading material-master-heading">
+<div>
+<p class="section-kicker">材料マスター</p>
+<h2>材料一覧</h2>
+</div>
+<span class="badge" id="materialsMasterCountBadge">0件</span>
+</div>
+<div class="material-toolbar">
+<div class="material-toolbar-top">
+<input class="material-search" id="materialSearchInput" placeholder="材料名・分類・仕入先を検索" type="search"/>
+<button class="btn btn-primary material-add-btn" id="openNewMaterialBtn" type="button">＋ 材料追加</button>
+</div>
+<div class="material-quick-row">
+<button class="material-mode-btn is-active" data-material-mode="normal" type="button">通常</button>
+<button class="material-mode-btn" data-material-mode="cost" type="button">原価一覧</button>
+<button class="material-filter-toggle" id="materialFilterToggleBtn" type="button">絞り込み</button>
+</div>
+<div class="material-category-chips" id="materialCategoryChips"></div>
+<div class="material-advanced-filters is-hidden" id="materialAdvancedFilters">
+<label class="field">
+<span class="field-label">仕入先</span>
+<select id="materialSupplierFilter"><option value="">すべて</option></select>
+</label>
+<label class="field">
+<span class="field-label">原価</span>
+<select id="materialPriceFilter">
+<option value="all">すべて</option>
+<option value="missing">原価未入力</option>
+<option value="1000">換算原価 1,000円以上</option>
+<option value="5000">換算原価 5,000円以上</option>
+<option value="10000">換算原価 10,000円以上</option>
+</select>
+</label>
+<label class="field">
+<span class="field-label">並び順</span>
+<select id="materialSortSelect">
+<option value="name">名前順</option>
+<option value="price-desc">原価が高い順</option>
+<option value="price-asc">原価が安い順</option>
+<option value="category">カテゴリー順</option>
+</select>
+</label>
+<button class="btn btn-secondary" id="clearMaterialFiltersBtn" type="button">絞り込みをクリア</button>
+</div>
+</div>
+<div class="material-result-line" id="materialResultLine"></div>
+<div class="material-compact-list" id="materialsMasterList"></div>
+</section>
+<div aria-hidden="true" class="material-editor-modal" id="materialEditorModal">
+<div class="material-editor-backdrop" id="materialEditorBackdrop"></div>
+<section aria-labelledby="materialEditorTitle" aria-modal="true" class="card material-editor-sheet" role="dialog">
+<div class="material-editor-head">
+<div>
+<p class="section-kicker">材料マスター</p>
+<h2 id="materialEditorTitle">材料編集</h2>
+</div>
+<button class="btn btn-secondary btn-inline" id="closeMaterialEditorBtn" type="button">閉じる</button>
+</div>
+<div class="stack-form material-editor-form">
+<label class="field"><span class="field-label">材料名</span><input id="matName" type="text"/></label>
+<div class="micro-row">
+<label class="field"><span class="field-label">規格量</span><input id="matBaseAmount" min="0" step="0.01" type="number"/></label>
+<label class="field"><span class="field-label">単位</span><select id="matBaseUnit">
+<option>g</option><option>kg</option><option>ml</option><option>L</option><option>個</option><option>枚</option><option>本</option><option>pc</option><option>袋</option>
+</select></label>
+</div>
+<label class="field"><span class="field-label">規格価格</span><input id="matBasePrice" min="0" step="0.01" type="number"/></label>
+<label class="field"><span class="field-label">カテゴリ</span><input id="matCategory" type="text"/></label>
+<label class="field"><span class="field-label">サブカテゴリ</span><input id="matSubCategory" type="text"/></label>
+<label class="field"><span class="field-label">仕入先</span><input id="matSupplier" type="text"/></label>
+<label class="field"><span class="field-label">メモ</span><textarea id="matNote"></textarea></label>
+</div>
+<div class="material-editor-actions">
+<button class="btn btn-primary" id="saveMaterialMasterBtn" type="button">保存</button>
+<button class="btn btn-secondary" id="newMaterialMasterBtn" type="button">入力をクリア</button>
+</div>
+</section>
+</div>
+</section>
+<section class="tab-panel" data-tab="recipes">
+<div class="layout-grid two-cols">
 
-    <section class="tab-panel is-active" data-tab="materials">
-      <section class="card material-master-card">
-        <div class="section-heading material-master-heading">
-          <div>
-            <p class="section-kicker">材料マスター</p>
-            <h2>材料一覧</h2>
-          </div>
-          <span class="badge" id="materialsMasterCountBadge">0件</span>
-        </div>
 
-        <div class="material-toolbar">
-          <div class="material-toolbar-top">
-            <input id="materialSearchInput" class="material-search" type="search" placeholder="材料名・分類・仕入先を検索">
-            <button class="btn btn-primary material-add-btn" type="button" id="openNewMaterialBtn">＋ 材料追加</button>
-          </div>
 
-          <div class="material-quick-row">
-            <button class="material-mode-btn is-active" type="button" data-material-mode="normal">通常</button>
-            <button class="material-mode-btn" type="button" data-material-mode="cost">原価一覧</button>
-            <button class="material-filter-toggle" type="button" id="materialFilterToggleBtn">絞り込み</button>
-          </div>
-
-          <div id="materialCategoryChips" class="material-category-chips"></div>
-
-          <div id="materialAdvancedFilters" class="material-advanced-filters is-hidden">
-            <label class="field">
-              <span class="field-label">仕入先</span>
-              <select id="materialSupplierFilter"><option value="">すべて</option></select>
-            </label>
-            <label class="field">
-              <span class="field-label">原価</span>
-              <select id="materialPriceFilter">
-                <option value="all">すべて</option>
-                <option value="missing">原価未入力</option>
-                <option value="1000">換算原価 1,000円以上</option>
-                <option value="5000">換算原価 5,000円以上</option>
-                <option value="10000">換算原価 10,000円以上</option>
-              </select>
-            </label>
-            <label class="field">
-              <span class="field-label">並び順</span>
-              <select id="materialSortSelect">
-                <option value="name">名前順</option>
-                <option value="price-desc">原価が高い順</option>
-                <option value="price-asc">原価が安い順</option>
-                <option value="category">カテゴリー順</option>
-              </select>
-            </label>
-            <button class="btn btn-secondary" type="button" id="clearMaterialFiltersBtn">絞り込みをクリア</button>
-          </div>
-        </div>
-
-        <div class="material-result-line" id="materialResultLine"></div>
-        <div class="material-compact-list" id="materialsMasterList"></div>
-      </section>
-
-      <div class="material-editor-modal" id="materialEditorModal" aria-hidden="true">
-        <div class="material-editor-backdrop" id="materialEditorBackdrop"></div>
-        <section class="card material-editor-sheet" role="dialog" aria-modal="true" aria-labelledby="materialEditorTitle">
-          <div class="material-editor-head">
-            <div>
-              <p class="section-kicker">材料マスター</p>
-              <h2 id="materialEditorTitle">材料編集</h2>
-            </div>
-            <button class="btn btn-secondary btn-inline" type="button" id="closeMaterialEditorBtn">閉じる</button>
-          </div>
-          <div class="stack-form material-editor-form">
-            <label class="field"><span class="field-label">材料名</span><input type="text" id="matName"></label>
-            <div class="micro-row">
-              <label class="field"><span class="field-label">規格量</span><input type="number" id="matBaseAmount" step="0.01" min="0"></label>
-              <label class="field"><span class="field-label">単位</span><select id="matBaseUnit">
-                <option>g</option><option>kg</option><option>ml</option><option>L</option><option>個</option><option>枚</option><option>本</option><option>pc</option><option>袋</option>
-              </select></label>
-            </div>
-            <label class="field"><span class="field-label">規格価格</span><input type="number" id="matBasePrice" step="0.01" min="0"></label>
-            <label class="field"><span class="field-label">カテゴリ</span><input type="text" id="matCategory"></label>
-            <label class="field"><span class="field-label">サブカテゴリ</span><input type="text" id="matSubCategory"></label>
-            <label class="field"><span class="field-label">仕入先</span><input type="text" id="matSupplier"></label>
-            <label class="field"><span class="field-label">メモ</span><textarea id="matNote"></textarea></label>
-          </div>
-          <div class="material-editor-actions">
-            <button class="btn btn-primary" type="button" id="saveMaterialMasterBtn">保存</button>
-            <button class="btn btn-secondary" type="button" id="newMaterialMasterBtn">入力をクリア</button>
-          </div>
-        </section>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="recipes">
-      <div class="layout-grid two-cols">
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">レシピ</p>
-              <h2>基本情報</h2>
-            </div>
-            <div class="sub-card">
-  <button class="btn btn-secondary" type="button" id="toggleRecipeCalcBtn">
+<section class="card recipe-list-card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">レシピマスター</p>
+<h2>レシピ一覧</h2>
+</div><span class="badge" id="recipeCountBadge">0件</span>
+</div>
+<div class="recipe-toolbar">
+<div class="recipe-toolbar-top">
+<input class="recipe-search" id="recipeSearchInput" placeholder="レシピ名・材料・工程を検索" type="search"/>
+<button class="btn btn-primary recipe-add-btn" id="openNewRecipeBtn" type="button">＋ レシピ追加</button>
+</div>
+<div style="display:flex;gap:7px;align-items:center;overflow-x:auto">
+<div class="recipe-type-chips" id="recipeTypeChips" style="flex:1"></div>
+<button class="recipe-filter-toggle" id="recipeFilterToggleBtn" type="button">絞り込み</button>
+</div>
+<div class="recipe-advanced-filters is-hidden" id="recipeAdvancedFilters">
+<label class="field"><span class="field-label">材料カテゴリー</span><select id="recipeMaterialCategoryFilter"><option value="">すべて</option></select></label>
+<label class="field"><span class="field-label">出来高単位</span><select id="recipeYieldUnitFilter"><option value="">すべて</option></select></label>
+<label class="field"><span class="field-label">工程</span><select id="recipeFlowFilter"><option value="all">すべて</option><option value="with">工程あり</option><option value="without">工程なし</option></select></label>
+<label class="field"><span class="field-label">関連商品</span><select id="recipeProductFilter"><option value="">すべて</option></select></label>
+<label class="field"><span class="field-label">並び順</span><select id="recipeSortSelect"><option value="name">名前順</option><option value="updated-desc">更新が新しい順</option><option value="cost-desc">原価が高い順</option><option value="cost-asc">原価が安い順</option></select></label>
+<button class="btn btn-secondary" id="clearRecipeFiltersBtn" type="button">絞り込みをクリア</button>
+</div>
+</div>
+<div class="recipe-result-line" id="recipeResultLine"></div>
+<div class="recipe-compact-list" id="recipeMasterList"></div>
+</section>
+</div>
+<div aria-hidden="true" class="recipe-editor-modal" id="recipeEditorModal"><div class="recipe-editor-backdrop" id="recipeEditorBackdrop"></div><section aria-labelledby="recipeEditorTitle" aria-modal="true" class="recipe-editor-sheet" role="dialog"><div class="recipe-editor-head"><div class="recipe-editor-title"><p class="section-kicker">レシピマスター</p><h2 id="recipeEditorTitle">レシピ編集</h2></div><button class="btn btn-secondary btn-inline recipe-modal-close" id="closeRecipeEditorBtn" type="button">閉じる</button></div><div class="recipe-editor-body" id="recipeEditorBody"><section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">レシピ</p>
+<h2>基本情報</h2>
+</div>
+<div class="sub-card">
+<button class="btn btn-secondary" id="toggleRecipeCalcBtn" type="button">
     レシピ換算ナビ
   </button>
-
-  <div id="recipeCalcPanel" class="stack-form is-hidden" style="margin-top:14px;">
-    <label class="field">
-      <span class="field-label">作りたい形状</span>
-      <select id="recipeCalcTargetShape">
-        <option value="round">丸</option>
-        <option value="rectangle">四角</option>
-      </select>
-    </label>
-
-    <div class="micro-row" id="recipeCalcRoundRow">
-      <label class="field">
-        <span class="field-label">直径(mm)</span>
-        <input type="number" id="recipeCalcTargetDiameter">
-      </label>
-      <label class="field">
-        <span class="field-label">高さ(mm)</span>
-        <input type="number" id="recipeCalcTargetHeight">
-      </label>
-    </div>
-
-    <div class="micro-row is-hidden" id="recipeCalcRectangleRow">
-      <label class="field">
-        <span class="field-label">横幅(mm)</span>
-        <input type="number" id="recipeCalcTargetWidth">
-      </label>
-      <label class="field">
-        <span class="field-label">奥行(mm)</span>
-        <input type="number" id="recipeCalcTargetDepth">
-      </label>
-            <label class="field">
-        <span class="field-label">高さ（ｍｍ）</span>
-        <input type="number" id="recipeCalcTargetRectHeight">
-      </label>
-    </div>
-
-    <label class="field">
-      <span class="field-label">必要数量</span>
-      <input type="number" id="recipeCalcQuantity" value="1" min="0" step="0.01">
-    </label>
-
-    <button class="btn btn-primary" type="button" id="runRecipeCalcBtn">
+<div class="stack-form is-hidden" id="recipeCalcPanel" style="margin-top:14px;">
+<label class="field">
+<span class="field-label">作りたい形状</span>
+<select id="recipeCalcTargetShape">
+<option value="round">丸</option>
+<option value="rectangle">四角</option>
+</select>
+</label>
+<div class="micro-row" id="recipeCalcRoundRow">
+<label class="field">
+<span class="field-label">直径(mm)</span>
+<input id="recipeCalcTargetDiameter" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">高さ(mm)</span>
+<input id="recipeCalcTargetHeight" type="number"/>
+</label>
+</div>
+<div class="micro-row is-hidden" id="recipeCalcRectangleRow">
+<label class="field">
+<span class="field-label">横幅(mm)</span>
+<input id="recipeCalcTargetWidth" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">奥行(mm)</span>
+<input id="recipeCalcTargetDepth" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">高さ（ｍｍ）</span>
+<input id="recipeCalcTargetRectHeight" type="number"/>
+</label>
+</div>
+<label class="field">
+<span class="field-label">必要数量</span>
+<input id="recipeCalcQuantity" min="0" step="0.01" type="number" value="1"/>
+</label>
+<button class="btn btn-primary" id="runRecipeCalcBtn" type="button">
       換算する
     </button>
-
-    <div id="recipeCalcResult" class="empty-box">
+<div class="empty-box" id="recipeCalcResult">
       換算結果がここに出ます。
     </div>
-  </div>
 </div>
-          </div>
-          <div class="stack-form">
-            <label class="field"><span class="field-label">名称</span><input type="text" id="recipeName"></label>
-            <label class="field"><span class="field-label">区分</span><select id="recipeType">
-                <option>試作</option>
-                <option>仕込み</option>
-                <option>試作＋仕込み</option>
-              </select></label>
-            <label class="field"><span class="field-label">日付</span><input type="date" id="recipeDate"></label>
-            <label class="field"><span class="field-label">担当</span><input type="text" id="recipeOwner"></label>
-            <div class="micro-row">
-              <label class="field">
-                <span class="field-label">出来高数量</span>
-                <input type="number" id="recipeYieldQuantity" step="0.01" min="0">
-              </label>
-              <label class="field">
-                <span class="field-label">出来高単位</span>
-                <select id="recipeYieldUnit">
-                  <option>個</option>
-                  <option>台</option>
-                  <option>人前</option>
-                  <option>箱</option>
-                  <option>本</option>
-                  <option>枚</option>
-                  <option>g</option>
-                  <option>kg</option>
-                  <option>ml</option>
-                  <option>L</option>
-                  <option>バット</option>
-                  <option>ボウル</option>
-                  <option>シート</option>
-                  <option>自由入力</option>
-                </select>
-              </label>
-            </div>
-            <label class="field">
-              <span class="field-label">基準形状</span>
-              <select id="recipeBaseShape">
-                <option value="round">丸</option>
-                <option value="rectangle">四角</option>
-              </select>
-            </label>
-            <div class="micro-row">
-              <label class="field">
-                <span class="field-label">基準直径(mm)</span>
-                <input type="number" id="recipeBaseDiameter" placeholder="例：210">
-              </label>
-              <label class="field">
-                <span class="field-label">基準高さ(mm)</span>
-                <input type="number" id="recipeBaseHeight" placeholder="例：45">
-              </label>
-            </div>
-            <div class="micro-row is-hidden" id="recipeRectangleSizeRow">
-              <label class="field">
-                <span class="field-label">基準横幅（ｍｍ）</span>
-                <input type="number" id="recipeBaseWidth" placeholder="例：３００">
-              </label>
-              <label class="field">
-                <span class="field-label">基準奥行（ｍｍ）</span>
-                <input type="number" id="recipeBaseDepth" placeholder="例：４００">
-              </label>
-            </div>
-
-
-            <div class="micro-row">
-              <label class="field">
-                <span class="field-label">変換後直径(mm)</span>
-                <input type="number" id="targetDiameter" placeholder="例：210">
-              </label>
-              <label class="field">
-                <span class="field-label">変換後高さ(mm)</span>
-                <input type="number" id="targetHeight" placeholder="例：45">
-              </label>
-            </div>
-
-            <button class="btn btn-secondary" type="button" id="scaleRecipeBtn">
+</div>
+</div>
+<div class="stack-form">
+<label class="field"><span class="field-label">名称</span><input id="recipeName" type="text"/></label>
+<label class="field"><span class="field-label">区分</span><select id="recipeType">
+<option>試作</option>
+<option>仕込み</option>
+<option>試作＋仕込み</option>
+</select></label>
+<label class="field"><span class="field-label">日付</span><input id="recipeDate" type="date"/></label>
+<label class="field"><span class="field-label">担当</span><input id="recipeOwner" type="text"/></label>
+<div class="micro-row">
+<label class="field">
+<span class="field-label">出来高数量</span>
+<input id="recipeYieldQuantity" min="0" step="0.01" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">出来高単位</span>
+<select id="recipeYieldUnit">
+<option>個</option>
+<option>台</option>
+<option>人前</option>
+<option>箱</option>
+<option>本</option>
+<option>枚</option>
+<option>g</option>
+<option>kg</option>
+<option>ml</option>
+<option>L</option>
+<option>バット</option>
+<option>ボウル</option>
+<option>シート</option>
+<option>自由入力</option>
+</select>
+</label>
+</div>
+<label class="field">
+<span class="field-label">基準形状</span>
+<select id="recipeBaseShape">
+<option value="round">丸</option>
+<option value="rectangle">四角</option>
+</select>
+</label>
+<div class="micro-row">
+<label class="field">
+<span class="field-label">基準直径(mm)</span>
+<input id="recipeBaseDiameter" placeholder="例：210" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">基準高さ(mm)</span>
+<input id="recipeBaseHeight" placeholder="例：45" type="number"/>
+</label>
+</div>
+<div class="micro-row is-hidden" id="recipeRectangleSizeRow">
+<label class="field">
+<span class="field-label">基準横幅（ｍｍ）</span>
+<input id="recipeBaseWidth" placeholder="例：３００" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">基準奥行（ｍｍ）</span>
+<input id="recipeBaseDepth" placeholder="例：４００" type="number"/>
+</label>
+</div>
+<div class="micro-row">
+<label class="field">
+<span class="field-label">変換後直径(mm)</span>
+<input id="targetDiameter" placeholder="例：210" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">変換後高さ(mm)</span>
+<input id="targetHeight" placeholder="例：45" type="number"/>
+</label>
+</div>
+<button class="btn btn-secondary" id="scaleRecipeBtn" type="button">
               サイズ変換
             </button>
-            <label class="field is-hidden" id="recipeYieldCustomField">
-              <span class="field-label">自由入力単位</span>
-              <input type="text" id="recipeYieldCustomUnit" placeholder="例：7号1台分 / バット1枚分 / ホテルパン1枚分">
-            </label>
-            <label class="field"><span class="field-label">メモ</span><textarea id="recipeMemo"></textarea></label>
-          </div>
-          <div class="sub-card">
-            <div class="inline-actions"><button class="btn btn-primary" type="button"
-                id="saveRecipeBtn">レシピ保存</button><button class="btn btn-secondary" type="button"
-                id="newRecipeBtn">新規</button><span class="badge" id="recipeCostLabel">原価: -</span></div>
-          </div>
-        </section>
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">材料</p>
-              <h2>配合</h2>
-            </div><button class="btn btn-secondary btn-inline" type="button" id="addRecipeMaterialBtn">材料追加</button>
-          </div>
-          <div class="list" id="recipeMaterialsList"></div>
-          <p class="helper-text" id="recipeMaterialsEmpty">まだ材料がありません。</p>
-          <div class="sub-card is-hidden" id="recipeMaterialFormCard">
-            <div class="stack-form">
-              <label class="field"><span class="field-label">カテゴリで絞り込み</span><select id="recipeMaterialFilterCategory">
-                  <option value="">すべて</option>
-                </select></label>
-              <label class="field"><span class="field-label">材料マスターから選択</span><select
-                  id="recipeMaterialSelect"></select></label>
-              <div class="micro-row">
-                <label class="field"><span class="field-label">数値</span><input type="number"
-                    id="recipeMaterialAmountValue" min="0" step="0.01"></label>
-                <label class="field"><span class="field-label">単位</span><select id="recipeMaterialAmountUnit">
-                    <option>g</option>
-                    <option>kg</option>
-                    <option>ml</option>
-                    <option>L</option>
-                    <option>個</option>
-                    <option>%</option>
-                  </select></label>
-              </div>
-              <label class="field"><span class="field-label">備考</span><input type="text"
-                  id="recipeMaterialNote"></label>
-              <div class="inline-actions"><button class="btn btn-primary" type="button"
-                  id="saveRecipeMaterialBtn">保存</button><button class="btn btn-secondary" type="button"
-                  id="cancelRecipeMaterialBtn">キャンセル</button></div>
-            </div>
-          </div>
-        </section>
-        <section class="card" style="grid-column:1 / -1;">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">工程</p>
-              <h2>標準フロー</h2>
-            </div><button class="btn btn-secondary btn-inline" type="button" id="addFlowBtn">工程追加</button>
-          </div>
-          <div class="list" id="flowList"></div>
-          <p class="helper-text" id="flowEmpty">まだ工程がありません。</p>
-          <div class="sub-card is-hidden" id="flowFormCard">
-            <div class="stack-form">
-              <label class="field"><span class="field-label">工程名</span><input type="text" id="flowTitle"></label>
-              <label class="field"><span class="field-label">説明</span><input type="text" id="flowDescription"></label>
-              <label class="field"><span class="field-label">所要時間（分）</span><input type="number" id="flowDurationMinutes"
-                  min="0" step="1"></label>
-              <label class="field"><span class="field-label">工程タイプ</span><select id="flowType">
-                  <option value="prep">prep</option>
-                  <option value="mix">mix</option>
-                  <option value="shape">shape</option>
-                  <option value="rest">rest</option>
-                  <option value="bake">bake</option>
-                  <option value="cool">cool</option>
-                  <option value="finish">finish</option>
-                  <option value="other">other</option>
-                </select></label>
-              <label class="field"><span class="field-label">並行しやすい工程か</span><select id="flowCanParallel">
-                  <option value="true">はい</option>
-                  <option value="false">いいえ</option>
-                </select></label>
-              <label class="field"><span class="field-label">使用設備</span><input type="text" id="flowEquipment"></label>
-              <label class="field"><span class="field-label">チェック項目（1行に1つ）</span><textarea
-                  id="flowChecks"></textarea></label>
-              <div class="inline-actions"><button class="btn btn-primary" type="button"
-                  id="saveFlowBtn">保存</button><button class="btn btn-secondary" type="button"
-                  id="cancelFlowBtn">キャンセル</button></div>
-            </div>
-          </div>
-        </section>
-        <section class="card recipe-list-card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">レシピマスター</p>
-              <h2>レシピ一覧</h2>
-            </div><span class="badge" id="recipeCountBadge">0件</span>
-          </div>
-          <div class="recipe-toolbar">
-            <div class="recipe-toolbar-top">
-              <input id="recipeSearchInput" class="recipe-search" type="search" placeholder="レシピ名・材料・工程を検索">
-              <button class="btn btn-primary recipe-add-btn" type="button" id="openNewRecipeBtn">＋ レシピ追加</button>
-            </div>
-            <div style="display:flex;gap:7px;align-items:center;overflow-x:auto">
-              <div id="recipeTypeChips" class="recipe-type-chips" style="flex:1"></div>
-              <button class="recipe-filter-toggle" type="button" id="recipeFilterToggleBtn">絞り込み</button>
-            </div>
-            <div id="recipeAdvancedFilters" class="recipe-advanced-filters is-hidden">
-              <label class="field"><span class="field-label">材料カテゴリー</span><select id="recipeMaterialCategoryFilter"><option value="">すべて</option></select></label>
-              <label class="field"><span class="field-label">出来高単位</span><select id="recipeYieldUnitFilter"><option value="">すべて</option></select></label>
-              <label class="field"><span class="field-label">工程</span><select id="recipeFlowFilter"><option value="all">すべて</option><option value="with">工程あり</option><option value="without">工程なし</option></select></label>
-              <label class="field"><span class="field-label">関連商品</span><select id="recipeProductFilter"><option value="">すべて</option></select></label>
-              <label class="field"><span class="field-label">並び順</span><select id="recipeSortSelect"><option value="name">名前順</option><option value="updated-desc">更新が新しい順</option><option value="cost-desc">原価が高い順</option><option value="cost-asc">原価が安い順</option></select></label>
-              <button class="btn btn-secondary" type="button" id="clearRecipeFiltersBtn">絞り込みをクリア</button>
-            </div>
-          </div>
-          <div class="recipe-result-line" id="recipeResultLine"></div>
-          <div class="recipe-compact-list" id="recipeMasterList"></div>
-        </section>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="products">
-      <div class="layout-grid two-cols">
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">商品</p>
-              <h2>商品マスター</h2>
-            </div>
-          </div>
-          <div class="stack-form">
-            <label class="field"><span class="field-label">商品名</span><input type="text" id="productName"></label>
-            <label class="field"><span class="field-label">区分</span><input type="text" id="productCategory"></label>
-            <label class="field"><span class="field-label">単位</span><input type="text" id="productUnitLabel"></label>
-            <label class="field">
-              <span class="field-label">商品タイプ</span>
-              <select id="productKind">
-                <option value="other">その他</option>
-                <option value="cake">ケーキ</option>
-                <option value="plateDessert">皿盛りデザート</option>
-                <option value="gift">ギフト</option>
-                <option value="afternoonTea">アフタヌーンティー</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span class="field-label">予約サイズを使う</span>
-              <select id="productUseReservationSize">
-                <option value="false">使わない</option>
-                <option value="true">使う</option>
-              </select>
-            </label>
-
-            <label class="field">
-              <span class="field-label">別名・予約名</span>
-              <textarea id="productAliases" placeholder="1行に1つ&#10;例：ウェディングケーキ&#10;例：婚礼ケーキ"></textarea>
-            </label>
-            <label class="field"><span class="field-label">メモ</span><textarea id="productNote"></textarea></label>
-            <label class="field">
-              <span class="field-label">売価</span>
-              <input type="number" id="productSalePrice" min="0" step="1">
-            </label>
-
-            <button class="btn btn-secondary" type="button" id="calcProductCostBtn">
+<label class="field is-hidden" id="recipeYieldCustomField">
+<span class="field-label">自由入力単位</span>
+<input id="recipeYieldCustomUnit" placeholder="例：7号1台分 / バット1枚分 / ホテルパン1枚分" type="text"/>
+</label>
+<label class="field"><span class="field-label">メモ</span><textarea id="recipeMemo"></textarea></label>
+</div>
+<div class="sub-card">
+<div class="inline-actions"><button class="btn btn-primary" id="saveRecipeBtn" type="button">レシピ保存</button><button class="btn btn-secondary" id="newRecipeBtn" type="button">新規</button><span class="badge" id="recipeCostLabel">原価: -</span></div>
+</div>
+</section><section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">材料</p>
+<h2>配合</h2>
+</div><button class="btn btn-secondary btn-inline" id="addRecipeMaterialBtn" type="button">材料追加</button>
+</div>
+<div class="list" id="recipeMaterialsList"></div>
+<p class="helper-text" id="recipeMaterialsEmpty">まだ材料がありません。</p>
+<div class="sub-card is-hidden" id="recipeMaterialFormCard">
+<div class="stack-form">
+<label class="field"><span class="field-label">カテゴリで絞り込み</span><select id="recipeMaterialFilterCategory">
+<option value="">すべて</option>
+</select></label>
+<label class="field"><span class="field-label">材料マスターから選択</span><select id="recipeMaterialSelect"></select></label>
+<div class="micro-row">
+<label class="field"><span class="field-label">数値</span><input id="recipeMaterialAmountValue" min="0" step="0.01" type="number"/></label>
+<label class="field"><span class="field-label">単位</span><select id="recipeMaterialAmountUnit">
+<option>g</option>
+<option>kg</option>
+<option>ml</option>
+<option>L</option>
+<option>個</option>
+<option>%</option>
+</select></label>
+</div>
+<label class="field"><span class="field-label">備考</span><input id="recipeMaterialNote" type="text"/></label>
+<div class="inline-actions"><button class="btn btn-primary" id="saveRecipeMaterialBtn" type="button">保存</button><button class="btn btn-secondary" id="cancelRecipeMaterialBtn" type="button">キャンセル</button></div>
+</div>
+</div>
+</section><section class="card" style="grid-column:1 / -1;">
+<div class="section-heading">
+<div>
+<p class="section-kicker">工程</p>
+<h2>標準フロー</h2>
+</div><button class="btn btn-secondary btn-inline" id="addFlowBtn" type="button">工程追加</button>
+</div>
+<div class="list" id="flowList"></div>
+<p class="helper-text" id="flowEmpty">まだ工程がありません。</p>
+<div class="sub-card is-hidden" id="flowFormCard">
+<div class="stack-form">
+<label class="field"><span class="field-label">工程名</span><input id="flowTitle" type="text"/></label>
+<label class="field"><span class="field-label">説明</span><input id="flowDescription" type="text"/></label>
+<label class="field"><span class="field-label">所要時間（分）</span><input id="flowDurationMinutes" min="0" step="1" type="number"/></label>
+<label class="field"><span class="field-label">工程タイプ</span><select id="flowType">
+<option value="prep">prep</option>
+<option value="mix">mix</option>
+<option value="shape">shape</option>
+<option value="rest">rest</option>
+<option value="bake">bake</option>
+<option value="cool">cool</option>
+<option value="finish">finish</option>
+<option value="other">other</option>
+</select></label>
+<label class="field"><span class="field-label">並行しやすい工程か</span><select id="flowCanParallel">
+<option value="true">はい</option>
+<option value="false">いいえ</option>
+</select></label>
+<label class="field"><span class="field-label">使用設備</span><input id="flowEquipment" type="text"/></label>
+<label class="field"><span class="field-label">チェック項目（1行に1つ）</span><textarea id="flowChecks"></textarea></label>
+<div class="inline-actions"><button class="btn btn-primary" id="saveFlowBtn" type="button">保存</button><button class="btn btn-secondary" id="cancelFlowBtn" type="button">キャンセル</button></div>
+</div>
+</div>
+</section></div></section></div></section>
+<section class="tab-panel" data-tab="products">
+<div class="layout-grid two-cols">
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">商品</p>
+<h2>商品マスター</h2>
+</div>
+</div>
+<div class="stack-form">
+<label class="field"><span class="field-label">商品名</span><input id="productName" type="text"/></label>
+<label class="field"><span class="field-label">区分</span><input id="productCategory" type="text"/></label>
+<label class="field"><span class="field-label">単位</span><input id="productUnitLabel" type="text"/></label>
+<label class="field">
+<span class="field-label">商品タイプ</span>
+<select id="productKind">
+<option value="other">その他</option>
+<option value="cake">ケーキ</option>
+<option value="plateDessert">皿盛りデザート</option>
+<option value="gift">ギフト</option>
+<option value="afternoonTea">アフタヌーンティー</option>
+</select>
+</label>
+<label class="field">
+<span class="field-label">予約サイズを使う</span>
+<select id="productUseReservationSize">
+<option value="false">使わない</option>
+<option value="true">使う</option>
+</select>
+</label>
+<label class="field">
+<span class="field-label">別名・予約名</span>
+<textarea id="productAliases" placeholder="1行に1つ
+例：ウェディングケーキ
+例：婚礼ケーキ"></textarea>
+</label>
+<label class="field"><span class="field-label">メモ</span><textarea id="productNote"></textarea></label>
+<label class="field">
+<span class="field-label">売価</span>
+<input id="productSalePrice" min="0" step="1" type="number"/>
+</label>
+<button class="btn btn-secondary" id="calcProductCostBtn" type="button">
               商品原価計算
             </button>
-          </div>
-          <div class="sub-card">
-            <div class="inline-actions"><button class="btn btn-primary" type="button"
-                id="saveProductBtn">商品保存</button><button class="btn btn-secondary" type="button"
-                id="newProductBtn">新規</button></div>
-          </div>
-        </section>
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">構成要素</p>
-              <h2>商品の中身</h2>
-            </div><button class="btn btn-secondary btn-inline" type="button" id="addProductComponentBtn">構成追加</button>
-          </div>
-          <div class="list" id="productComponentsList"></div>
-          <p class="helper-text" id="productComponentsEmpty">まだ構成要素がありません。</p>
-          <div class="sub-card is-hidden" id="productComponentFormCard">
-            <div class="stack-form">
-              <label class="field"><span class="field-label">種類</span><select id="productComponentSourceType">
-                  <option value="recipe">レシピ</option>
-                  <option value="material">材料</option>
-                  <option value="product">商品</option>
-                  <option value="task">作業</option>
-                </select></label>
-                <label class="field">
-  <span class="field-label">カテゴリ</span>
-  <select id="productComponentCategoryFilter">
-    <option value="">すべて</option>
-  </select>
-</label>
-
+</div>
+<div class="sub-card">
+<div class="inline-actions"><button class="btn btn-primary" id="saveProductBtn" type="button">商品保存</button><button class="btn btn-secondary" id="newProductBtn" type="button">新規</button></div>
+</div>
+</section>
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">構成要素</p>
+<h2>商品の中身</h2>
+</div><button class="btn btn-secondary btn-inline" id="addProductComponentBtn" type="button">構成追加</button>
+</div>
+<div class="list" id="productComponentsList"></div>
+<p class="helper-text" id="productComponentsEmpty">まだ構成要素がありません。</p>
+<div class="sub-card is-hidden" id="productComponentFormCard">
+<div class="stack-form">
+<label class="field"><span class="field-label">種類</span><select id="productComponentSourceType">
+<option value="recipe">レシピ</option>
+<option value="material">材料</option>
+<option value="product">商品</option>
+<option value="task">作業</option>
+</select></label>
 <label class="field">
-  <span class="field-label">サブカテゴリ</span>
-  <select id="productComponentSubCategoryFilter">
-    <option value="">すべて</option>
-  </select>
+<span class="field-label">カテゴリ</span>
+<select id="productComponentCategoryFilter">
+<option value="">すべて</option>
+</select>
 </label>
-              <label class="field"><span class="field-label">参照先</span><select
-                  id="productComponentRefSelect"></select></label>
-              <label class="field"><span class="field-label">数量</span><input type="number" id="productComponentQuantity"
-                  min="0" step="0.01" value="1"></label>
-              <div class="micro-row">
-                <label class="field">
-                  <span class="field-label">使用形状</span>
-                  <select id="productComponentShape">
-                    <option value="round">丸</option>
-                    <option value="rectangle">四角</option>
-                  </select>
-                </label>
-                <div class="micro-row" id="productComponentSizeRow">
-
-                  <label class="field">
-                    <span class="field-label">使用直径(mm)</span>
-                    <input type="number" id="productComponentDiameter" placeholder="例：150">
-                  </label>
-                  <label class="field">
-                    <span class="field-label">使用高さ(mm)</span>
-                    <input type="number" id="productComponentHeight" placeholder="例：45">
-                  </label>
-                  <div class="micro-row is-hidden" id="productComponentRectangleSizeRow">
-                    <label class="field">
-                      <span class="field-label">使用横幅</span>
-                      <input type="number" id="productComponentWidth" placeholder="例：３００">
-                    </label>
-                    <label class="field">
-                      <span class="field-label">使用奥行</span>
-                      <input type="number" id="productComponentDepth" placeholder="例：４００">
-                    </label>
-                  </div>
-                </div>
-                <label class="field"><span class="field-label">単位</span><input type="text"
-                    id="productComponentUnit"></label>
-              </div>
-              <div class="inline-actions"><button class="btn btn-primary" type="button"
-                  id="saveProductComponentBtn">保存</button><button class="btn btn-secondary" type="button"
-                  id="cancelProductComponentBtn">キャンセル</button></div>
-            </div>
-          </div>
-        </section>
-        <section class="card" style="grid-column:1 / -1;">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">一覧</p>
-              <h2>商品一覧</h2>
-            </div><span class="badge" id="productCountBadge">0件</span>
-          </div>
-          <div class="list" id="productList"></div>
-        </section>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="orders">
-      <div class="layout-grid two-cols">
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">受注</p>
-              <h2>受注入力</h2>
-            </div>
-          </div>
-          <div class="stack-form">
-            <label class="field"><span class="field-label">施工日</span><input type="date" id="orderDate"></label>
-            <label class="field"><span class="field-label">商品</span><select id="orderProductSelect"></select></label>
-            <div class="micro-row">
-              <label class="field"><span class="field-label">数量</span><input type="number" id="orderQuantity" min="0"
-                  step="0.01" value="1"></label>
-              <label class="field"><span class="field-label">単位</span><input type="text" id="orderUnit"></label>
-            </div>
-            <label class="field"><span class="field-label">顧客 / 案件名</span><input type="text" id="orderCustomer"></label>
-            <label class="field"><span class="field-label">メモ</span><textarea id="orderMemo"></textarea></label>
-          </div>
-          <div class="sub-card">
-            <div class="inline-actions"><button class="btn btn-primary" type="button"
-                id="saveOrderBtn">受注保存</button><button class="btn btn-secondary" type="button"
-                id="newOrderBtn">新規</button></div>
-          </div>
-        </section>
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">一覧</p>
-              <h2>受注一覧</h2>
-            </div><span class="badge" id="orderCountBadge">0件</span>
-          </div>
-          <div class="list" id="orderList"></div>
-        </section>
-      </div>
-    </section>
-    <section class="tab-panel" data-tab="reservations">
-      <div class="layout-grid two-cols">
-
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">予約</p>
-              <h2>予約JSON読込</h2>
-            </div>
-          </div>
-
-          <div class="stack-form">
-            <label class="field">
-              <span class="field-label">予約JSON</span>
-              <textarea id="reservationJsonArea"></textarea>
-            </label>
-          </div>
-
-          <div class="sub-card">
-            <div class="inline-actions">
-              <button class="btn btn-primary" type="button" id="importReservationBtn">
+<label class="field">
+<span class="field-label">サブカテゴリ</span>
+<select id="productComponentSubCategoryFilter">
+<option value="">すべて</option>
+</select>
+</label>
+<label class="field"><span class="field-label">参照先</span><select id="productComponentRefSelect"></select></label>
+<label class="field"><span class="field-label">数量</span><input id="productComponentQuantity" min="0" step="0.01" type="number" value="1"/></label>
+<div class="micro-row">
+<label class="field">
+<span class="field-label">使用形状</span>
+<select id="productComponentShape">
+<option value="round">丸</option>
+<option value="rectangle">四角</option>
+</select>
+</label>
+<div class="micro-row" id="productComponentSizeRow">
+<label class="field">
+<span class="field-label">使用直径(mm)</span>
+<input id="productComponentDiameter" placeholder="例：150" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">使用高さ(mm)</span>
+<input id="productComponentHeight" placeholder="例：45" type="number"/>
+</label>
+<div class="micro-row is-hidden" id="productComponentRectangleSizeRow">
+<label class="field">
+<span class="field-label">使用横幅</span>
+<input id="productComponentWidth" placeholder="例：３００" type="number"/>
+</label>
+<label class="field">
+<span class="field-label">使用奥行</span>
+<input id="productComponentDepth" placeholder="例：４００" type="number"/>
+</label>
+</div>
+</div>
+<label class="field"><span class="field-label">単位</span><input id="productComponentUnit" type="text"/></label>
+</div>
+<div class="inline-actions"><button class="btn btn-primary" id="saveProductComponentBtn" type="button">保存</button><button class="btn btn-secondary" id="cancelProductComponentBtn" type="button">キャンセル</button></div>
+</div>
+</div>
+</section>
+<section class="card" style="grid-column:1 / -1;">
+<div class="section-heading">
+<div>
+<p class="section-kicker">一覧</p>
+<h2>商品一覧</h2>
+</div><span class="badge" id="productCountBadge">0件</span>
+</div>
+<div class="list" id="productList"></div>
+</section>
+</div>
+</section>
+<section class="tab-panel" data-tab="orders">
+<div class="layout-grid two-cols">
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">受注</p>
+<h2>受注入力</h2>
+</div>
+</div>
+<div class="stack-form">
+<label class="field"><span class="field-label">施工日</span><input id="orderDate" type="date"/></label>
+<label class="field"><span class="field-label">商品</span><select id="orderProductSelect"></select></label>
+<div class="micro-row">
+<label class="field"><span class="field-label">数量</span><input id="orderQuantity" min="0" step="0.01" type="number" value="1"/></label>
+<label class="field"><span class="field-label">単位</span><input id="orderUnit" type="text"/></label>
+</div>
+<label class="field"><span class="field-label">顧客 / 案件名</span><input id="orderCustomer" type="text"/></label>
+<label class="field"><span class="field-label">メモ</span><textarea id="orderMemo"></textarea></label>
+</div>
+<div class="sub-card">
+<div class="inline-actions"><button class="btn btn-primary" id="saveOrderBtn" type="button">受注保存</button><button class="btn btn-secondary" id="newOrderBtn" type="button">新規</button></div>
+</div>
+</section>
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">一覧</p>
+<h2>受注一覧</h2>
+</div><span class="badge" id="orderCountBadge">0件</span>
+</div>
+<div class="list" id="orderList"></div>
+</section>
+</div>
+</section>
+<section class="tab-panel" data-tab="reservations">
+<div class="layout-grid two-cols">
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">予約</p>
+<h2>予約JSON読込</h2>
+</div>
+</div>
+<div class="stack-form">
+<label class="field">
+<span class="field-label">予約JSON</span>
+<textarea id="reservationJsonArea"></textarea>
+</label>
+</div>
+<div class="sub-card">
+<div class="inline-actions">
+<button class="btn btn-primary" id="importReservationBtn" type="button">
                 予約JSON読込
               </button>
-            </div>
-          </div>
-          <button class="btn btn-secondary" type="button" id="mergeReservationBtn">
+</div>
+</div>
+<button class="btn btn-secondary" id="mergeReservationBtn" type="button">
             予約JSONを追加読込
           </button>
-
-          <button class="btn btn-secondary" type="button" id="replaceReservationBtn">
+<button class="btn btn-secondary" id="replaceReservationBtn" type="button">
             予約JSONで上書き
           </button>
-
-          <button class="btn btn-danger" type="button" id="clearReservationBtn">
+<button class="btn btn-danger" id="clearReservationBtn" type="button">
             予約データ初期化
           </button>
-          <button class="btn btn-secondary" type="button" id="rebuildReservationBtn">
+<button class="btn btn-secondary" id="rebuildReservationBtn" type="button">
 
             予約解析を再実行
 
           </button>
-        </section>
-
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">一覧</p>
-              <h2>予約一覧</h2>
-            </div>
-
-            <span class="badge" id="reservationCountBadge">0件</span>
-          </div>
-          <div class="sub-card">
-            <label class="field">
-              <span class="field-label">表示フィルター</span>
-              <select id="reservationFilter">
-                <option value="productionTarget">製造対象のみ</option>
-                <option value="all">全件</option>
-                <option value="notSent">未送信</option>
-                <option value="batched">バッチ化済み</option>
-                <option value="wedding">婚礼</option>
-                <option value="anniversary">アニバーサリー</option>
-                <option value="banquet">宴会</option>
-                <option value="delivered">納品済み</option>
-              </select>
-            </label>
-            <label class="field">
-              <span class="field-label">カテゴリ</span>
-              <select id="reservationCategoryFilter">
-                <option value="all">全カテゴリ</option>
-                <option value="宴会">宴会</option>
-                <option value="婚礼">婚礼</option>
-                <option value="アニバーサリー">アニバーサリー</option>
-                <option value="アフタヌーンティー">アフタヌーンティー</option>
-              </select>
-            </label>
-
-            <div class="micro-row">
-              <label class="field">
-                <span class="field-label">開始日</span>
-                <input type="date" id="reservationFromDate">
-              </label>
-
-              <label class="field">
-                <span class="field-label">終了日</span>
-                <input type="date" id="reservationToDate">
-              </label>
-            </div>
-
-            <button class="btn btn-secondary btn-inline" type="button" id="clearReservationDateFilterBtn">
+</section>
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">一覧</p>
+<h2>予約一覧</h2>
+</div>
+<span class="badge" id="reservationCountBadge">0件</span>
+</div>
+<div class="sub-card">
+<label class="field">
+<span class="field-label">表示フィルター</span>
+<select id="reservationFilter">
+<option value="productionTarget">製造対象のみ</option>
+<option value="all">全件</option>
+<option value="notSent">未送信</option>
+<option value="batched">バッチ化済み</option>
+<option value="wedding">婚礼</option>
+<option value="anniversary">アニバーサリー</option>
+<option value="banquet">宴会</option>
+<option value="delivered">納品済み</option>
+</select>
+</label>
+<label class="field">
+<span class="field-label">カテゴリ</span>
+<select id="reservationCategoryFilter">
+<option value="all">全カテゴリ</option>
+<option value="宴会">宴会</option>
+<option value="婚礼">婚礼</option>
+<option value="アニバーサリー">アニバーサリー</option>
+<option value="アフタヌーンティー">アフタヌーンティー</option>
+</select>
+</label>
+<div class="micro-row">
+<label class="field">
+<span class="field-label">開始日</span>
+<input id="reservationFromDate" type="date"/>
+</label>
+<label class="field">
+<span class="field-label">終了日</span>
+<input id="reservationToDate" type="date"/>
+</label>
+</div>
+<button class="btn btn-secondary btn-inline" id="clearReservationDateFilterBtn" type="button">
               日付クリア
             </button>
-          </div>
-          <div class="list" id="reservationList"></div>
-        </section>
-
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="aggregate">
-      <div class="layout-grid">
-        <section class="card">
-          <div class="section-heading">
-            <div>
+</div>
+<div class="list" id="reservationList"></div>
+</section>
+</div>
+</section>
+<section class="tab-panel" data-tab="aggregate">
+<div class="layout-grid">
+<section class="card">
+<div class="section-heading">
+<div>
               集計 <p class="section-kicker"></p>
-              <h2>必要数集計</h2>
-            </div>
-          </div>
-          <div class="sub-card">
-            <div class="inline-actions"><button class="btn btn-secondary" type="button"
-                id="runAggregateBtn">受注から集計</button><button class="btn btn-primary" type="button"
-                id="createBatchesFromAggregateBtn">集計結果から製造バッチ作成</button>
-              <button class="btn btn-secondary" type="button" id="createUnlinkedBatchesBtn">
+<h2>必要数集計</h2>
+</div>
+</div>
+<div class="sub-card">
+<div class="inline-actions"><button class="btn btn-secondary" id="runAggregateBtn" type="button">受注から集計</button><button class="btn btn-primary" id="createBatchesFromAggregateBtn" type="button">集計結果から製造バッチ作成</button>
+<button class="btn btn-secondary" id="createUnlinkedBatchesBtn" type="button">
                 未紐付け仮バッチ作成
               </button>
-            </div>
-          </div>
-        </section>
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">必要レシピ</p>
-              <h2>倍率計算結果</h2>
-            </div><span class="badge" id="aggregateRecipeCountBadge">0件</span>
-          </div>
-          <div class="list" id="aggregateRecipeList"></div>
-        </section>
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">必要作業</p>
-              <h2>作業合計</h2>
-            </div><span class="badge" id="aggregateTaskCountBadge">0件</span>
-          </div>
-          <div class="list" id="aggregateTaskList"></div>
-        </section>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="production">
-      <div class="layout-grid two-cols">
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">製造</p>
-              <h2>製造バッチ一覧</h2>
-            </div><span class="badge" id="batchCountBadge">0件</span>
-          </div>
-          <div class="list" id="batchList"></div>
-        </section>
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">詳細</p>
-              <h2>バッチ内容</h2>
-            </div>
-          </div>
-          <div id="batchDetailView" class="empty-box">バッチを選ぶと詳細がここに出ます。</div>
-        </section>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="schedule">
-      <div class="layout-grid two-cols">
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">段取り</p>
-              <h2>製造候補</h2>
-            </div><button class="btn btn-secondary btn-inline" type="button"
-              id="loadScheduleCandidatesBtn">候補を読込</button>
-          </div>
-          <div class="list" id="scheduleCandidateList"></div>
-          <p class="helper-text" id="scheduleCandidateEmpty">製造バッチを作ると、ここに候補が出ます。</p>
-        </section>
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">段取り項目</p>
-              <h2>本日の並び</h2>
-            </div>
-            <div class="inline-actions"><button class="btn btn-secondary btn-inline" type="button"
-                id="newPlanBtn">新規</button><button class="btn btn-primary btn-inline" type="button"
-                id="savePlanBtn">保存</button></div>
-          </div>
-          <div class="stack-form" style="margin-bottom:16px;"><label class="field"><span
-                class="field-label">段取り名</span><input type="text" id="planName"></label><label class="field"><span
-                class="field-label">メモ</span><textarea id="planMemo"></textarea></label></div>
-          <div class="list" id="planStepList"></div>
-          <p class="helper-text" id="planStepEmpty">候補を追加するとここに並びます。</p>
-        </section>
-        <section class="card" style="grid-column:1 / -1;">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">保存済み段取り</p>
-              <h2>段取り一覧</h2>
-            </div><span class="badge" id="planCountBadge">0件</span>
-          </div>
-          <div class="list" id="planList"></div>
-        </section>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="planner">
-      <div class="layout-grid">
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">計画表</p>
-              <h2>週表示</h2>
-            </div><span class="badge" id="planItemCountBadge">0件</span>
-          </div>
-          <div class="planner-toolbar">
-            <label class="field"><span class="field-label">表示モード</span><select id="plannerMode">
-                <option value="week">1週間</option>
-                <option value="month">1ヶ月</option>
-              </select></label>
-            <label class="field"><span class="field-label">開始日</span><input type="date" id="plannerStartDate"></label>
-          </div>
-          <div class="sub-card">
-            <div class="inline-actions"><button class="btn btn-secondary" type="button"
-                id="renderPlannerBtn">計画表を表示</button></div>
-          </div>
-          <div class="planner-grid week" id="plannerGrid"></div>
-          <div class="sub-card" style="margin-top:16px;">
-            <div class="inline-actions"><button class="btn btn-secondary" type="button"
-                id="buildPrintViewBtn">印刷用レイアウト作成</button><button class="btn btn-primary" type="button"
-                id="printPlannerBtn">印刷する</button></div>
-            <p class="helper-text" style="margin-top:10px;">A4横向き、上に日付、下に項目を縦に並べる簡易レイアウトです。</p>
-          </div>
-        </section>
-        <section class="card" id="printPlannerSection">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">印刷プレビュー</p>
-              <h2>週間 印刷レイアウト</h2>
-            </div>
-          </div>
-          <div id="printPlannerView" class="print-planner-view">
-            <p class="helper-text">「印刷用レイアウト作成」を押すとここに表示されます。</p>
-          </div>
-        </section>
-      </div>
-    </section>
-
-    <section class="tab-panel" data-tab="library">
-      <div class="layout-grid">
-        <section class="card">
-          <div class="section-heading">
-            <div>
-              <p class="section-kicker">JSON</p>
-              <h2>バックアップ / 読込</h2>
-            </div>
-          </div>
-          <div class="stack-form">
-            <div class="inline-actions">
-              <button class="btn btn-secondary" type="button" id="exportJsonBtn">全体JSON出力</button>
-              <button class="btn btn-secondary" type="button" id="replaceJsonBtn">貼り付けJSONで全置換</button>
-              <button class="btn btn-primary" type="button" id="mergeJsonBtn">貼り付けJSONを追加読込</button>
-            </div>
-            <label class="field"><span class="field-label">JSONファイル読込</span><input type="file" id="importJsonInput"
-                accept="application/json" /></label>
-            <label class="field"><span class="field-label">JSON貼り付け</span><textarea
-                id="jsonPasteArea"></textarea></label>
-            <button class="btn btn-secondary" type="button" id="clearJsonPasteBtn">空にする</button>
-            <p class="helper-text">材料マスター配列、単体レシピ、全体バックアップに対応。追加読込は今のUIを保ったままデータだけ取り込みます。</p>
-          </div>
-        </section>
-      </div>
-    </section>
-  </div>
-
-  <div class="modal-backdrop" id="planAssignModal">
-    <div class="modal-card">
-      <div class="section-heading">
-        <div>
-          <p class="section-kicker">計画へ送る</p>
-          <h2>日付設定</h2>
-        </div>
-      </div>
-      <div class="stack-form">
-        <label class="field"><span class="field-label">設定方法</span><select id="assignMode">
-            <option value="days_before">施工日の何日前</option>
-            <option value="fixed_date">日付を直接指定</option>
-          </select></label>
-        <label class="field" id="assignDaysField"><span class="field-label">何日前</span><input type="number"
-            id="assignDaysBefore" min="0" step="1" value="1"></label>
-        <label class="field is-hidden" id="assignDateField"><span class="field-label">計画日</span><input type="date"
-            id="assignFixedDate"></label>
-      </div>
-      <div class="sub-card">
-        <div class="inline-actions">
-          <button class="btn btn-primary" type="button" id="confirmAssignBtn">計画へ追加</button>
-          <button class="btn btn-secondary" type="button" id="cancelAssignBtn">閉じる</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <nav class="tabbar">
-    <div class="tabbar-inner">
-      <button class="tab-btn is-active" type="button" data-tab-target="materials"><span class="tab-icon">🧂</span><span
-          class="tab-label">材料</span></button>
-      <button class="tab-btn" type="button" data-tab-target="recipes"><span class="tab-icon">🍰</span><span
-          class="tab-label">レシピ</span></button>
-      <button class="tab-btn" type="button" data-tab-target="products"><span class="tab-icon">📦</span><span
-          class="tab-label">商品</span></button>
-      <button class="tab-btn" type="button" data-tab-target="orders"><span class="tab-icon">🧾</span><span
-          class="tab-label">受注</span></button>
-      <button class="tab-btn" type="button" data-tab-target="reservations">
-        <span class="tab-icon">📋</span>
-        <span class="tab-label">予約</span>
-      </button>
-      <button class="tab-btn" type="button" data-tab-target="aggregate"><span class="tab-icon">🧮</span><span
-          class="tab-label">集計</span></button>
-      <button class="tab-btn" type="button" data-tab-target="production"><span class="tab-icon">⚖️</span><span
-          class="tab-label">製造</span></button>
-      <button class="tab-btn" type="button" data-tab-target="schedule"><span class="tab-icon">🗂️</span><span
-          class="tab-label">段取り</span></button>
-      <button class="tab-btn" type="button" data-tab-target="planner"><span class="tab-icon">🗓️</span><span
-          class="tab-label">計画</span></button>
-      <button class="tab-btn" type="button" data-tab-target="library"><span class="tab-icon">📚</span><span
-          class="tab-label">一覧</span></button>
-    </div>
-  </nav>
-  <script src="./assets/js/utils.js"></script>
-  <script src="./assets/js/db.js"></script>
-  <script src="./assets/js/core.js"></script>
-  <script src="./assets/js/materials.js"></script>
-  <script src="./assets/js/recipes.js"></script>
-  <script src="./assets/js/products.js"></script>
-  <script src="./assets/js/reservations.js"></script>
-  <script src="./assets/js/orders.js"></script>
-  <script src="./assets/js/production.js"></script>
-  <script src="./assets/js/schedule.js"></script>
-  <script src="./assets/js/importExport.js"></script>
-  <script src="./assets/js/app.js"></script>
-  <script id="material-master-ui-v2-script">
+</div>
+</div>
+</section>
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">必要レシピ</p>
+<h2>倍率計算結果</h2>
+</div><span class="badge" id="aggregateRecipeCountBadge">0件</span>
+</div>
+<div class="list" id="aggregateRecipeList"></div>
+</section>
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">必要作業</p>
+<h2>作業合計</h2>
+</div><span class="badge" id="aggregateTaskCountBadge">0件</span>
+</div>
+<div class="list" id="aggregateTaskList"></div>
+</section>
+</div>
+</section>
+<section class="tab-panel" data-tab="production">
+<div class="layout-grid two-cols">
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">製造</p>
+<h2>製造バッチ一覧</h2>
+</div><span class="badge" id="batchCountBadge">0件</span>
+</div>
+<div class="list" id="batchList"></div>
+</section>
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">詳細</p>
+<h2>バッチ内容</h2>
+</div>
+</div>
+<div class="empty-box" id="batchDetailView">バッチを選ぶと詳細がここに出ます。</div>
+</section>
+</div>
+</section>
+<section class="tab-panel" data-tab="schedule">
+<div class="layout-grid two-cols">
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">段取り</p>
+<h2>製造候補</h2>
+</div><button class="btn btn-secondary btn-inline" id="loadScheduleCandidatesBtn" type="button">候補を読込</button>
+</div>
+<div class="list" id="scheduleCandidateList"></div>
+<p class="helper-text" id="scheduleCandidateEmpty">製造バッチを作ると、ここに候補が出ます。</p>
+</section>
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">段取り項目</p>
+<h2>本日の並び</h2>
+</div>
+<div class="inline-actions"><button class="btn btn-secondary btn-inline" id="newPlanBtn" type="button">新規</button><button class="btn btn-primary btn-inline" id="savePlanBtn" type="button">保存</button></div>
+</div>
+<div class="stack-form" style="margin-bottom:16px;"><label class="field"><span class="field-label">段取り名</span><input id="planName" type="text"/></label><label class="field"><span class="field-label">メモ</span><textarea id="planMemo"></textarea></label></div>
+<div class="list" id="planStepList"></div>
+<p class="helper-text" id="planStepEmpty">候補を追加するとここに並びます。</p>
+</section>
+<section class="card" style="grid-column:1 / -1;">
+<div class="section-heading">
+<div>
+<p class="section-kicker">保存済み段取り</p>
+<h2>段取り一覧</h2>
+</div><span class="badge" id="planCountBadge">0件</span>
+</div>
+<div class="list" id="planList"></div>
+</section>
+</div>
+</section>
+<section class="tab-panel" data-tab="planner">
+<div class="layout-grid">
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">計画表</p>
+<h2>週表示</h2>
+</div><span class="badge" id="planItemCountBadge">0件</span>
+</div>
+<div class="planner-toolbar">
+<label class="field"><span class="field-label">表示モード</span><select id="plannerMode">
+<option value="week">1週間</option>
+<option value="month">1ヶ月</option>
+</select></label>
+<label class="field"><span class="field-label">開始日</span><input id="plannerStartDate" type="date"/></label>
+</div>
+<div class="sub-card">
+<div class="inline-actions"><button class="btn btn-secondary" id="renderPlannerBtn" type="button">計画表を表示</button></div>
+</div>
+<div class="planner-grid week" id="plannerGrid"></div>
+<div class="sub-card" style="margin-top:16px;">
+<div class="inline-actions"><button class="btn btn-secondary" id="buildPrintViewBtn" type="button">印刷用レイアウト作成</button><button class="btn btn-primary" id="printPlannerBtn" type="button">印刷する</button></div>
+<p class="helper-text" style="margin-top:10px;">A4横向き、上に日付、下に項目を縦に並べる簡易レイアウトです。</p>
+</div>
+</section>
+<section class="card" id="printPlannerSection">
+<div class="section-heading">
+<div>
+<p class="section-kicker">印刷プレビュー</p>
+<h2>週間 印刷レイアウト</h2>
+</div>
+</div>
+<div class="print-planner-view" id="printPlannerView">
+<p class="helper-text">「印刷用レイアウト作成」を押すとここに表示されます。</p>
+</div>
+</section>
+</div>
+</section>
+<section class="tab-panel" data-tab="library">
+<div class="layout-grid">
+<section class="card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">JSON</p>
+<h2>バックアップ / 読込</h2>
+</div>
+</div>
+<div class="stack-form">
+<div class="inline-actions">
+<button class="btn btn-secondary" id="exportJsonBtn" type="button">全体JSON出力</button>
+<button class="btn btn-secondary" id="replaceJsonBtn" type="button">貼り付けJSONで全置換</button>
+<button class="btn btn-primary" id="mergeJsonBtn" type="button">貼り付けJSONを追加読込</button>
+</div>
+<label class="field"><span class="field-label">JSONファイル読込</span><input accept="application/json" id="importJsonInput" type="file"/></label>
+<label class="field"><span class="field-label">JSON貼り付け</span><textarea id="jsonPasteArea"></textarea></label>
+<button class="btn btn-secondary" id="clearJsonPasteBtn" type="button">空にする</button>
+<p class="helper-text">材料マスター配列、単体レシピ、全体バックアップに対応。追加読込は今のUIを保ったままデータだけ取り込みます。</p>
+</div>
+</section>
+</div>
+</section>
+</div>
+<div class="modal-backdrop" id="planAssignModal">
+<div class="modal-card">
+<div class="section-heading">
+<div>
+<p class="section-kicker">計画へ送る</p>
+<h2>日付設定</h2>
+</div>
+</div>
+<div class="stack-form">
+<label class="field"><span class="field-label">設定方法</span><select id="assignMode">
+<option value="days_before">施工日の何日前</option>
+<option value="fixed_date">日付を直接指定</option>
+</select></label>
+<label class="field" id="assignDaysField"><span class="field-label">何日前</span><input id="assignDaysBefore" min="0" step="1" type="number" value="1"/></label>
+<label class="field is-hidden" id="assignDateField"><span class="field-label">計画日</span><input id="assignFixedDate" type="date"/></label>
+</div>
+<div class="sub-card">
+<div class="inline-actions">
+<button class="btn btn-primary" id="confirmAssignBtn" type="button">計画へ追加</button>
+<button class="btn btn-secondary" id="cancelAssignBtn" type="button">閉じる</button>
+</div>
+</div>
+</div>
+</div>
+<nav class="tabbar">
+<div class="tabbar-inner">
+<button class="tab-btn is-active" data-tab-target="materials" type="button"><span class="tab-icon">🧂</span><span class="tab-label">材料</span></button>
+<button class="tab-btn" data-tab-target="recipes" type="button"><span class="tab-icon">🍰</span><span class="tab-label">レシピ</span></button>
+<button class="tab-btn" data-tab-target="products" type="button"><span class="tab-icon">📦</span><span class="tab-label">商品</span></button>
+<button class="tab-btn" data-tab-target="orders" type="button"><span class="tab-icon">🧾</span><span class="tab-label">受注</span></button>
+<button class="tab-btn" data-tab-target="reservations" type="button">
+<span class="tab-icon">📋</span>
+<span class="tab-label">予約</span>
+</button>
+<button class="tab-btn" data-tab-target="aggregate" type="button"><span class="tab-icon">🧮</span><span class="tab-label">集計</span></button>
+<button class="tab-btn" data-tab-target="production" type="button"><span class="tab-icon">⚖️</span><span class="tab-label">製造</span></button>
+<button class="tab-btn" data-tab-target="schedule" type="button"><span class="tab-icon">🗂️</span><span class="tab-label">段取り</span></button>
+<button class="tab-btn" data-tab-target="planner" type="button"><span class="tab-icon">🗓️</span><span class="tab-label">計画</span></button>
+<button class="tab-btn" data-tab-target="library" type="button"><span class="tab-icon">📚</span><span class="tab-label">一覧</span></button>
+</div>
+</nav>
+<script src="./assets/js/utils.js"></script>
+<script src="./assets/js/db.js"></script>
+<script src="./assets/js/core.js"></script>
+<script src="./assets/js/materials.js"></script>
+<script src="./assets/js/recipes.js"></script>
+<script src="./assets/js/products.js"></script>
+<script src="./assets/js/reservations.js"></script>
+<script src="./assets/js/orders.js"></script>
+<script src="./assets/js/production.js"></script>
+<script src="./assets/js/schedule.js"></script>
+<script src="./assets/js/importExport.js"></script>
+<script src="./assets/js/app.js"></script>
+<script id="material-master-ui-v2-script">
 (function(){
   'use strict';
   const filterState={query:'',category:'',supplier:'',price:'all',sort:'name',mode:'normal'};
@@ -1031,8 +943,7 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
   </script>
-
-  <script id="recipe-master-ui-v2-script">
+<script id="recipe-master-ui-v2-script">
 (function(){
   'use strict';
   const $=id=>document.getElementById(id);
@@ -1113,16 +1024,7 @@
       </article>`;
     }).join('');
   }
-  function makeModal(){
-    const tab=document.querySelector('section[data-tab="recipes"]');
-    const grid=tab?.querySelector(':scope > .layout-grid.two-cols');
-    if(!tab||!grid||$('recipeEditorModal'))return;
-    const editorCards=[...grid.children].filter(x=>x.matches('section.card')&&!x.classList.contains('recipe-list-card'));
-    if(editorCards.length<3)return;
-    const modal=document.createElement('div');modal.id='recipeEditorModal';modal.className='recipe-editor-modal';modal.setAttribute('aria-hidden','true');
-    modal.innerHTML=`<div class="recipe-editor-backdrop" id="recipeEditorBackdrop"></div><section class="recipe-editor-sheet" role="dialog" aria-modal="true" aria-labelledby="recipeEditorTitle"><div class="recipe-editor-head"><div class="recipe-editor-title"><p class="section-kicker">レシピマスター</p><h2 id="recipeEditorTitle">レシピ編集</h2></div><button class="btn btn-secondary btn-inline recipe-modal-close" type="button" id="closeRecipeEditorBtn">閉じる</button></div><div class="recipe-editor-body" id="recipeEditorBody"></div></section>`;
-    tab.appendChild(modal);const body=$('recipeEditorBody');editorCards.slice(0,3).forEach(c=>body.appendChild(c));
-  }
+  function makeModal(){ return; }
   function openModal(){const m=$('recipeEditorModal');if(m){m.classList.add('is-open');m.setAttribute('aria-hidden','false');setTimeout(()=>$('recipeName')?.focus(),80);}}
   function closeModal(){const m=$('recipeEditorModal');if(m){m.classList.remove('is-open');m.setAttribute('aria-hidden','true');}}
   function titleFromEditor(){const name=$('recipeName')?.value.trim();$('recipeEditorTitle').textContent=name||'レシピを追加';}
@@ -1155,9 +1057,8 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
   </script>
-
-  <script src="./assets/tesseract/tesseract.min.js"></script>
-  <script>
+<script src="./assets/tesseract/tesseract.min.js"></script>
+<script>
 /* 製造管理アプリ ローカルOCR取込。画像は端末外へ送信しません。 */
 (function(){'use strict';
 const Q=s=>document.querySelector(s), E=s=>document.querySelectorAll(s), H='production_design_ocr_history_v1';
@@ -1209,5 +1110,4 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
   </script>
 </body>
-
 </html>
