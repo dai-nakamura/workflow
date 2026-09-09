@@ -271,39 +271,26 @@
 <option value="rectangle">四角</option>
 </select>
 </label>
-<div class="micro-row">
+<div class="micro-row" id="recipeRoundSizeRow">
 <label class="field">
 <span class="field-label">基準直径(mm)</span>
 <input id="recipeBaseDiameter" placeholder="例：210" type="number"/>
 </label>
-<label class="field">
-<span class="field-label">基準高さ(mm)</span>
-<input id="recipeBaseHeight" placeholder="例：45" type="number"/>
-</label>
 </div>
 <div class="micro-row is-hidden" id="recipeRectangleSizeRow">
 <label class="field">
-<span class="field-label">基準横幅（ｍｍ）</span>
-<input id="recipeBaseWidth" placeholder="例：３００" type="number"/>
+<span class="field-label">基準横幅(mm)</span>
+<input id="recipeBaseWidth" placeholder="例：45" type="number"/>
 </label>
 <label class="field">
-<span class="field-label">基準奥行（ｍｍ）</span>
-<input id="recipeBaseDepth" placeholder="例：４００" type="number"/>
+<span class="field-label">基準奥行(mm)</span>
+<input id="recipeBaseDepth" placeholder="例：110" type="number"/>
 </label>
 </div>
-<div class="micro-row">
 <label class="field">
-<span class="field-label">変換後直径(mm)</span>
-<input id="targetDiameter" placeholder="例：210" type="number"/>
+<span class="field-label" id="recipeBaseHeightLabel">基準高さ(mm)</span>
+<input id="recipeBaseHeight" placeholder="例：65" type="number"/>
 </label>
-<label class="field">
-<span class="field-label">変換後高さ(mm)</span>
-<input id="targetHeight" placeholder="例：45" type="number"/>
-</label>
-</div>
-<button class="btn btn-secondary" id="scaleRecipeBtn" type="button">
-              サイズ変換
-            </button>
 <label class="field is-hidden" id="recipeYieldCustomField">
 <span class="field-label">自由入力単位</span>
 <input id="recipeYieldCustomUnit" placeholder="例：7号1台分 / バット1枚分 / ホテルパン1枚分" type="text"/>
@@ -1086,6 +1073,55 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
   </script>
+<script id="recipe-shape-height-fix-v7">
+(function(){
+  'use strict';
+  function syncBaseShapeUi(){
+    const shape=document.getElementById('recipeBaseShape');
+    const round=document.getElementById('recipeRoundSizeRow');
+    const rect=document.getElementById('recipeRectangleSizeRow');
+    if(!shape||!round||!rect)return;
+    const isRect=shape.value==='rectangle';
+    round.classList.toggle('is-hidden',isRect);
+    rect.classList.toggle('is-hidden',!isRect);
+  }
+  function syncCalcShapeUi(){
+    const shape=document.getElementById('recipeCalcTargetShape');
+    const round=document.getElementById('recipeCalcRoundRow');
+    const rect=document.getElementById('recipeCalcRectangleRow');
+    if(!shape||!round||!rect)return;
+    const isRect=shape.value==='rectangle';
+    round.classList.toggle('is-hidden',isRect);
+    rect.classList.toggle('is-hidden',!isRect);
+  }
+  // recipes.js の四角換算が丸用の高さを参照していたため、四角専用高さを使う。
+  window.getRecipeCalcTargetSize=function(){
+    const shape=document.getElementById('recipeCalcTargetShape')?.value||'round';
+    if(shape==='rectangle'){
+      return {
+        shape:'rectangle',
+        width:Number(document.getElementById('recipeCalcTargetWidth')?.value||0),
+        depth:Number(document.getElementById('recipeCalcTargetDepth')?.value||0),
+        height:Number(document.getElementById('recipeCalcTargetRectHeight')?.value||document.getElementById('recipeBaseHeight')?.value||1)
+      };
+    }
+    return {
+      shape:'round',
+      diameter:Number(document.getElementById('recipeCalcTargetDiameter')?.value||0),
+      height:Number(document.getElementById('recipeCalcTargetHeight')?.value||document.getElementById('recipeBaseHeight')?.value||1)
+    };
+  };
+  try{ getRecipeCalcTargetSize=window.getRecipeCalcTargetSize; }catch(e){}
+
+  function bind(){
+    document.getElementById('recipeBaseShape')?.addEventListener('change',syncBaseShapeUi);
+    document.getElementById('recipeCalcTargetShape')?.addEventListener('change',syncCalcShapeUi);
+    syncBaseShapeUi();
+    syncCalcShapeUi();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
+</script>
 <script src="./assets/tesseract/tesseract.min.js"></script>
 <script>
 /* 製造管理アプリ ローカルOCR取込。画像は端末外へ送信しません。 */
