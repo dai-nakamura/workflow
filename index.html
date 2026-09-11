@@ -526,7 +526,7 @@
 <p class="section-kicker">一覧</p>
 <h2>受注一覧</h2>
 </div><span class="badge" id="orderCountBadge">0件</span>
-<button class="btn btn-primary btn-inline" id="orderNewV9" type="button">＋ 受注追加</button></div>
+<button class="btn btn-primary btn-inline" id="orderNewV9" type="button">＋ 受注追加</button><button class="btn btn-danger btn-inline" id="clearOrdersBtnV11" type="button">受注を一括削除</button></div>
 <div class="v9-toolbar"><input class="v9-search" id="orderSearchV9" placeholder="商品名・顧客・メモを検索" type="search"/><div class="v9-chips" id="orderDateChipsV9"><button class="v9-chip is-active" data-order-range="all" type="button">すべて</button><button class="v9-chip" data-order-range="upcoming" type="button">今後</button><button class="v9-chip" data-order-range="today" type="button">今日</button></div></div><div class="v9-resultline" id="orderResultV9"></div><div class="list" id="orderList"></div>
 </section>
 </div>
@@ -1158,7 +1158,188 @@ function history(){open();Q('#ocrTitle').textContent='OCR取込履歴';status('�
 function costRows(){return(db.materialsMaster||[]).filter(m=>m&&m.name).slice().sort((a,b)=>String(a.category||'').localeCompare(String(b.category||''),'ja')||String(a.subCategory||'').localeCompare(String(b.subCategory||''),'ja')||String(a.name||'').localeCompare(String(b.name||''),'ja')).map(m=>{const amount=Number(m.baseAmount)||0,price=Number(m.basePrice)||0,cost=amount>0?price/amount:null;return{category:m.category||'',subCategory:m.subCategory||'',name:m.name||'',amount,unit:m.baseUnit||'',price,cost,supplier:m.supplier||'',note:m.note||''}})}
 function xmlText(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 function exportCostExcel(){const rows=costRows();if(!rows.length)return alert('材料マスターがありません。');const head=['大分類','小分類','材料名','仕入内容量','基準単位','仕入価格','1単位原価','10単位原価','50単位原価','100単位原価','500単位原価','1000単位原価','仕入先','備考'];const data=rows.map((r,i)=>{const row=i+2;return`<Row><Cell><Data ss:Type="String">${xmlText(r.category)}</Data></Cell><Cell><Data ss:Type="String">${xmlText(r.subCategory)}</Data></Cell><Cell><Data ss:Type="String">${xmlText(r.name)}</Data></Cell><Cell ss:StyleID="Qty"><Data ss:Type="Number">${r.amount}</Data></Cell><Cell><Data ss:Type="String">${xmlText(r.unit)}</Data></Cell><Cell ss:StyleID="Money"><Data ss:Type="Number">${r.price}</Data></Cell><Cell ss:StyleID="UnitCost" ss:Formula="=IF(RC[-3]&gt;0,RC[-1]/RC[-3],0)"><Data ss:Type="Number">${r.cost||0}</Data></Cell>${[10,50,100,500,1000].map((v,j)=>`<Cell ss:StyleID="Money" ss:Formula="=RC[-${j+1}]*${v}"><Data ss:Type="Number">${(r.cost||0)*v}</Data></Cell>`).join('')}<Cell><Data ss:Type="String">${xmlText(r.supplier)}</Data></Cell><Cell ss:StyleID="Wrap"><Data ss:Type="String">${xmlText(r.note)}</Data></Cell></Row>`}).join('');const xml=`<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="Default"><Alignment ss:Vertical="Center"/><Font ss:FontName="Yu Gothic" ss:Size="10"/></Style><Style ss:ID="Title"><Font ss:Bold="1" ss:Size="16"/><Interior ss:Color="#DCE6F1" ss:Pattern="Solid"/></Style><Style ss:ID="Head"><Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/><Font ss:Bold="1" ss:Color="#FFFFFF"/><Interior ss:Color="#1F4E78" ss:Pattern="Solid"/><Borders><Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/></Borders></Style><Style ss:ID="Money"><NumberFormat ss:Format="¥#,##0.00"/></Style><Style ss:ID="UnitCost"><NumberFormat ss:Format="¥#,##0.0000"/></Style><Style ss:ID="Qty"><NumberFormat ss:Format="#,##0.##"/></Style><Style ss:ID="Wrap"><Alignment ss:Vertical="Top" ss:WrapText="1"/></Style></Styles><Worksheet ss:Name="材料原価早見表"><Table><Column ss:Width="70"/><Column ss:Width="75"/><Column ss:Width="180"/><Column ss:Width="70"/><Column ss:Width="55"/><Column ss:Width="75"/><Column ss:Width="75"/><Column ss:Width="75"/><Column ss:Width="75"/><Column ss:Width="80"/><Column ss:Width="80"/><Column ss:Width="85"/><Column ss:Width="100"/><Column ss:Width="220"/><Row ss:Height="28"><Cell ss:StyleID="Title" ss:MergeAcross="13"><Data ss:Type="String">材料原価早見表（${date()}現在）</Data></Cell></Row><Row>${head.map(h=>`<Cell ss:StyleID="Head"><Data ss:Type="String">${h}</Data></Cell>`).join('')}</Row>${data}</Table><WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel"><FreezePanes/><FrozenNoSplit/><SplitHorizontal>2</SplitHorizontal><TopRowBottomPane>2</TopRowBottomPane><AutoFilter x:Range="R2C1:R${rows.length+2}C14"/><PageSetup><Layout x:Orientation="Landscape"/><PageMargins x:Bottom="0.5" x:Left="0.25" x:Right="0.25" x:Top="0.5"/></PageSetup></WorksheetOptions></Worksheet></Workbook>`;const blob=new Blob(['\ufeff',xml],{type:'application/vnd.ms-excel;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='材料原価早見表_'+date()+'.xls';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-function printCostTable(){const rows=costRows();if(!rows.length)return alert('材料マスターがありません。');const body=rows.map(r=>`<tr><td>${esc(r.category)}</td><td>${esc(r.subCategory)}</td><td>${esc(r.name)}</td><td>${r.amount.toLocaleString()}${esc(r.unit)}</td><td>¥${r.price.toLocaleString()}</td><td>${r.cost===null?'要確認':'¥'+r.cost.toFixed(4)}</td>${[10,50,100,500,1000].map(v=>`<td>${r.cost===null?'-':'¥'+(r.cost*v).toFixed(2)}</td>`).join('')}<td>${esc(r.supplier)}</td></tr>`).join(''),w=window.open('','_blank');if(!w)return alert('ポップアップを許可してください。');w.document.write(`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>材料原価早見表</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:-apple-system,BlinkMacSystemFont,"Yu Gothic",sans-serif;color:#111}h1{font-size:18px;margin:0 0 3px}.date{font-size:10px;margin-bottom:8px}table{width:100%;border-collapse:collapse;font-size:8.5px}th,td{border:1px solid #777;padding:3px;text-align:right}th{background:#dce6f1;text-align:center}td:nth-child(-n+3),td:last-child{text-align:left}tr{break-inside:avoid}thead{display:table-header-group}</style></head><body><h1>材料原価早見表</h1><div class="date">${date()}現在　※1単位原価は材料マスターの「仕入価格÷内容量」で計算</div><table><thead><tr><th>大分類</th><th>小分類</th><th>材料名</th><th>仕入内容量</th><th>仕入価格</th><th>1単位</th><th>10単位</th><th>50単位</th><th>100単位</th><th>500単位</th><th>1000単位</th><th>仕入先</th></tr></thead><tbody>${body}</tbody></table><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`);w.document.close()}
+function printCostTable(){const rows=costRows();if(!rows.length)return alert('材料マスターがありません。');const body=rows.map(r=>`<tr><td>${esc(r.category)}</td><td>${esc(r.subCategory)}</td><td>${esc(r.name)}</td><td>${r.amount.toLocaleString()}${esc(r.unit)}</td><td>¥${r.price.toLocaleString()}</td><td>${r.cost===null?'要確認':'¥'+r.cost.toFixed(4)}</td>${[10,50,100,500,1000].map(v=>`<td>${r.cost===null?'-':'¥'+(r.cost*v).toFixed(2)}</td>`).join('')}<td>${esc(r.supplier)}</td></tr>`).join(''),w=window.open('','_blank');if(!w)return alert('ポップアップを許可してください。');w.document.write(`<!doctype html><html lang="ja"><head><meta charset="utf-8"><title>材料原価早見表</title><style>@page{size:A4 landscape;margin:8mm}body{font-family:-apple-system,BlinkMacSystemFont,"Yu Gothic",sans-serif;color:#111}h1{font-size:18px;margin:0 0 3px}.date{font-size:10px;margin-bottom:8px}table{width:100%;border-collapse:collapse;font-size:8.5px}th,td{border:1px solid #777;padding:3px;text-align:right}th{background:#dce6f1;text-align:center}td:nth-child(-n+3),td:last-child{text-align:left}tr{break-inside:avoid}thead{display:table-header-group}</style></head><body><h1>材料原価早見表</h1><div class="date">${date()}現在　※1単位原価は材料マスターの「仕入価格÷内容量」で計算</div><table><thead><tr><th>大分類</th><th>小分類</th><th>材料名</th><th>仕入内容量</th><th>仕入価格</th><th>1単位</th><th>10単位</th><th>50単位</th><th>100単位</th><th>500単位</th><th>1000単位</th><th>仕入先</th></tr></thead><tbody>${body}</tbody></table><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script>
+<script id="reservation-detail-import-v13">
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const escV13=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const normV13=v=>String(v??'').trim().replace(/\s+/g,' ').toLowerCase();
+
+function reservationItemNameV13(item){
+  const name=String(item?.name||item?.productName||'').trim();
+  const type=String(item?.type||item?.category||'').trim();
+  // ジャンル名より、JSONに入っている実商品名を優先
+  if(name && !['アニバーサリーケーキ','ウェディングケーキ','ウエディングケーキ','ケーキ','その他'].includes(name)) return name;
+  return name || type || '商品名未設定';
+}
+function reservationItemDetailsV13(item){
+  const options=Array.isArray(item?.options)?item.options.filter(Boolean):[];
+  const sizes=[item?.size,item?.squareSize,item?.multiSize].filter(Boolean);
+  return {
+    productName:reservationItemNameV13(item),
+    itemType:String(item?.type||item?.category||''),
+    size:String(item?.size||''),
+    squareSize:String(item?.squareSize||''),
+    multiSize:String(item?.multiSize||''),
+    options,
+    plateMessage:String(item?.plateMessage||''),
+    dessertCostNote:String(item?.dessertCostNote||''),
+    itemNotes:String(item?.notes||''),
+    reportType:String(item?.reportType||''),
+    cost:Number(item?.cost||0),
+    sizeText:sizes.join(' / '),
+    optionText:options.join(' / ')
+  };
+}
+function findProductIdV13(item){
+  const name=reservationItemNameV13(item);
+  if(!name||typeof db==='undefined'||!Array.isArray(db.productMasters)) return '';
+  const n=normV13(name);
+  let hit=db.productMasters.find(p=>normV13(p.name)===n);
+  if(hit)return hit.id;
+  hit=db.productMasters.find(p=>n.includes(normV13(p.name))||normV13(p.name).includes(n));
+  return hit?.id||'';
+}
+function convertRawReservationOrdersV13(rawOrders){
+  const orders=[]; const orderItems=[];
+  (rawOrders||[]).forEach(order=>{
+    if(typeof window.isDoneReservation==='function' && window.isDoneReservation(order))return;
+    const orderId=order.id || (typeof window.createId==='function'?createId('resord'):`resord_${Date.now()}_${Math.random()}`);
+    orders.push({
+      id:orderId,
+      date:order.date||'', time:order.time||'',
+      customer:order.clientName||order.customer||'',
+      category:order.category||'', venue:order.venue||'',
+      guestCount:Number(order.guestCount||0),
+      notes:order.orderNotes||order.notes||'',
+      status:order.status||'', productionStatus:'未送信', isProductionTarget:true
+    });
+    (Array.isArray(order.items)?order.items:[]).forEach(item=>{
+      const d=reservationItemDetailsV13(item);
+      let sizeInfo=null,sizeInfoList=[],sizeMode='';
+      try{
+        if(typeof window.parseReservationSize==='function'){
+          const p=parseReservationSize(item)||{}; sizeInfo=p.sizeInfo||null;sizeInfoList=p.sizeInfoList||[];sizeMode=p.mode||'';
+        }
+      }catch(_e){}
+      orderItems.push({
+        id:typeof window.createId==='function'?createId('resitem'):`resitem_${Date.now()}_${Math.random()}`,
+        orderId,
+        productId:findProductIdV13(item), recipeId:'',
+        productName:d.productName,
+        category:d.itemType||order.category||'',
+        quantity:Number(item.quantity||1),
+        unit:d.itemType==='皿盛りデザート'?'人前':'点',
+        size:d.size, squareSize:d.squareSize, multiSize:d.multiSize,
+        sizeInfo,sizeInfoList,sizeMode,
+        options:d.options,
+        plateMessage:d.plateMessage,
+        dessertCostNote:d.dessertCostNote,
+        reportType:d.reportType,
+        cost:d.cost,
+        notes:d.itemNotes,
+        rawType:d.itemType
+      });
+    });
+  });
+  return {orders,orderItems};
+}
+
+// v10/v11のconvertInputを上書きし、予約アプリ生JSONでは詳細を落とさない
+window.convertInput=function(parsed){
+  let rawOrders=[],payload;
+  if(Array.isArray(parsed)){
+    rawOrders=parsed;
+    const active=rawOrders.filter(o=>!(typeof window.isDoneReservation==='function'&&isDoneReservation(o)));
+    payload=convertRawReservationOrdersV13(active);
+    return {payload,excluded:rawOrders.length-active.length,total:rawOrders.length};
+  }
+  if(parsed&&Array.isArray(parsed.orders)&&Array.isArray(parsed.orderItems)){
+    const all=parsed.orders;
+    const active=all.filter(o=>!(typeof window.isDoneReservation==='function'&&isDoneReservation(o)));
+    const ids=new Set(active.map(o=>o.id));
+    const normalizedItems=parsed.orderItems.filter(i=>ids.has(i.orderId)).map(i=>{
+      const d=reservationItemDetailsV13(i);
+      return {...i,
+        productName:d.productName,
+        category:i.category||d.itemType||'',
+        size:i.size||d.size, squareSize:i.squareSize||d.squareSize, multiSize:i.multiSize||d.multiSize,
+        options:Array.isArray(i.options)?i.options:d.options,
+        plateMessage:i.plateMessage||d.plateMessage,
+        dessertCostNote:i.dessertCostNote||d.dessertCostNote,
+        notes:i.notes||d.itemNotes,
+        cost:Number(i.cost??d.cost??0)
+      };
+    });
+    return {payload:{orders:active,orderItems:normalizedItems},excluded:all.length-active.length,total:all.length};
+  }
+  if(parsed&&Array.isArray(parsed.orders)){
+    rawOrders=parsed.orders;
+    const active=rawOrders.filter(o=>!(typeof window.isDoneReservation==='function'&&isDoneReservation(o)));
+    payload=convertRawReservationOrdersV13(active);
+    return {payload,excluded:rawOrders.length-active.length,total:rawOrders.length};
+  }
+  throw new Error('予約JSONの形式を判定できません。');
+};
+
+function itemDetailTextV13(i,compact=false){
+  const chunks=[];
+  if(i.size)chunks.push(i.size);
+  if(i.squareSize)chunks.push(i.squareSize);
+  if(i.multiSize)chunks.push(i.multiSize);
+  if(Array.isArray(i.options)&&i.options.length)chunks.push(i.options.join('・'));
+  if(!compact&&i.plateMessage)chunks.push(`プレート: ${i.plateMessage}`);
+  if(!compact&&i.notes)chunks.push(i.notes);
+  return chunks.filter(Boolean).join(' / ');
+}
+
+// 一覧も「アニバーサリーケーキ」だけでなく商品名＋サイズまで見えるようにする
+const oldRender=window.renderReservationsV10;
+window.renderReservationsV10=function(){
+  if(!$('reservationList')||typeof db==='undefined')return oldRender?.();
+  const all=(db.reservationOrders||[]).filter(o=>!(typeof window.isDoneReservation==='function'&&isDoneReservation(o)));
+  const visible=typeof window.resVisible==='function'?all.filter(resVisible):all;
+  const list=visible.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+  if($('reservationCountBadge'))$('reservationCountBadge').textContent=`${list.length}件`;
+  if($('reservationResultV9'))$('reservationResultV9').textContent=`表示 ${list.length}件 / 保持 ${all.length}件`;
+  $('reservationList').innerHTML=list.length?list.map(o=>{
+    const items=(db.reservationOrderItems||[]).filter(i=>i.orderId===o.id),u=items.filter(i=>!i.productId&&!i.recipeId).length;
+    const summary=items.slice(0,2).map(i=>{
+      const d=itemDetailTextV13(i,true);return `${i.productName||'商品名未設定'}${d?' ['+d+']':''}`;
+    }).join(' ・ ')+(items.length>2?` 他${items.length-2}件`: '');
+    return `<article class="v9-row" data-v10-res="${escV13(o.id)}" tabindex="0"><div><div class="v9-row-title">${escV13(o.customer||'名称未設定')}</div><div class="v9-row-meta">${escV13(o.date||'-')}${o.time?' '+escV13(o.time):''}${o.venue?' / '+escV13(o.venue):''}${o.category?' / '+escV13(o.category):''}</div><div class="v9-row-sub">${escV13(summary||'商品なし')}</div></div><span class="v9-row-badge ${u?'warn':''}">${u?`未紐付 ${u}`:(o.productionStatus==='製造バッチ化済み'?'送信済':'確認')}</span></article>`;
+  }).join(''):'<div class="empty-box">条件に合う予約がありません。</div>';
+};
+
+window.reservationDetail=function(id){
+  const o=(db.reservationOrders||[]).find(x=>x.id===id);if(!o)return;
+  const items=(db.reservationOrderItems||[]).filter(i=>i.orderId===id);
+  if($('reservationDetailTitleV9'))$('reservationDetailTitleV9').textContent=o.customer||'予約詳細';
+  if(!$('reservationDetailBodyV9'))return;
+  $('reservationDetailBodyV9').innerHTML=`<div class="v9-detail-block"><div class="v9-detail-grid"><b>日付</b><span>${escV13(o.date||'-')}${o.time?' '+escV13(o.time):''}</span><b>区分</b><span>${escV13(o.category||'-')}</span><b>会場</b><span>${escV13(o.venue||'-')}</span><b>状態</b><span>${escV13(o.status||'-')} / ${escV13(o.productionStatus||'未送信')}</span><b>メモ</b><span>${escV13(o.notes||'-')}</span></div></div><div class="v9-detail-block"><strong>内容 ${items.length}件</strong>${items.map(i=>{
+    const size=[i.size,i.squareSize,i.multiSize].filter(Boolean).join(' / ');
+    const options=Array.isArray(i.options)?i.options.filter(Boolean).join(' / '):String(i.options||'');
+    return `<div class="v9-item-line"><div style="min-width:0;flex:1"><b>${escV13(i.productName||'商品名未設定')}</b><div class="v9-row-sub">${escV13(i.category||'')}${i.quantity?` / ${escV13(i.quantity)}${escV13(i.unit||'点')}`:''}${size?' / '+escV13(size):''}</div>${options?`<div class="v9-row-sub"><b>オプション:</b> ${escV13(options)}</div>`:''}${i.plateMessage?`<div class="v9-row-sub"><b>プレート:</b> ${escV13(i.plateMessage)}</div>`:''}${i.notes?`<div class="v9-row-sub">${escV13(i.notes)}</div>`:''}<div class="v9-row-sub">${i.productId?'商品紐付け':i.recipeId?'レシピ紐付け':'未紐付け'}</div></div><button type="button" class="v9-link-btn" data-v10-pick-res="${escV13(i.id)}">${i.productId||i.recipeId?'変更':'紐付け'}</button></div>`;
+  }).join('')}</div>${o.productionStatus==='製造バッチ化済み'?'':`<button class="btn btn-primary" style="width:100%" data-v10-send-res="${escV13(o.id)}" type="button">製造へ送る</button>`}`;
+  if(typeof window.openSheet==='function')openSheet('reservationDetailV9');
+};
+
+// 既存保存データにも、保持している詳細フィールドから表示名を補正
+function migrateReservationItemsV13(){
+  if(typeof db==='undefined'||!Array.isArray(db.reservationOrderItems))return;
+  let changed=false;
+  db.reservationOrderItems.forEach(i=>{
+    if(!i.productName && i.name){i.productName=i.name;changed=true;}
+    if(!Array.isArray(i.options)&&i.options){i.options=[String(i.options)];changed=true;}
+  });
+  if(changed&&typeof window.persistDb==='function')persistDb();
+}
+setTimeout(()=>{migrateReservationItemsV13();window.renderReservationsV10?.();},50);
+})();
+</script>
+
+</body></html>`);w.document.close()}
 async function file(e){const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;if(!f.type.startsWith('image/'))return alert('画像を選択してください。');st.cancel=false;open();Q('#ocrTitle').textContent='画像を読み取り中';const u=URL.createObjectURL(f);Q('#ocrBody').innerHTML=`<div class="ocr-card"><img id="ocrPreview" class="ocr-preview"><p class="ocr-small">画像は外部へ送信しません。</p><button class="btn btn-danger" id="ocrCancel">キャンセル</button></div>`;Q('#ocrPreview').src=u;Q('#ocrCancel').onclick=()=>{st.cancel=true;if(st.worker)st.worker.terminate();st.worker=null;status('キャンセルしました','warn')};try{status('画像を補正しています');progress(.03);const raw=await canvas(f),img=enhance(raw);st.image=raw.toDataURL('image/jpeg',.82);if(!window.Tesseract)throw Error('OCR本体を読み込めません。assets/tesseract の配置を確認してください。');status('ローカルOCR辞書を読み込んでいます');st.worker=await Tesseract.createWorker('jpn+eng',1,{...C,logger:m=>{if(m.status==='recognizing text'){progress(.12+(m.progress||0)*.8);status('文字を読み取り中 '+Math.round((m.progress||0)*100)+'%')}}});const a=await st.worker.recognize(img);await st.worker.terminate();st.worker=null;URL.revokeObjectURL(u);if(!st.cancel)analyze(a.data.text||'','画像OCR')}catch(err){console.error(err);status('OCR失敗：'+err.message+'。jpn.traineddata.gz / eng.traineddata.gz を assets/tesseract/lang-data に配置してください。','err');progress(0)}}
 async function canvas(f){const u=URL.createObjectURL(f),im=new Image();im.src=u;await im.decode();const s=Math.min(1,2200/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=Math.round(im.naturalWidth*s);c.height=Math.round(im.naturalHeight*s);c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);return c}function enhance(src){const c=document.createElement('canvas');c.width=src.width;c.height=src.height;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0);const z=x.getImageData(0,0,c.width,c.height),d=z.data;let sum=0;for(let i=0;i<d.length;i+=4)sum+=d[i]*.299+d[i+1]*.587+d[i+2]*.114;const mean=sum/(d.length/4),t=Math.max(120,Math.min(205,mean*.93));for(let i=0;i<d.length;i+=4){let g=d[i]*.299+d[i+1]*.587+d[i+2]*.114;g=(g-mean)*1.4+mean;g=g>t?255:Math.max(0,g*.75);d[i]=d[i+1]=d[i+2]=g}x.putImageData(z,0,0);return c}
 function detect(t){const recipeRows=(t.match(/^\s*[*＊・●-]\s*.+?[：:]\s*(?:[\d.]+(?:\s*[〜~-]\s*[\d.]+)?\s*(?:kg|g|ml|mL|L|個|本|袋|缶|箱|枚)|少量|適量)/gmi)||[]).length,r=(t.match(/レシピ|配合|作り方|製造工程|仕上がり|■材料|コンポート|ムース|クリーム|クレーム|生地|グラサージュ/g)||[]).length+recipeRows*2,m=(t.match(/原材料|単価|価格|内容量|規格|入数|納品書|請求書|JAN/g)||[]).length;let d='判別できず';if(/納品書|請求書/.test(t))d='納品書・請求書';else if(/価格表|単価表/.test(t))d='材料価格表';else if(/材料一覧/.test(t))d='材料一覧表';else if(/製造工程/.test(t))d='製造工程表';else if(/配合/.test(t))d='配合表';else if(/レシピ|作り方|■材料/.test(t)||recipeRows>=2||r>m)d='レシピ表';else if(/原材料|内容量|規格|JAN/.test(t))d='原材料ラベル';return{kind:r>m||recipeRows>=2?'recipe':m?'material':'unknown',doc:d}}
@@ -1287,8 +1468,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .v10-unmatched-row{padding:10px;border:1px solid var(--line,#e2e8f0);border-radius:12px;margin-bottom:7px;background:#fff;cursor:pointer}
 .v10-unmatched-row strong{display:block}
 .v10-unmatched-row small{display:block;color:var(--muted,#657080);margin-top:3px}
+.v12-aggregate-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.v12-aggregate-delete{border:0;background:transparent;color:#b42318;font-weight:800;padding:8px 4px;cursor:pointer}
+.v12-aggregate-status{font-size:12px;color:var(--muted,#657080);margin-top:8px}
 .v10-danger-note{font-size:11px;color:#9a3412;margin-top:5px}
 #reservationImportCardV9 .inline-actions{flex-wrap:wrap}
+.v11-armed{outline:2px solid currentColor;outline-offset:2px;font-weight:900}
+.v11-inline-note{font-size:11px;color:var(--muted,#657080);margin-top:4px}
 </style>
 <script id="v10-flow-fix">
 (function(){
@@ -1302,8 +1488,35 @@ const state={orderQ:'',orderRange:'all',resQ:'',resRange:'active',resCat:'all',p
 function isDoneStatus(s){
   const x=norm(s);
   if(!x)return false;
-  return x.includes('納品済')||x.includes('完成済')||x==='完成'||x.includes('処理済')||x==='完了'||
+  return x.includes('納品済')||x.includes('納品完了')||x.includes('完成済')||x==='完成'||
+         x.includes('完了済')||x==='完了'||x.includes('処理済')||x.includes('対応済')||
          x.includes('キャンセル')||x.includes('取消')||x.includes('中止');
+}
+function isDoneReservation(o){
+  if(!o)return false;
+  if(o.isProductionTarget===false)return true;
+  return [o.status,o.productionStatus,o.state,o.progressStatus,o.workflowStatus]
+    .some(isDoneStatus);
+}
+function armDestructiveButton(btn,armedText,normalText,onConfirm){
+  if(!btn)return;
+  if(btn.dataset.v11Armed==='1'){
+    clearTimeout(Number(btn.dataset.v11Timer)||0);
+    btn.dataset.v11Armed='0';
+    btn.classList.remove('v11-armed');
+    btn.textContent=normalText;
+    onConfirm();
+    return;
+  }
+  btn.dataset.v11Armed='1';
+  btn.classList.add('v11-armed');
+  btn.textContent=armedText;
+  const timer=setTimeout(()=>{
+    btn.dataset.v11Armed='0';
+    btn.classList.remove('v11-armed');
+    btn.textContent=normalText;
+  },4500);
+  btn.dataset.v11Timer=String(timer);
 }
 function persist(){if(typeof persistDb==='function')persistDb()}
 function show(el,on){if(el)el.classList.toggle('is-hidden',!on)}
@@ -1331,7 +1544,7 @@ function cleanupReservations(){
   if(!Array.isArray(db.reservationOrders))db.reservationOrders=[];
   if(!Array.isArray(db.reservationOrderItems))db.reservationOrderItems=[];
   const beforeOrders=db.reservationOrders.length,beforeItems=db.reservationOrderItems.length;
-  const active=db.reservationOrders.filter(o=>!isDoneStatus(o.status));
+  const active=db.reservationOrders.filter(o=>!isDoneReservation(o));
   const keyMap=new Map(), idMap=new Map(), kept=[];
   active.forEach(o=>{
     const k=orderKey(o);
@@ -1373,20 +1586,20 @@ function convertInput(parsed){
   let rawOrders=[],payload;
   if(Array.isArray(parsed)){
     rawOrders=parsed;
-    const active=rawOrders.filter(o=>!isDoneStatus(o.status));
+    const active=rawOrders.filter(o=>!isDoneReservation(o));
     payload=typeof convertReservationAppOrdersToPayload==='function'
       ? convertReservationAppOrdersToPayload(active)
       : {orders:active,orderItems:[]};
     return {payload,excluded:rawOrders.length-active.length,total:rawOrders.length};
   }
   if(parsed&&Array.isArray(parsed.orders)&&Array.isArray(parsed.orderItems)){
-    const all=parsed.orders,active=all.filter(o=>!isDoneStatus(o.status)),ids=new Set(active.map(o=>o.id));
+    const all=parsed.orders,active=all.filter(o=>!isDoneReservation(o)),ids=new Set(active.map(o=>o.id));
     payload={orders:active,orderItems:parsed.orderItems.filter(i=>ids.has(i.orderId))};
     return {payload,excluded:all.length-active.length,total:all.length};
   }
   if(parsed&&Array.isArray(parsed.orders)){
     rawOrders=parsed.orders;
-    const active=rawOrders.filter(o=>!isDoneStatus(o.status));
+    const active=rawOrders.filter(o=>!isDoneReservation(o));
     payload=typeof convertReservationAppOrdersToPayload==='function'
       ? convertReservationAppOrdersToPayload(active)
       : {orders:active,orderItems:[]};
@@ -1405,7 +1618,7 @@ function mergeReservationPayload(payload){
   let added=0,updated=0;
 
   incomingOrders.forEach(o=>{
-    if(isDoneStatus(o.status))return;
+    if(isDoneReservation(o))return;
     let cur=existingById.get(o.id)||existingByKey.get(orderKey(o));
     if(cur){
       const keepProd=cur.productionStatus||'未送信';
@@ -1440,7 +1653,7 @@ function mergeReservationPayload(payload){
 }
 
 function replaceReservationPayload(payload){
-  db.reservationOrders=(payload.orders||[]).filter(o=>!isDoneStatus(o.status)).map(o=>({...o,productionStatus:o.productionStatus||'未送信'}));
+  db.reservationOrders=(payload.orders||[]).filter(o=>!isDoneReservation(o)).map(o=>({...o,productionStatus:o.productionStatus||'未送信'}));
   const ids=new Set(db.reservationOrders.map(o=>o.id));
   db.reservationOrderItems=(payload.orderItems||[]).filter(i=>ids.has(i.orderId)).map(i=>({...i}));
   return cleanupReservations();
@@ -1463,7 +1676,6 @@ function doImport(mode){
     const x=convertInput(parsed);
     let r;
     if(mode==='replace'){
-      if(!confirm(`現在の予約データを削除し、JSONの進行中データ ${x.payload.orders.length}件で上書きしますか？`))return;
       r=replaceReservationPayload(x.payload);
     }else{
       r=mergeReservationPayload(x.payload);
@@ -1499,7 +1711,6 @@ function openOrder(o){
 }
 function deleteOrderV10(id){
   const o=(db.orderItems||[]).find(x=>x.id===id);if(!o)return;
-  if(!confirm(`「${o.productName||'この受注'}」を削除しますか？`))return;
   db.orderItems=db.orderItems.filter(x=>x.id!==id);
   if(appState.currentOrderId===id&&typeof resetOrderEditor==='function')resetOrderEditor();
   appState.aggregateResult={recipeTotals:[],taskTotals:[],materialTotals:[],unmatchedItems:[]};
@@ -1509,7 +1720,7 @@ function deleteOrderV10(id){
 /* 予約表示 */
 function resItems(id){return (db.reservationOrderItems||[]).filter(i=>i.orderId===id)}
 function resVisible(o){
-  if(isDoneStatus(o.status))return false;
+  if(isDoneReservation(o))return false;
   if(state.resRange==='unsent'&&(o.productionStatus||'未送信')!=='未送信')return false;
   if(state.resRange==='active'&&o.productionStatus==='製造バッチ化済み')return false;
   if(state.resCat!=='all'&&o.category!==state.resCat)return false;
@@ -1520,7 +1731,7 @@ function resVisible(o){
 function mappingLabel(i){return i.productId?'商品':i.recipeId?'レシピ':'未紐付け'}
 function renderReservationsV10(){
   if(!$('reservationList'))return;
-  const all=(db.reservationOrders||[]).filter(o=>!isDoneStatus(o.status));
+  const all=(db.reservationOrders||[]).filter(o=>!isDoneReservation(o));
   const list=all.filter(resVisible).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
   if($('reservationCountBadge'))$('reservationCountBadge').textContent=`${list.length}件`;
   if($('reservationResultV9'))$('reservationResultV9').textContent=`表示 ${list.length}件 / 保持 ${all.length}件`;
@@ -1610,30 +1821,77 @@ function renderAggregateV10(){
   if($('aggregateRecipeCountBadge'))$('aggregateRecipeCountBadge').textContent=`${recipes.length}件`;
   if($('aggregateTaskCountBadge'))$('aggregateTaskCountBadge').textContent=`${tasks.length}件`;
   if($('aggregateUnmatchedCountBadge'))$('aggregateUnmatchedCountBadge').textContent=`${u.length}件`;
-  if($('aggregateRecipeList'))$('aggregateRecipeList').innerHTML=recipes.length?recipes.map(x=>`<div class="v10-aggregate-row"><div class="v10-aggregate-title">${esc(x.recipeName)}</div><div class="v10-aggregate-meta">${esc(x.eventDate||'-')} / 必要 ${esc(x.requiredQuantity)}${esc(x.requiredUnit||'')} / ${esc(x.requiredScale)}倍</div></div>`).join(''):'<div class="empty-box">まだ集計していません。</div>';
-  if($('aggregateTaskList'))$('aggregateTaskList').innerHTML=tasks.length?tasks.map(x=>`<div class="v10-aggregate-row"><div class="v10-aggregate-title">${esc(x.taskName)}</div><div class="v10-aggregate-meta">${esc(x.eventDate||'-')} / ${esc(x.requiredCount)}${esc(x.unit||'')}</div></div>`).join(''):'<div class="empty-box">必要作業はありません。</div>';
-  if($('aggregateUnmatchedList'))$('aggregateUnmatchedList').innerHTML=u.length?u.map(x=>`<article class="v10-unmatched-row" data-v10-unmatched="${esc(x.orderId)}"><strong>${esc(x.productName)}</strong><small>${esc(x.date||'-')} / ${esc(x.quantity)}${esc(x.unit||'')}${x.customer?' / '+esc(x.customer):''}　→ タップして商品・レシピを選択</small></article>`).join(''):'<div class="empty-box">要紐付けはありません。</div>';
+  if($('aggregateRecipeList'))$('aggregateRecipeList').innerHTML=recipes.length?recipes.map((x,i)=>`<div class="v10-aggregate-row v12-aggregate-row"><div><div class="v10-aggregate-title">${esc(x.recipeName)}</div><div class="v10-aggregate-meta">${esc(x.eventDate||'-')} / 必要 ${esc(x.requiredQuantity)}${esc(x.requiredUnit||'')} / ${esc(x.requiredScale)}倍</div></div><button type="button" class="v12-aggregate-delete" data-v12-remove-recipe="${i}">削除</button></div>`).join(''):'<div class="empty-box">まだ集計していません。</div>';
+  if($('aggregateTaskList'))$('aggregateTaskList').innerHTML=tasks.length?tasks.map((x,i)=>`<div class="v10-aggregate-row v12-aggregate-row"><div><div class="v10-aggregate-title">${esc(x.taskName)}</div><div class="v10-aggregate-meta">${esc(x.eventDate||'-')} / ${esc(x.requiredCount)}${esc(x.unit||'')}</div></div><button type="button" class="v12-aggregate-delete" data-v12-remove-task="${i}">削除</button></div>`).join(''):'<div class="empty-box">必要作業はありません。</div>';
+  if($('aggregateUnmatchedList'))$('aggregateUnmatchedList').innerHTML=u.length?u.map((x,i)=>`<article class="v10-unmatched-row v12-aggregate-row" data-v10-unmatched="${esc(x.orderId)}"><div><strong>${esc(x.productName)}</strong><small>${esc(x.date||'-')} / ${esc(x.quantity)}${esc(x.unit||'')}${x.customer?' / '+esc(x.customer):''}　→ タップして商品・レシピを選択</small></div><button type="button" class="v12-aggregate-delete" data-v12-remove-unmatched="${i}">削除</button></article>`).join(''):'<div class="empty-box">要紐付けはありません。</div>';
 }
+
 function runAggregateV10(){
   const r=computeAggregate();state.lastAggregate=r;appState.aggregateResult=r;persist();renderAggregateV10();return r;
 }
 function aggregateKey(x){return `${x.recipeId}|${x.eventDate||''}|${(x.sourceOrders||[]).map(s=>s.orderId).sort().join(',')}`}
 function createBatchesV10(){
-  const r=state.lastAggregate||appState.aggregateResult;
-  if(!r||!Array.isArray(r.recipeTotals)){alert('先に「受注から集計」を押してください。');return}
-  if((r.unmatchedItems||[]).length){alert(`要紐付けが ${r.unmatchedItems.length}件あります。先に紐付けてください。`);return}
-  if(!(r.recipeTotals||[]).length){alert('製造バッチにするレシピがありません。');return}
-  let made=0,skip=0;
-  r.recipeTotals.forEach(t=>{
-    const rec=(db.recipeMasters||[]).find(x=>x.id===t.recipeId);if(!rec)return;
+  // 表示中の集計結果を最優先。無ければその場で再集計して作成する。
+  let r=state.lastAggregate;
+  if(!r||!Array.isArray(r.recipeTotals)){
+    r=(appState&&appState.aggregateResult&&Array.isArray(appState.aggregateResult.recipeTotals))
+      ? appState.aggregateResult
+      : computeAggregate();
+    state.lastAggregate=r;
+    if(appState)appState.aggregateResult=r;
+  }
+  if((r.unmatchedItems||[]).length){
+    alert(`要紐付けが ${r.unmatchedItems.length}件あります。先に紐付けるか、不要な項目は集計欄の「削除」で外してください。`);
+    return;
+  }
+  const totals=Array.isArray(r.recipeTotals)?r.recipeTotals:[];
+  if(!totals.length){alert('製造バッチにするレシピがありません。');return}
+  if(!Array.isArray(db.productionBatches))db.productionBatches=[];
+  let made=0,skip=0,missing=0;
+  totals.forEach(t=>{
+    const rec=(db.recipeMasters||[]).find(x=>x.id===t.recipeId);
+    if(!rec){missing++;return}
     const key=aggregateKey(t);
-    if((db.productionBatches||[]).some(b=>b.aggregateKey===key)){skip++;return}
-    db.productionBatches.unshift({id:createId('batch'),recipeId:rec.id,recipeName:rec.name,name:`${rec.name} ${t.requiredScale}倍`,date:t.eventDate||today(),sourceOrders:JSON.parse(JSON.stringify(t.sourceOrders||[])),scale:t.requiredScale,requiredQuantity:t.requiredQuantity,requiredUnit:t.requiredUnit,yieldQuantity:rec.yieldQuantity||0,yieldUnit:rec.yieldUnit||'',materials:typeof scaleRecipeMaterials==='function'?scaleRecipeMaterials(rec,t.requiredScale):[],flows:JSON.parse(JSON.stringify(rec.flows||[])),memo:'集計から自動生成',aggregateKey:key,createdAt:new Date().toISOString()});made++;
+    if(db.productionBatches.some(b=>b.aggregateKey===key)){skip++;return}
+    const y=Number(rec.yieldQuantity||t.yieldQuantity||0);
+    const q=Number(t.requiredQuantity||0);
+    const scale=Number(t.requiredScale)>0?Number(t.requiredScale):(y>0?Math.ceil((q/y)*100)/100:1);
+    db.productionBatches.unshift({
+      id:createId('batch'),recipeId:rec.id,recipeName:rec.name,
+      name:`${rec.name} ${scale}倍`,date:t.eventDate||today(),
+      sourceOrders:JSON.parse(JSON.stringify(t.sourceOrders||[])),
+      scale,requiredQuantity:q,requiredUnit:t.requiredUnit||rec.yieldUnit||'',
+      yieldQuantity:rec.yieldQuantity||0,yieldUnit:rec.yieldUnit||'',
+      materials:typeof scaleRecipeMaterials==='function'?scaleRecipeMaterials(rec,scale):[],
+      flows:JSON.parse(JSON.stringify(rec.flows||[])).map((f,idx)=>({...f,flowOrder:idx,batchName:`${rec.name} ${scale}倍`,recipeName:rec.name,scale})),
+      memo:'集計から自動生成',aggregateKey:key,createdAt:new Date().toISOString()
+    });
+    made++;
   });
-  persist();if(typeof renderBatchList==='function')renderBatchList();
-  alert(`製造バッチを ${made}件作成しました。${skip?`\n作成済み ${skip}件は重複作成しませんでした。`:''}`);
-  if(typeof activateTab==='function')activateTab('production');
+  persist();
+  if(typeof renderBatchList==='function')renderBatchList();
+  if(made>0){
+    if(typeof activateTab==='function')activateTab('production');
+    alert(`製造バッチを ${made}件作成しました。${skip?`\n作成済み ${skip}件は重複作成しませんでした。`:''}${missing?`\nレシピが見つからない項目 ${missing}件は作成できませんでした。`:''}`);
+  }else{
+    alert(skip?`すべて作成済みです（${skip}件）。`:`製造バッチを作成できませんでした。${missing?` レシピ参照切れ ${missing}件。`:''}`);
+  }
 }
+
+function removeAggregateItemV12(kind,index){
+  const r=state.lastAggregate||appState.aggregateResult;
+  if(!r)return;
+  const map={recipe:'recipeTotals',task:'taskTotals',unmatched:'unmatchedItems'};
+  const key=map[kind];
+  if(!key||!Array.isArray(r[key]))return;
+  const i=Number(index);
+  if(!Number.isInteger(i)||i<0||i>=r[key].length)return;
+  r[key].splice(i,1);
+  state.lastAggregate=r;
+  if(appState)appState.aggregateResult=r;
+  renderAggregateV10();
+}
+
 
 /* 予約から製造 */
 function createDirectRecipeBatch(order,item){
@@ -1664,18 +1922,43 @@ function bind(){
   // 受注操作はcaptureで旧ハンドラより先に処理
   $('orderList')?.addEventListener('click',e=>{
     const d=e.target.closest('[data-v10-order-delete]');
-    if(d){e.preventDefault();e.stopImmediatePropagation();deleteOrderV10(d.dataset.v10OrderDelete);return}
+    if(d){e.preventDefault();e.stopImmediatePropagation();const id=d.dataset.v10OrderDelete;armDestructiveButton(d,'もう一度押して削除','削除',()=>deleteOrderV10(id));return}
     const row=e.target.closest('[data-v10-order]');if(row){e.preventDefault();e.stopImmediatePropagation();openOrder((db.orderItems||[]).find(x=>x.id===row.dataset.v10Order))}
   },true);
   $('orderNewV9')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();openOrder(null)},true);
+  $('clearOrdersBtnV11')?.addEventListener('click',e=>{
+    e.preventDefault();e.stopImmediatePropagation();
+    const btn=e.currentTarget;
+    armDestructiveButton(btn,'もう一度押して全削除','受注を一括削除',()=>{
+      db.orderItems=[];
+      if(typeof resetOrderEditor==='function')resetOrderEditor();
+      if(appState)appState.aggregateResult={recipeTotals:[],taskTotals:[],materialTotals:[],unmatchedItems:[]};
+      state.lastAggregate=null;persist();renderOrdersV10();renderAggregateV10();
+      show($('orderEditorCardV9'),false);
+    });
+  },true);
   $('orderSearchV9')?.addEventListener('input',e=>{state.orderQ=e.target.value;renderOrdersV10()});
   $('orderDateChipsV9')?.addEventListener('click',e=>{const b=e.target.closest('[data-order-range]');if(!b)return;state.orderRange=b.dataset.orderRange;[...$('orderDateChipsV9').children].forEach(x=>x.classList.toggle('is-active',x===b));renderOrdersV10()});
   $('saveOrderBtn')?.addEventListener('click',()=>setTimeout(()=>{show($('orderEditorCardV9'),false);renderOrdersV10()},0));
 
   // JSON UI
   $('reservationImportToggleV9')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();const c=$('reservationImportCardV9');show(c,c?.classList.contains('is-hidden'));if(!c?.classList.contains('is-hidden'))c.scrollIntoView({behavior:'smooth',block:'start'})},true);
-  [['importReservationBtn','merge'],['mergeReservationBtn','merge'],['replaceReservationBtn','replace']].forEach(([id,mode])=>$ (id)?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();doImport(mode)},true));
-  $('clearReservationBtn')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();if(!confirm('予約データをすべて削除しますか？'))return;db.reservationOrders=[];db.reservationOrderItems=[];persist();renderReservationsV10();setImportStatus('予約データを全削除しました。','warn')},true);
+  [['importReservationBtn','merge'],['mergeReservationBtn','merge']].forEach(([id,mode])=>$ (id)?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();doImport(mode)},true));
+  $('replaceReservationBtn')?.addEventListener('click',e=>{
+    e.preventDefault();e.stopImmediatePropagation();
+    const btn=e.currentTarget;
+    armDestructiveButton(btn,'もう一度押して上書き','現在の予約を削除して上書き',()=>doImport('replace'));
+  },true);
+  $('clearReservationBtn')?.addEventListener('click',e=>{
+    e.preventDefault();e.stopImmediatePropagation();
+    const btn=e.currentTarget;
+    armDestructiveButton(btn,'もう一度押して全削除','予約データ全削除',()=>{
+      db.reservationOrders=[];db.reservationOrderItems=[];
+      if(appState) appState.aggregateResult={recipeTotals:[],taskTotals:[],materialTotals:[],unmatchedItems:[]};
+      state.lastAggregate=null;persist();renderReservationsV10();renderAggregateV10();
+      setImportStatus('予約データを全削除しました。','warn');
+    });
+  },true);
   $('cleanupReservationBtnV10')?.addEventListener('click',e=>{e.preventDefault();const r=cleanupReservations();renderReservationsV10();setImportStatus(`整理完了：予約 ${r.removedOrders}件・明細 ${r.removedItems}件を削除/統合しました。`)});
 
   $('reservationSearchV9')?.addEventListener('input',e=>{state.resQ=e.target.value;renderReservationsV10()});
@@ -1692,7 +1975,9 @@ function bind(){
   // 集計・バッチ作成もcaptureで元のイベントを止める
   $('runAggregateBtn')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();runAggregateV10()},true);
   $('createBatchesFromAggregateBtn')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();createBatchesV10()},true);
-  $('aggregateUnmatchedList')?.addEventListener('click',e=>{const r=e.target.closest('[data-v10-unmatched]');if(r)openPicker({kind:'order',id:r.dataset.v10Unmatched},'product')});
+  $('aggregateRecipeList')?.addEventListener('click',e=>{const b=e.target.closest('[data-v12-remove-recipe]');if(!b)return;e.preventDefault();e.stopPropagation();removeAggregateItemV12('recipe',b.dataset.v12RemoveRecipe)});
+  $('aggregateTaskList')?.addEventListener('click',e=>{const b=e.target.closest('[data-v12-remove-task]');if(!b)return;e.preventDefault();e.stopPropagation();removeAggregateItemV12('task',b.dataset.v12RemoveTask)});
+  $('aggregateUnmatchedList')?.addEventListener('click',e=>{const del=e.target.closest('[data-v12-remove-unmatched]');if(del){e.preventDefault();e.stopPropagation();removeAggregateItemV12('unmatched',del.dataset.v12RemoveUnmatched);return}const r=e.target.closest('[data-v10-unmatched]');if(r)openPicker({kind:'order',id:r.dataset.v10Unmatched},'product')});
 
   $('createUnlinkedBatchesBtn')?.remove();
   renderOrdersV10();renderReservationsV10();renderAggregateV10();
@@ -1700,5 +1985,186 @@ function bind(){
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
 </script>
+
+<script id="reservation-detail-import-v13">
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const escV13=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const normV13=v=>String(v??'').trim().replace(/\s+/g,' ').toLowerCase();
+
+function reservationItemNameV13(item){
+  const name=String(item?.name||item?.productName||'').trim();
+  const type=String(item?.type||item?.category||'').trim();
+  // ジャンル名より、JSONに入っている実商品名を優先
+  if(name && !['アニバーサリーケーキ','ウェディングケーキ','ウエディングケーキ','ケーキ','その他'].includes(name)) return name;
+  return name || type || '商品名未設定';
+}
+function reservationItemDetailsV13(item){
+  const options=Array.isArray(item?.options)?item.options.filter(Boolean):[];
+  const sizes=[item?.size,item?.squareSize,item?.multiSize].filter(Boolean);
+  return {
+    productName:reservationItemNameV13(item),
+    itemType:String(item?.type||item?.category||''),
+    size:String(item?.size||''),
+    squareSize:String(item?.squareSize||''),
+    multiSize:String(item?.multiSize||''),
+    options,
+    plateMessage:String(item?.plateMessage||''),
+    dessertCostNote:String(item?.dessertCostNote||''),
+    itemNotes:String(item?.notes||''),
+    reportType:String(item?.reportType||''),
+    cost:Number(item?.cost||0),
+    sizeText:sizes.join(' / '),
+    optionText:options.join(' / ')
+  };
+}
+function findProductIdV13(item){
+  const name=reservationItemNameV13(item);
+  if(!name||typeof db==='undefined'||!Array.isArray(db.productMasters)) return '';
+  const n=normV13(name);
+  let hit=db.productMasters.find(p=>normV13(p.name)===n);
+  if(hit)return hit.id;
+  hit=db.productMasters.find(p=>n.includes(normV13(p.name))||normV13(p.name).includes(n));
+  return hit?.id||'';
+}
+function convertRawReservationOrdersV13(rawOrders){
+  const orders=[]; const orderItems=[];
+  (rawOrders||[]).forEach(order=>{
+    if(typeof window.isDoneReservation==='function' && window.isDoneReservation(order))return;
+    const orderId=order.id || (typeof window.createId==='function'?createId('resord'):`resord_${Date.now()}_${Math.random()}`);
+    orders.push({
+      id:orderId,
+      date:order.date||'', time:order.time||'',
+      customer:order.clientName||order.customer||'',
+      category:order.category||'', venue:order.venue||'',
+      guestCount:Number(order.guestCount||0),
+      notes:order.orderNotes||order.notes||'',
+      status:order.status||'', productionStatus:'未送信', isProductionTarget:true
+    });
+    (Array.isArray(order.items)?order.items:[]).forEach(item=>{
+      const d=reservationItemDetailsV13(item);
+      let sizeInfo=null,sizeInfoList=[],sizeMode='';
+      try{
+        if(typeof window.parseReservationSize==='function'){
+          const p=parseReservationSize(item)||{}; sizeInfo=p.sizeInfo||null;sizeInfoList=p.sizeInfoList||[];sizeMode=p.mode||'';
+        }
+      }catch(_e){}
+      orderItems.push({
+        id:typeof window.createId==='function'?createId('resitem'):`resitem_${Date.now()}_${Math.random()}`,
+        orderId,
+        productId:findProductIdV13(item), recipeId:'',
+        productName:d.productName,
+        category:d.itemType||order.category||'',
+        quantity:Number(item.quantity||1),
+        unit:d.itemType==='皿盛りデザート'?'人前':'点',
+        size:d.size, squareSize:d.squareSize, multiSize:d.multiSize,
+        sizeInfo,sizeInfoList,sizeMode,
+        options:d.options,
+        plateMessage:d.plateMessage,
+        dessertCostNote:d.dessertCostNote,
+        reportType:d.reportType,
+        cost:d.cost,
+        notes:d.itemNotes,
+        rawType:d.itemType
+      });
+    });
+  });
+  return {orders,orderItems};
+}
+
+// v10/v11のconvertInputを上書きし、予約アプリ生JSONでは詳細を落とさない
+window.convertInput=function(parsed){
+  let rawOrders=[],payload;
+  if(Array.isArray(parsed)){
+    rawOrders=parsed;
+    const active=rawOrders.filter(o=>!(typeof window.isDoneReservation==='function'&&isDoneReservation(o)));
+    payload=convertRawReservationOrdersV13(active);
+    return {payload,excluded:rawOrders.length-active.length,total:rawOrders.length};
+  }
+  if(parsed&&Array.isArray(parsed.orders)&&Array.isArray(parsed.orderItems)){
+    const all=parsed.orders;
+    const active=all.filter(o=>!(typeof window.isDoneReservation==='function'&&isDoneReservation(o)));
+    const ids=new Set(active.map(o=>o.id));
+    const normalizedItems=parsed.orderItems.filter(i=>ids.has(i.orderId)).map(i=>{
+      const d=reservationItemDetailsV13(i);
+      return {...i,
+        productName:d.productName,
+        category:i.category||d.itemType||'',
+        size:i.size||d.size, squareSize:i.squareSize||d.squareSize, multiSize:i.multiSize||d.multiSize,
+        options:Array.isArray(i.options)?i.options:d.options,
+        plateMessage:i.plateMessage||d.plateMessage,
+        dessertCostNote:i.dessertCostNote||d.dessertCostNote,
+        notes:i.notes||d.itemNotes,
+        cost:Number(i.cost??d.cost??0)
+      };
+    });
+    return {payload:{orders:active,orderItems:normalizedItems},excluded:all.length-active.length,total:all.length};
+  }
+  if(parsed&&Array.isArray(parsed.orders)){
+    rawOrders=parsed.orders;
+    const active=rawOrders.filter(o=>!(typeof window.isDoneReservation==='function'&&isDoneReservation(o)));
+    payload=convertRawReservationOrdersV13(active);
+    return {payload,excluded:rawOrders.length-active.length,total:rawOrders.length};
+  }
+  throw new Error('予約JSONの形式を判定できません。');
+};
+
+function itemDetailTextV13(i,compact=false){
+  const chunks=[];
+  if(i.size)chunks.push(i.size);
+  if(i.squareSize)chunks.push(i.squareSize);
+  if(i.multiSize)chunks.push(i.multiSize);
+  if(Array.isArray(i.options)&&i.options.length)chunks.push(i.options.join('・'));
+  if(!compact&&i.plateMessage)chunks.push(`プレート: ${i.plateMessage}`);
+  if(!compact&&i.notes)chunks.push(i.notes);
+  return chunks.filter(Boolean).join(' / ');
+}
+
+// 一覧も「アニバーサリーケーキ」だけでなく商品名＋サイズまで見えるようにする
+const oldRender=window.renderReservationsV10;
+window.renderReservationsV10=function(){
+  if(!$('reservationList')||typeof db==='undefined')return oldRender?.();
+  const all=(db.reservationOrders||[]).filter(o=>!(typeof window.isDoneReservation==='function'&&isDoneReservation(o)));
+  const visible=typeof window.resVisible==='function'?all.filter(resVisible):all;
+  const list=visible.sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
+  if($('reservationCountBadge'))$('reservationCountBadge').textContent=`${list.length}件`;
+  if($('reservationResultV9'))$('reservationResultV9').textContent=`表示 ${list.length}件 / 保持 ${all.length}件`;
+  $('reservationList').innerHTML=list.length?list.map(o=>{
+    const items=(db.reservationOrderItems||[]).filter(i=>i.orderId===o.id),u=items.filter(i=>!i.productId&&!i.recipeId).length;
+    const summary=items.slice(0,2).map(i=>{
+      const d=itemDetailTextV13(i,true);return `${i.productName||'商品名未設定'}${d?' ['+d+']':''}`;
+    }).join(' ・ ')+(items.length>2?` 他${items.length-2}件`: '');
+    return `<article class="v9-row" data-v10-res="${escV13(o.id)}" tabindex="0"><div><div class="v9-row-title">${escV13(o.customer||'名称未設定')}</div><div class="v9-row-meta">${escV13(o.date||'-')}${o.time?' '+escV13(o.time):''}${o.venue?' / '+escV13(o.venue):''}${o.category?' / '+escV13(o.category):''}</div><div class="v9-row-sub">${escV13(summary||'商品なし')}</div></div><span class="v9-row-badge ${u?'warn':''}">${u?`未紐付 ${u}`:(o.productionStatus==='製造バッチ化済み'?'送信済':'確認')}</span></article>`;
+  }).join(''):'<div class="empty-box">条件に合う予約がありません。</div>';
+};
+
+window.reservationDetail=function(id){
+  const o=(db.reservationOrders||[]).find(x=>x.id===id);if(!o)return;
+  const items=(db.reservationOrderItems||[]).filter(i=>i.orderId===id);
+  if($('reservationDetailTitleV9'))$('reservationDetailTitleV9').textContent=o.customer||'予約詳細';
+  if(!$('reservationDetailBodyV9'))return;
+  $('reservationDetailBodyV9').innerHTML=`<div class="v9-detail-block"><div class="v9-detail-grid"><b>日付</b><span>${escV13(o.date||'-')}${o.time?' '+escV13(o.time):''}</span><b>区分</b><span>${escV13(o.category||'-')}</span><b>会場</b><span>${escV13(o.venue||'-')}</span><b>状態</b><span>${escV13(o.status||'-')} / ${escV13(o.productionStatus||'未送信')}</span><b>メモ</b><span>${escV13(o.notes||'-')}</span></div></div><div class="v9-detail-block"><strong>内容 ${items.length}件</strong>${items.map(i=>{
+    const size=[i.size,i.squareSize,i.multiSize].filter(Boolean).join(' / ');
+    const options=Array.isArray(i.options)?i.options.filter(Boolean).join(' / '):String(i.options||'');
+    return `<div class="v9-item-line"><div style="min-width:0;flex:1"><b>${escV13(i.productName||'商品名未設定')}</b><div class="v9-row-sub">${escV13(i.category||'')}${i.quantity?` / ${escV13(i.quantity)}${escV13(i.unit||'点')}`:''}${size?' / '+escV13(size):''}</div>${options?`<div class="v9-row-sub"><b>オプション:</b> ${escV13(options)}</div>`:''}${i.plateMessage?`<div class="v9-row-sub"><b>プレート:</b> ${escV13(i.plateMessage)}</div>`:''}${i.notes?`<div class="v9-row-sub">${escV13(i.notes)}</div>`:''}<div class="v9-row-sub">${i.productId?'商品紐付け':i.recipeId?'レシピ紐付け':'未紐付け'}</div></div><button type="button" class="v9-link-btn" data-v10-pick-res="${escV13(i.id)}">${i.productId||i.recipeId?'変更':'紐付け'}</button></div>`;
+  }).join('')}</div>${o.productionStatus==='製造バッチ化済み'?'':`<button class="btn btn-primary" style="width:100%" data-v10-send-res="${escV13(o.id)}" type="button">製造へ送る</button>`}`;
+  if(typeof window.openSheet==='function')openSheet('reservationDetailV9');
+};
+
+// 既存保存データにも、保持している詳細フィールドから表示名を補正
+function migrateReservationItemsV13(){
+  if(typeof db==='undefined'||!Array.isArray(db.reservationOrderItems))return;
+  let changed=false;
+  db.reservationOrderItems.forEach(i=>{
+    if(!i.productName && i.name){i.productName=i.name;changed=true;}
+    if(!Array.isArray(i.options)&&i.options){i.options=[String(i.options)];changed=true;}
+  });
+  if(changed&&typeof window.persistDb==='function')persistDb();
+}
+setTimeout(()=>{migrateReservationItemsV13();window.renderReservationsV10?.();},50);
+})();
+</script>
+
 </body>
 </html>
