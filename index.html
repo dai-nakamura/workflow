@@ -44,6 +44,14 @@
   .recipe-material-name{font-size:13.5px}.recipe-material-amount,.recipe-material-cost{font-size:11.5px}
 }
 @media(max-width:390px){.recipe-material-cost{display:none}}
+</style><style id="v9-flow-style">
+[data-tab="orders"] .layout-grid,[data-tab="reservations"] .layout-grid{grid-template-columns:1fr!important}
+#orderListCardV9,#reservationListCardV9{order:1}#orderEditorCardV9,#reservationImportCardV9{order:2}.v9-collapsible.is-hidden{display:none!important}.v9-legacy-filter{display:none!important}
+.v9-toolbar{display:grid;gap:8px;margin:8px 0 6px}.v9-search{width:100%;min-height:44px;border:1px solid var(--line,#d9e0ea);border-radius:13px;padding:9px 12px;font:inherit;background:#fff}.v9-chips{display:flex;gap:6px;overflow-x:auto;padding:1px 0 3px;scrollbar-width:none}.v9-chips::-webkit-scrollbar{display:none}.v9-chip{flex:0 0 auto;border:1px solid var(--line,#d9e0ea);background:#fff;border-radius:999px;padding:7px 11px;font-weight:800;font-size:12px}.v9-chip.is-active{background:#111827;color:#fff;border-color:#111827}.v9-resultline{font-size:12px;color:var(--muted,#657080);margin-bottom:7px}
+.v9-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:center;border-bottom:1px solid var(--line,#e5e7eb);padding:9px 2px;cursor:pointer}.v9-row:last-child{border-bottom:0}.v9-row-title{font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v9-row-meta,.v9-row-sub{font-size:12px;color:var(--muted,#657080);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v9-row-badge{font-size:11px;padding:4px 7px;border-radius:999px;background:#eef2f7;white-space:nowrap}.v9-row-badge.warn{background:#fff4d6}.v9-delete{border:0;background:transparent;color:#c2251b;font-weight:800;padding:8px}
+.v9-sheet{position:fixed;inset:0;z-index:10050;display:none}.v9-sheet.is-open{display:block}.v9-sheet-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.35)}.v9-sheet-panel{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:12px 14px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.13)}.v9-sheet-head{display:flex;align-items:center;gap:10px;position:sticky;top:-12px;background:#fff;padding:8px 0 10px;z-index:2}.v9-back{border:0;background:#eef2f7;border-radius:999px;padding:8px 11px;font-weight:800}.v9-detail-block{border:1px solid var(--line,#e5e7eb);border-radius:14px;padding:10px;margin:8px 0}.v9-detail-grid{display:grid;grid-template-columns:78px 1fr;gap:6px 8px;font-size:13px}.v9-detail-grid b{color:var(--muted,#657080)}.v9-item-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;padding:8px 0;border-top:1px solid #eef0f3}.v9-link-btn{border:1px solid var(--line,#d9e0ea);background:#fff;border-radius:10px;padding:7px 9px;font-weight:800}.v9-master-results{margin-top:8px}.v9-master-row{width:100%;text-align:left;border:0;border-bottom:1px solid #eef0f3;background:#fff;padding:11px 4px}.v9-master-row strong{display:block}.v9-master-row small{color:var(--muted,#657080)}
+.aggregate-link-controls{display:none!important}.aggregate-link-row{padding:9px}.aggregate-link-types{display:none!important}.aggregate-link-row::after{content:'タップしてマスターを選択';display:block;margin-top:7px;font-size:12px;font-weight:800;color:#2563eb}.aggregate-link-row{cursor:pointer}
+@media(min-width:760px){.v9-sheet-panel{max-width:620px;left:50%;transform:translateX(-50%)}}
 </style></head>
 <body>
 <div class="app-shell">
@@ -309,7 +317,6 @@
 </div>
 <div class="list" id="recipeMaterialsList"></div>
 <p class="helper-text" id="recipeMaterialsEmpty">まだ材料がありません。</p>
-
 </section><section class="card" style="grid-column:1 / -1;">
 <div class="section-heading">
 <div>
@@ -492,7 +499,7 @@
 </section>
 <section class="tab-panel" data-tab="orders">
 <div class="layout-grid two-cols">
-<section class="card">
+<section class="card v9-collapsible is-hidden" id="orderEditorCardV9">
 <div class="section-heading">
 <div>
 <p class="section-kicker">受注</p>
@@ -513,20 +520,20 @@
 <div class="inline-actions"><button class="btn btn-primary" id="saveOrderBtn" type="button">受注保存</button><button class="btn btn-secondary" id="newOrderBtn" type="button">新規</button></div>
 </div>
 </section>
-<section class="card">
+<section class="card" id="orderListCardV9">
 <div class="section-heading">
 <div>
 <p class="section-kicker">一覧</p>
 <h2>受注一覧</h2>
 </div><span class="badge" id="orderCountBadge">0件</span>
-</div>
-<div class="list" id="orderList"></div>
+<button class="btn btn-primary btn-inline" id="orderNewV9" type="button">＋ 受注追加</button></div>
+<div class="v9-toolbar"><input class="v9-search" id="orderSearchV9" placeholder="商品名・顧客・メモを検索" type="search"/><div class="v9-chips" id="orderDateChipsV9"><button class="v9-chip is-active" data-order-range="all" type="button">すべて</button><button class="v9-chip" data-order-range="upcoming" type="button">今後</button><button class="v9-chip" data-order-range="today" type="button">今日</button></div></div><div class="v9-resultline" id="orderResultV9"></div><div class="list" id="orderList"></div>
 </section>
 </div>
 </section>
 <section class="tab-panel" data-tab="reservations">
 <div class="layout-grid two-cols">
-<section class="card">
+<section class="card v9-collapsible is-hidden" id="reservationImportCardV9">
 <div class="section-heading">
 <div>
 <p class="section-kicker">予約</p>
@@ -561,15 +568,15 @@
 
           </button>
 </section>
-<section class="card">
+<section class="card" id="reservationListCardV9">
 <div class="section-heading">
 <div>
 <p class="section-kicker">一覧</p>
 <h2>予約一覧</h2>
 </div>
 <span class="badge" id="reservationCountBadge">0件</span>
-</div>
-<div class="sub-card">
+<button class="btn btn-secondary btn-inline" id="reservationImportToggleV9" type="button">JSON取込</button></div>
+<div class="sub-card v9-legacy-filter">
 <label class="field">
 <span class="field-label">表示フィルター</span>
 <select id="reservationFilter">
@@ -607,7 +614,7 @@
               日付クリア
             </button>
 </div>
-<div class="list" id="reservationList"></div>
+<div class="v9-toolbar"><input class="v9-search" id="reservationSearchV9" placeholder="名前・会場・商品を検索" type="search"/><div class="v9-chips" id="reservationStatusChipsV9"><button class="v9-chip is-active" data-res-range="active" type="button">進行中</button><button class="v9-chip" data-res-range="unsent" type="button">未送信</button><button class="v9-chip" data-res-range="all" type="button">全件</button></div><div class="v9-chips" id="reservationCategoryChipsV9"><button class="v9-chip is-active" data-res-cat="all" type="button">すべて</button><button class="v9-chip" data-res-cat="婚礼" type="button">婚礼</button><button class="v9-chip" data-res-cat="宴会" type="button">宴会</button><button class="v9-chip" data-res-cat="アニバーサリー" type="button">記念日</button><button class="v9-chip" data-res-cat="アフタヌーンティー" type="button">AT</button></div></div><div class="v9-resultline" id="reservationResultV9"></div><div class="list" id="reservationList"></div>
 </section>
 </div>
 </section>
@@ -622,9 +629,7 @@
 </div>
 <div class="sub-card">
 <div class="inline-actions"><button class="btn btn-secondary" id="runAggregateBtn" type="button">受注から集計</button><button class="btn btn-primary" id="createBatchesFromAggregateBtn" type="button">集計結果から製造バッチ作成</button>
-<button class="btn btn-secondary" id="createUnlinkedBatchesBtn" type="button">
-                未紐付け仮バッチ作成
-              </button>
+
 </div>
 </div>
 </section>
@@ -645,6 +650,11 @@
 </div><span class="badge" id="aggregateTaskCountBadge">0件</span>
 </div>
 <div class="list" id="aggregateTaskList"></div>
+</section>
+<section class="card" id="aggregateLinkCard">
+<div class="section-heading"><div><p class="section-kicker">要紐付け</p><h2>レシピ・商品を選択</h2></div><span class="badge" id="aggregateUnmatchedCountBadge">0件</span></div>
+<p class="helper-text">名前だけで入った受注は、商品またはレシピのマスターを選んでその場で紐付けできます。</p>
+<div class="list" id="aggregateUnmatchedList"></div>
 </section>
 </div>
 </section>
@@ -767,6 +777,7 @@
 </div>
 </section>
 </div>
+<div aria-hidden="true" class="modal-backdrop" id="orderDetailModal"><div class="modal-card order-detail-card"><div class="section-heading"><div><p class="section-kicker">受注詳細</p><h2 id="orderDetailTitle">受注内容</h2></div><button class="btn btn-secondary btn-inline" id="closeOrderDetailBtn" type="button">閉じる</button></div><div id="orderDetailBody"></div></div></div>
 <div class="modal-backdrop" id="planAssignModal">
 <div class="modal-card">
 <div class="section-heading">
@@ -1122,6 +1133,30 @@
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
 </script>
+<style>
+.order-compact-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:center;padding:10px 12px;border:1px solid var(--line,#d9e0ea);border-radius:13px;background:#fff;margin-bottom:7px;cursor:pointer}.order-compact-main{min-width:0}.order-compact-title{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.order-compact-meta{font-size:12px;color:var(--muted,#657080);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.order-compact-delete{grid-row:1 / span 2;grid-column:2;padding:7px 9px;font-size:12px}.order-detail-card{max-width:560px}.order-detail-grid{display:grid;grid-template-columns:90px 1fr;gap:8px 10px;font-size:14px}.order-detail-grid dt{font-weight:800;color:var(--muted,#657080)}.order-detail-grid dd{margin:0;word-break:break-word}.aggregate-link-row{border:1px solid var(--line,#d9e0ea);border-radius:14px;padding:10px;margin-bottom:8px;background:#fff}.aggregate-link-name{font-weight:800}.aggregate-link-meta{font-size:12px;color:var(--muted,#657080);margin-top:2px}.aggregate-link-types{display:flex;gap:6px;margin:9px 0 7px}.aggregate-link-chip{border:1px solid var(--line,#d9e0ea);background:#fff;border-radius:999px;padding:6px 10px;font-weight:700}.aggregate-link-chip.is-active{background:#111827;color:#fff}.aggregate-link-controls{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px}.aggregate-link-controls select{width:100%;min-width:0}@media(max-width:560px){.order-detail-grid{grid-template-columns:72px 1fr}.aggregate-link-controls{grid-template-columns:1fr}.aggregate-link-controls .btn{width:100%}}
+</style>
+<script>
+(function(){'use strict';
+const $=id=>document.getElementById(id), esc=s=>String(s??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
+const completedStatuses=new Set(['処理済み','完成済み','完成','納品済み','完了']); let linkTypes={};
+function openOrderDetail(o){if(!o)return;const p=(db.productMasters||[]).find(x=>x.id===o.productId);$('orderDetailTitle').textContent=o.productName||p?.name||'受注内容';$('orderDetailBody').innerHTML=`<dl class="order-detail-grid"><dt>施工日</dt><dd>${esc(o.date||'-')}</dd><dt>商品</dt><dd>${esc(o.productName||p?.name||'-')}</dd><dt>数量</dt><dd>${esc(o.quantity??'-')}${esc(o.unit||'')}</dd><dt>顧客/案件</dt><dd>${esc(o.customer||'-')}</dd><dt>メモ</dt><dd>${esc(o.memo||o.notes||'-')}</dd><dt>紐付け</dt><dd>${o.productId?'商品マスター':o.recipeId?'レシピマスター':'未紐付け'}</dd></dl>`;const m=$('orderDetailModal');m?.classList.add('is-active');m?.setAttribute('aria-hidden','false')}
+function closeOrderDetail(){const m=$('orderDetailModal');m?.classList.remove('is-active');m?.setAttribute('aria-hidden','true')}
+function renderOrderListV8(){if(typeof db==='undefined'||!$('orderList'))return;const a=db.orderItems||[];$('orderCountBadge').textContent=`${a.length}件`;if(!a.length){$('orderList').innerHTML='<div class="empty-box">まだ受注がありません。</div>';return}$('orderList').innerHTML=a.map(o=>`<article class="order-compact-row" data-order-row-id="${esc(o.id)}" tabindex="0"><div class="order-compact-main"><div class="order-compact-title">${esc(o.productName||'商品名未設定')} × ${esc(o.quantity??0)}${esc(o.unit||'')}</div><div class="order-compact-meta">${esc(o.date||'-')}${o.customer?' / '+esc(o.customer):''}${o.memo?' / '+esc(o.memo):''}</div></div><button class="btn btn-danger btn-inline order-compact-delete delete-order-btn" type="button" data-id="${esc(o.id)}">削除</button></article>`).join('')}
+try{window.renderOrderList=renderOrderListV8;renderOrderList=renderOrderListV8}catch(e){}
+function makeReservationPayload(parsed){let payload;if(Array.isArray(parsed))payload=convertReservationAppOrdersToPayload(parsed);else if(Array.isArray(parsed.orders)&&Array.isArray(parsed.orderItems))payload={orders:parsed.orders,orderItems:parsed.orderItems};else if(Array.isArray(parsed.orders))payload=convertReservationAppOrdersToPayload(parsed.orders);else throw new Error('予約JSONの形式を判定できません。');const all=payload.orders||[],keep=all.filter(o=>!completedStatuses.has(String(o.status||'').trim())),ids=new Set(keep.map(o=>o.id));return {payload:{...payload,orders:keep,orderItems:(payload.orderItems||[]).filter(i=>ids.has(i.orderId))},excluded:all.length-keep.length}}
+function importV8(mode){const text=$('reservationJsonArea')?.value.trim();if(!text){alert('予約JSONを貼り付けてください。');return}try{const x=makeReservationPayload(JSON.parse(text));importReservationData(x.payload,mode);if(x.excluded)setTimeout(()=>alert(`完成・処理済み ${x.excluded}件は取り込みませんでした。`),0)}catch(e){alert(e.message||'予約JSONを読み込めませんでした。')}}
+const baseAggregate=typeof aggregateOrderItems==='function'?aggregateOrderItems:null;
+function aggregateV8(){const r=baseAggregate?baseAggregate():{recipeTotals:[],taskTotals:[],materialTotals:[],unmatchedItems:[]},remain=[];for(const u of r.unmatchedItems||[]){const o=(db.orderItems||[]).find(x=>x.id===u.orderId);if(!o?.recipeId){remain.push(u);continue}const rec=(db.recipeMasters||[]).find(x=>x.id===o.recipeId);if(!rec){remain.push(u);continue}let cur=r.recipeTotals.find(x=>x.recipeId===rec.id);if(!cur){cur={recipeId:rec.id,recipeName:rec.name,requiredQuantity:0,requiredUnit:o.unit||rec.yieldUnit||'',yieldQuantity:Number(rec.yieldQuantity||0),yieldUnit:rec.yieldUnit||'',eventDate:o.date||'',sourceOrders:[]};r.recipeTotals.push(cur)}cur.requiredQuantity+=Number(o.quantity||0);cur.requiredScale=cur.yieldQuantity>0?Math.ceil(cur.requiredQuantity/cur.yieldQuantity*100)/100:0;cur.sourceOrders.push({orderId:o.id,customer:o.customer||'',date:o.date||'',productName:o.productName||''})}r.unmatchedItems=remain;return r}
+try{window.aggregateOrderItems=aggregateV8;aggregateOrderItems=aggregateV8}catch(e){}
+function renderLinks(){const box=$('aggregateUnmatchedList');if(!box)return;const a=appState?.aggregateResult?.unmatchedItems||[];$('aggregateUnmatchedCountBadge').textContent=`${a.length}件`;if(!a.length){box.innerHTML='<div class="empty-box">要紐付けの商品はありません。</div>';return}box.innerHTML=a.map((u,i)=>{const k=u.orderId||String(i),t=linkTypes[k]||'product',masters=t==='recipe'?(db.recipeMasters||[]):db.productMasters||[];return `<article class="aggregate-link-row" data-unmatched-key="${esc(k)}"><div class="aggregate-link-name">${esc(u.productName||'商品名なし')}</div><div class="aggregate-link-meta">${esc(u.date||'-')} / ${esc(u.quantity||0)}${esc(u.unit||'')}${u.customer?' / '+esc(u.customer):''}</div><div class="aggregate-link-types"><button class="aggregate-link-chip ${t==='product'?'is-active':''}" data-link-type="product" type="button">商品</button><button class="aggregate-link-chip ${t==='recipe'?'is-active':''}" data-link-type="recipe" type="button">レシピ</button></div><div class="aggregate-link-controls"><select data-master-select><option value="">${t==='recipe'?'レシピ':'商品'}マスターから選択</option>${masters.map(m=>`<option value="${esc(m.id)}">${esc(m.name)}</option>`).join('')}</select><button class="btn btn-primary btn-inline" data-apply-link type="button">紐付け</button></div></article>`}).join('')}
+const baseRender=typeof renderAggregate==='function'?renderAggregate:null;
+function renderAggregateV8(){if(baseRender){const a=window.alert;window.alert=m=>String(m).startsWith('未紐付けの商品があります。')?undefined:a(m);try{baseRender()}finally{window.alert=a}}renderLinks()}
+try{window.renderAggregate=renderAggregateV8;renderAggregate=renderAggregateV8}catch(e){}
+function bind(){$('orderList')?.addEventListener('click',e=>{if(e.target.closest('.delete-order-btn'))return;const row=e.target.closest('[data-order-row-id]');if(row)openOrderDetail((db.orderItems||[]).find(o=>o.id===row.dataset.orderRowId))},true);$('closeOrderDetailBtn')?.addEventListener('click',closeOrderDetail);$('orderDetailModal')?.addEventListener('click',e=>{if(e.target===$('orderDetailModal'))closeOrderDetail()});[['importReservationBtn','merge'],['mergeReservationBtn','merge'],['replaceReservationBtn','replace']].forEach(([id,mode])=>$(id)?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();importV8(mode)},true));$('aggregateUnmatchedList')?.addEventListener('click',e=>{const row=e.target.closest('.aggregate-link-row');if(!row)return;const key=row.dataset.unmatchedKey,b=e.target.closest('[data-link-type]');if(b){linkTypes[key]=b.dataset.linkType;renderLinks();return}if(e.target.closest('[data-apply-link]')){const id=row.querySelector('[data-master-select]')?.value;if(!id){alert('マスターを選択してください。');return}const o=(db.orderItems||[]).find(x=>x.id===key);if(!o){alert('受注データが見つかりません。');return}const t=linkTypes[key]||'product';if(t==='recipe'){o.recipeId=id;o.productId=''}else{o.productId=id;delete o.recipeId;const p=(db.productMasters||[]).find(x=>x.id===id);if(p)o.productName=p.name}if(typeof persistDb==='function')persistDb();appState.aggregateResult=aggregateV8();renderAggregateV8();renderOrderListV8()}});renderOrderListV8();renderLinks()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
+</script>
 <script src="./assets/tesseract/tesseract.min.js"></script>
 <script>
 /* 製造管理アプリ ローカルOCR取込。画像は端末外へ送信しません。 */
@@ -1255,6 +1290,68 @@ function bind(){
   $('recipeMasterList')?.addEventListener('click',e=>{if(e.target.closest('.delete-recipe-btn'))return;const row=e.target.closest('[data-recipe-row-id]');if(!row)return;setTimeout(()=>$('recipeName')?.scrollIntoView({behavior:'smooth',block:'start'}),0);},true);
   $('openNewRecipeBtn')?.addEventListener('click',()=>setTimeout(()=>$('recipeName')?.scrollIntoView({behavior:'smooth',block:'start'}),0));
   renderCompactRecipeMaterials();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+})();
+</script>
+<div aria-hidden="true" class="v9-sheet" id="reservationDetailV9"><div class="v9-sheet-backdrop" data-v9-close="reservationDetailV9"></div><section class="v9-sheet-panel"><div class="v9-sheet-head"><button class="v9-back" data-v9-close="reservationDetailV9" type="button">‹ 戻る</button><strong id="reservationDetailTitleV9">予約詳細</strong></div><div id="reservationDetailBodyV9"></div></section></div>
+<div aria-hidden="true" class="v9-sheet" id="masterPickerV9"><div class="v9-sheet-backdrop" data-v9-close="masterPickerV9"></div><section class="v9-sheet-panel"><div class="v9-sheet-head"><button class="v9-back" data-v9-close="masterPickerV9" type="button">‹ 戻る</button><strong id="masterPickerTitleV9">マスターから選択</strong></div><div class="v9-chips" id="masterPickerTypeV9"><button class="v9-chip is-active" data-picker-type="product" type="button">商品</button><button class="v9-chip" data-picker-type="recipe" type="button">レシピ</button></div><input class="v9-search" id="masterPickerSearchV9" placeholder="名前で検索" type="search"/><div class="v9-master-results" id="masterPickerResultsV9"></div></section></div>
+<script id="v9-flow-script">
+(function(){'use strict';
+const $=id=>document.getElementById(id), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const doneStatus=s=>/^(完成|完成済み|納品済み|処理済み|完了|キャンセル済み|キャンセル)$/.test(String(s||'').trim());
+const state={orderQ:'',orderRange:'all',resQ:'',resRange:'active',resCat:'all',pickerType:'product',pickerTarget:null};
+function today(){return new Date().toISOString().slice(0,10)}
+function openSheet(id){$(id)?.classList.add('is-open');$(id)?.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
+function closeSheet(id){$(id)?.classList.remove('is-open');$(id)?.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+function show(el,on){if(el)el.classList.toggle('is-hidden',!on)}
+
+// 1) 受注：一覧を主画面にし、必要時だけ入力欄を開く。
+function orderVisible(o){const q=state.orderQ.trim().toLowerCase();if(q&&!`${o.productName||''} ${o.customer||''} ${o.memo||''}`.toLowerCase().includes(q))return false;const d=o.date||'';if(state.orderRange==='upcoming'&&d<today())return false;if(state.orderRange==='today'&&d!==today())return false;return true}
+function renderOrdersV9(){if(typeof db==='undefined'||!$('orderList'))return;const all=db.orderItems||[],a=all.filter(orderVisible).sort((x,y)=>String(x.date||'').localeCompare(String(y.date||'')));$('orderCountBadge').textContent=`${a.length}件`;$('orderResultV9').textContent=`表示 ${a.length}件 / 全${all.length}件`;if(!a.length){$('orderList').innerHTML='<div class="empty-box">条件に合う受注がありません。</div>';return}$('orderList').innerHTML=a.map(o=>`<article class="v9-row" data-v9-order="${esc(o.id)}" tabindex="0"><div><div class="v9-row-title">${esc(o.productName||'商品名未設定')} × ${esc(o.quantity??0)}${esc(o.unit||'')}</div><div class="v9-row-meta">${esc(o.date||'-')}${o.customer?' / '+esc(o.customer):''}</div>${o.memo?`<div class="v9-row-sub">${esc(o.memo)}</div>`:''}</div><button class="v9-delete" data-v9-order-delete="${esc(o.id)}" type="button">削除</button></article>`).join('')}
+try{renderOrderList=renderOrdersV9}catch(e){} window.renderOrderList=renderOrdersV9;
+function openOrderEditor(o){show($('orderEditorCardV9'),true);if(o){appState.currentOrderId=o.id;$('orderDate').value=o.date||today();$('orderProductSelect').value=o.productId||'';$('orderQuantity').value=o.quantity??1;$('orderUnit').value=o.unit||'';$('orderCustomer').value=o.customer||'';$('orderMemo').value=o.memo||'';}else if(typeof resetOrderEditor==='function')resetOrderEditor();$('orderEditorCardV9')?.scrollIntoView({behavior:'smooth',block:'start'})}
+
+// 2) 予約：取込時点で終了データを捨てる。既存予約一覧はコンパクト表示。
+const originalImportReservationData=typeof importReservationData==='function'?importReservationData:null;
+if(originalImportReservationData){
+  const filteredImport=function(payload,mode='merge'){
+    const orders=Array.isArray(payload?.orders)?payload.orders:[], keep=orders.filter(o=>!doneStatus(o.status)&&o.productionStatus!=='製造バッチ化済み'),ids=new Set(keep.map(o=>o.id));
+    const dropped=orders.length-keep.length; const clean={...payload,orders:keep,orderItems:(payload.orderItems||[]).filter(i=>ids.has(i.orderId))};
+    originalImportReservationData(clean,mode); if(dropped) setTimeout(()=>alert(`終了済み ${dropped}件を除外して取り込みました。`),0);
+  }; try{importReservationData=filteredImport}catch(e){} window.importReservationData=filteredImport;
+}
+function reservationItems(id){return (db.reservationOrderItems||[]).filter(i=>i.orderId===id)}
+function resVisible(o){if(doneStatus(o.status)&&state.resRange!=='all')return false;if(state.resRange==='unsent'&&(o.productionStatus||'未送信')!=='未送信')return false;if(state.resRange==='active'&&o.productionStatus==='製造バッチ化済み')return false;if(state.resCat!=='all'&&o.category!==state.resCat)return false;const q=state.resQ.trim().toLowerCase();if(q){const items=reservationItems(o.id);const hay=`${o.customer||''} ${o.venue||''} ${o.category||''} ${o.notes||''} ${items.map(i=>i.productName||'').join(' ')}`.toLowerCase();if(!hay.includes(q))return false}return true}
+function mappingLabel(i){if(i.productId)return '商品';if(i.recipeId)return 'レシピ';return '未紐付け'}
+function renderReservationsV9(){if(typeof db==='undefined'||!$('reservationList'))return;const all=db.reservationOrders||[],a=all.filter(resVisible).sort((x,y)=>String(x.date||'').localeCompare(String(y.date||'')));$('reservationCountBadge').textContent=`${a.length}件`;$('reservationResultV9').textContent=`表示 ${a.length}件 / 保持 ${all.length}件`;if(!a.length){$('reservationList').innerHTML='<div class="empty-box">条件に合う予約がありません。</div>';return}$('reservationList').innerHTML=a.map(o=>{const items=reservationItems(o.id),unlinked=items.filter(i=>!i.productId&&!i.recipeId).length,summary=items.slice(0,2).map(i=>i.productName||'商品名未設定').join('・')+(items.length>2?` 他${items.length-2}件`:'');return `<article class="v9-row" data-v9-res="${esc(o.id)}" tabindex="0"><div><div class="v9-row-title">${esc(o.customer||'名称未設定')}</div><div class="v9-row-meta">${esc(o.date||'-')}${o.venue?' / '+esc(o.venue):''}${o.category?' / '+esc(o.category):''}</div><div class="v9-row-sub">${esc(summary||'商品なし')}</div></div><span class="v9-row-badge ${unlinked?'warn':''}">${unlinked?`未紐付 ${unlinked}`:(o.productionStatus==='製造バッチ化済み'?'送信済':'確認')}</span></article>`}).join('')}
+try{renderReservations=renderReservationsV9}catch(e){} window.renderReservations=renderReservationsV9;
+function reservationDetail(id){const o=(db.reservationOrders||[]).find(x=>x.id===id);if(!o)return;const items=reservationItems(id);$('reservationDetailTitleV9').textContent=o.customer||'予約詳細';$('reservationDetailBodyV9').innerHTML=`<div class="v9-detail-block"><div class="v9-detail-grid"><b>日付</b><span>${esc(o.date||'-')}</span><b>区分</b><span>${esc(o.category||'-')}</span><b>会場</b><span>${esc(o.venue||'-')}</span><b>状態</b><span>${esc(o.status||'-')} / ${esc(o.productionStatus||'未送信')}</span><b>メモ</b><span>${esc(o.notes||'-')}</span></div></div><div class="v9-detail-block"><strong>内容 ${items.length}件</strong>${items.map(i=>`<div class="v9-item-line"><div><b>${esc(i.productName||'商品名未設定')}</b><div class="v9-row-sub">${esc(i.quantity||1)}${esc(i.unit||'点')}${i.size?' / '+esc(i.size):''} / ${mappingLabel(i)}</div></div><button type="button" class="v9-link-btn" data-v9-pick-resitem="${esc(i.id)}">${i.productId||i.recipeId?'変更':'紐付け'}</button></div>`).join('')}</div>${o.productionStatus==='製造バッチ化済み'?'':`<button class="btn btn-primary" style="width:100%" data-v9-send-res="${esc(o.id)}" type="button">製造へ送る</button>`}`;openSheet('reservationDetailV9')}
+
+// Direct recipe reservation batch support.
+const baseCreateReservation=typeof createBatchesFromReservation==='function'?createBatchesFromReservation:null;
+if(baseCreateReservation){const enhanced=function(order,items){const direct=(items||[]).filter(i=>i.recipeId&&!i.productId),normal=(items||[]).filter(i=>!i.recipeId||i.productId);if(normal.length)baseCreateReservation(order,normal);direct.forEach(i=>{const r=(db.recipeMasters||[]).find(x=>x.id===i.recipeId);if(!r)return;const q=Number(i.quantity||1),y=Number(r.yieldQuantity||1)||1,scale=Math.ceil((q/y)*100)/100;db.productionBatches.unshift({id:createId('batch'),sourceType:'reservation',sourceOrderId:order.id,sourceOrderItemId:i.id,recipeId:r.id,recipeName:r.name,name:`${r.name} ${scale}倍`,date:order.date||today(),scale,requiredQuantity:q,requiredUnit:i.unit||r.yieldUnit||'',yieldQuantity:r.yieldQuantity||0,yieldUnit:r.yieldUnit||'',materials:scaleRecipeMaterials(r,scale),flows:deepCopy(r.flows||[]),sourceOrders:[{orderId:order.id,customer:order.customer||'',date:order.date||'',productName:i.productName||r.name}],memo:'予約からレシピ直接紐付け',createdAt:new Date().toISOString()})})};try{createBatchesFromReservation=enhanced}catch(e){}window.createBatchesFromReservation=enhanced}
+
+// 3) 共通マスターピッカー：商品/レシピを検索して1タップ紐付け。
+function openPicker(target,type='product'){state.pickerTarget=target;state.pickerType=type;$('masterPickerSearchV9').value='';document.querySelectorAll('[data-picker-type]').forEach(b=>b.classList.toggle('is-active',b.dataset.pickerType===type));renderPicker();openSheet('masterPickerV9')}
+function renderPicker(){const q=$('masterPickerSearchV9')?.value.trim().toLowerCase()||'',list=(state.pickerType==='recipe'?db.recipeMasters:db.productMasters)||[];$('masterPickerTitleV9').textContent=state.pickerType==='recipe'?'レシピから選択':'商品から選択';$('masterPickerResultsV9').innerHTML=list.filter(m=>!q||`${m.name||''} ${m.category||''} ${m.type||''}`.toLowerCase().includes(q)).slice(0,100).map(m=>`<button class="v9-master-row" type="button" data-v9-master-id="${esc(m.id)}"><strong>${esc(m.name||'名称未設定')}</strong><small>${esc(state.pickerType==='recipe'?(m.type||'レシピ'):(m.category||'商品'))}</small></button>`).join('')||'<div class="empty-box">該当なし</div>'}
+function applyPicker(id){const t=state.pickerTarget;if(!t)return;if(t.kind==='order'){const o=(db.orderItems||[]).find(x=>x.id===t.id);if(!o)return;if(state.pickerType==='product'){o.productId=id;delete o.recipeId}else{o.recipeId=id;o.productId=''}if(typeof runAggregate==='function')runAggregate();}
+if(t.kind==='reservation'){const i=(db.reservationOrderItems||[]).find(x=>x.id===t.id);if(!i)return;if(state.pickerType==='product'){i.productId=id;delete i.recipeId}else{i.recipeId=id;i.productId=''};if(typeof persistDb==='function')persistDb();renderReservationsV9();reservationDetail(i.orderId)}closeSheet('masterPickerV9')}
+
+// Aggregate unresolved rows open common picker; remove warning-only dead end.
+const oldRenderLinks=typeof renderLinks==='function'?renderLinks:null;
+function bindAggregateRows(){document.querySelectorAll('#aggregateUnmatchedList .aggregate-link-row').forEach((row,idx)=>{row.onclick=()=>{const u=appState.aggregateResult?.unmatchedItems?.[idx];if(u)openPicker({kind:'order',id:u.orderId},'product')}})}
+const oldRenderAggregateV9=typeof renderAggregate==='function'?renderAggregate:null;
+if(oldRenderAggregateV9){const wrapped=function(){oldRenderAggregateV9();setTimeout(bindAggregateRows,0)};try{renderAggregate=wrapped}catch(e){}window.renderAggregate=wrapped}
+const baseCreateAgg=typeof createBatchesFromAggregate==='function'?createBatchesFromAggregate:null;
+if(baseCreateAgg){const safe=function(){const unresolved=appState.aggregateResult?.unmatchedItems||[];if(unresolved.length){alert(`未紐付けが ${unresolved.length}件あります。先に商品またはレシピへ紐付けてください。`);return}baseCreateAgg()};try{createBatchesFromAggregate=safe}catch(e){}window.createBatchesFromAggregate=safe}
+
+function bind(){
+ $('orderSearchV9')?.addEventListener('input',e=>{state.orderQ=e.target.value;renderOrdersV9()});$('orderDateChipsV9')?.addEventListener('click',e=>{const b=e.target.closest('[data-order-range]');if(!b)return;state.orderRange=b.dataset.orderRange;[...$('orderDateChipsV9').children].forEach(x=>x.classList.toggle('is-active',x===b));renderOrdersV9()});$('orderNewV9')?.addEventListener('click',()=>openOrderEditor(null));$('newOrderBtn')?.addEventListener('click',()=>openOrderEditor(null));$('saveOrderBtn')?.addEventListener('click',()=>setTimeout(()=>{show($('orderEditorCardV9'),false);renderOrdersV9()},0));$('orderList')?.addEventListener('click',e=>{const del=e.target.closest('[data-v9-order-delete]');if(del)return;const row=e.target.closest('[data-v9-order]');if(row){const o=(db.orderItems||[]).find(x=>x.id===row.dataset.v9Order);if(o)openOrderEditor(o)}},true);
+ $('reservationImportToggleV9')?.addEventListener('click',()=>show($('reservationImportCardV9'),$('reservationImportCardV9')?.classList.contains('is-hidden')));$('reservationSearchV9')?.addEventListener('input',e=>{state.resQ=e.target.value;renderReservationsV9()});$('reservationStatusChipsV9')?.addEventListener('click',e=>{const b=e.target.closest('[data-res-range]');if(!b)return;state.resRange=b.dataset.resRange;[...$('reservationStatusChipsV9').children].forEach(x=>x.classList.toggle('is-active',x===b));renderReservationsV9()});$('reservationCategoryChipsV9')?.addEventListener('click',e=>{const b=e.target.closest('[data-res-cat]');if(!b)return;state.resCat=b.dataset.resCat;[...$('reservationCategoryChipsV9').children].forEach(x=>x.classList.toggle('is-active',x===b));renderReservationsV9()});$('reservationList')?.addEventListener('click',e=>{const row=e.target.closest('[data-v9-res]');if(row)reservationDetail(row.dataset.v9Res)});$('reservationDetailBodyV9')?.addEventListener('click',e=>{const p=e.target.closest('[data-v9-pick-resitem]');if(p)openPicker({kind:'reservation',id:p.dataset.v9PickResitem},'product');const send=e.target.closest('[data-v9-send-res]');if(send){closeSheet('reservationDetailV9');sendReservationToProduction(send.dataset.v9SendRes)}});
+ document.querySelectorAll('[data-v9-close]').forEach(x=>x.addEventListener('click',()=>closeSheet(x.dataset.v9Close)));$('masterPickerTypeV9')?.addEventListener('click',e=>{const b=e.target.closest('[data-picker-type]');if(!b)return;state.pickerType=b.dataset.pickerType;document.querySelectorAll('[data-picker-type]').forEach(x=>x.classList.toggle('is-active',x===b));renderPicker()});$('masterPickerSearchV9')?.addEventListener('input',renderPicker);$('masterPickerResultsV9')?.addEventListener('click',e=>{const b=e.target.closest('[data-v9-master-id]');if(b)applyPicker(b.dataset.v9MasterId)});
+ // remove obsolete aggregate button if recreated by other scripts
+ $('createUnlinkedBatchesBtn')?.remove(); renderOrdersV9();renderReservationsV9();if(typeof renderAggregate==='function')renderAggregate();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
 })();
