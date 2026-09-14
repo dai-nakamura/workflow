@@ -1162,71 +1162,7 @@ function printCostTable(){const rows=costRows();if(!rows.length)return alert('�
 
 
 
-<script id="recipe-load-fix-v16">
-(function(){
-'use strict';
-const $=id=>document.getElementById(id);
-function cp(v){try{return JSON.parse(JSON.stringify(v))}catch(e){return v}}
-function setv(id,v){const el=$(id);if(el)el.value=v??''}
-function recipeById(id){return (window.db?.recipeMasters||[]).find(r=>r.id===id)}
-function robustLoadRecipeMaster(id){
-  const recipe=recipeById(id);
-  if(!recipe||typeof window.appState==='undefined')return;
-  appState.currentRecipeId=recipe.id;
-  setv('recipeName',recipe.name||'');
-  setv('recipeType',recipe.type||'試作');
-  setv('recipeDate',recipe.date||(typeof getTodayString==='function'?getTodayString():''));
-  setv('recipeOwner',recipe.owner||'');
-  setv('recipeYieldQuantity',recipe.yieldQuantity??'');
-  const preset=(typeof getRecipeYieldPresetValues==='function')?getRecipeYieldPresetValues():[];
-  if(preset.includes(recipe.yieldUnit)){
-    setv('recipeYieldUnit',recipe.yieldUnit||'個');
-    setv('recipeYieldCustomUnit','');
-  }else{
-    setv('recipeYieldUnit','自由入力');
-    setv('recipeYieldCustomUnit',recipe.yieldUnit||'');
-  }
-  setv('recipeMemo',recipe.memo||'');
-  const bs=recipe.baseSize||{};
-  const shape=recipe.baseShape||bs.shape||((recipe.baseWidth||bs.width||recipe.baseDepth||bs.depth)?'rectangle':'round');
-  setv('recipeBaseShape',shape);
-  setv('recipeBaseDiameter',recipe.baseDiameter??bs.diameter??'');
-  setv('recipeBaseWidth',recipe.baseWidth??bs.width??'');
-  setv('recipeBaseDepth',recipe.baseDepth??bs.depth??'');
-  setv('recipeBaseHeight',recipe.baseHeight??bs.height??'');
-  appState.currentRecipeMaterials=cp(Array.isArray(recipe.materials)?recipe.materials:[]);
-  appState.currentRecipeFlows=cp(Array.isArray(recipe.flows)?recipe.flows:[]);
-  try{if(typeof toggleRecipeBaseSizeFields==='function')toggleRecipeBaseSizeFields()}catch(e){}
-  try{if(typeof toggleRecipeYieldCustomField==='function')toggleRecipeYieldCustomField()}catch(e){}
-  try{if(typeof renderRecipeMaterials==='function')renderRecipeMaterials()}catch(e){console.error(e)}
-  try{if(typeof renderFlows==='function')renderFlows()}catch(e){}
-  try{if(typeof updateEditingLabel==='function')updateEditingLabel()}catch(e){}
-  try{if(typeof updateRecipeCostLabel==='function')updateRecipeCostLabel()}catch(e){}
-  const title=$('recipeEditorTitle');if(title)title.textContent=recipe.name||'レシピ編集';
-  const empty=$('recipeMaterialsEmpty');
-  if(empty&&appState.currentRecipeMaterials.length)empty.classList.add('is-hidden');
-}
-window.loadRecipeMaster=robustLoadRecipeMaster;
-try{loadRecipeMaster=robustLoadRecipeMaster}catch(e){}
 
-// v7で削除した旧サイズ入力を参照する古いコードが残っていても落ちないようにする。
-['targetDiameter','targetHeight'].forEach(id=>{
-  if(!$(id)){
-    const input=document.createElement('input');
-    input.type='hidden';input.id=id;input.setAttribute('aria-hidden','true');
-    document.body.appendChild(input);
-    if(window.els)els[id]=input;
-  }
-});
-
-// 行タップは必ず保存済みレシピをロードしてから表示する。
-$('recipeMasterList')?.addEventListener('click',e=>{
-  if(e.target.closest('.delete-recipe-btn'))return;
-  const row=e.target.closest('[data-recipe-row-id]');if(!row)return;
-  robustLoadRecipeMaster(row.dataset.recipeRowId);
-},true);
-})();
-</script>
 
 </body></html>`);w.document.close()}
 async function file(e){const f=e.target.files&&e.target.files[0];e.target.value='';if(!f)return;if(!f.type.startsWith('image/'))return alert('画像を選択してください。');st.cancel=false;open();Q('#ocrTitle').textContent='画像を読み取り中';const u=URL.createObjectURL(f);Q('#ocrBody').innerHTML=`<div class="ocr-card"><img id="ocrPreview" class="ocr-preview"><p class="ocr-small">画像は外部へ送信しません。</p><button class="btn btn-danger" id="ocrCancel">キャンセル</button></div>`;Q('#ocrPreview').src=u;Q('#ocrCancel').onclick=()=>{st.cancel=true;if(st.worker)st.worker.terminate();st.worker=null;status('キャンセルしました','warn')};try{status('画像を補正しています');progress(.03);const raw=await canvas(f),img=enhance(raw);st.image=raw.toDataURL('image/jpeg',.82);if(!window.Tesseract)throw Error('OCR本体を読み込めません。assets/tesseract の配置を確認してください。');status('ローカルOCR辞書を読み込んでいます');st.worker=await Tesseract.createWorker('jpn+eng',1,{...C,logger:m=>{if(m.status==='recognizing text'){progress(.12+(m.progress||0)*.8);status('文字を読み取り中 '+Math.round((m.progress||0)*100)+'%')}}});const a=await st.worker.recognize(img);await st.worker.terminate();st.worker=null;URL.revokeObjectURL(u);if(!st.cancel)analyze(a.data.text||'','画像OCR')}catch(err){console.error(err);status('OCR失敗：'+err.message+'。jpn.traineddata.gz / eng.traineddata.gz を assets/tesseract/lang-data に配置してください。','err');progress(0)}}
