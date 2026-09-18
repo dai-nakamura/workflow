@@ -221,14 +221,36 @@ function convertReservationAppOrdersToPayload(reservationOrders) {
       return { orders, orderItems };
     }
 
-function isProductionTargetReservation(order) {
-      const status = order.status || '';
-
-      if (status === '納品済み') return false;
-      if (status === '完成') return false;
-
-      return true;
+/* v21: 予約の進行中/処理済み判定を全画面で共通化する。 */
+function normalizeReservationStatus(value) {
+      return String(value ?? '').normalize('NFKC').toLowerCase().replace(/[\s　・_\-／/（）()【】\[\]]/g, '');
     }
+
+function isCompletedReservationStatus(value) {
+      const s = normalizeReservationStatus(value);
+      if (!s) return false;
+      return s.includes('納品済') || s.includes('納品完了') ||
+        s.includes('完成済') || s === '完成' ||
+        s.includes('完了済') || s === '完了' ||
+        s.includes('処理済') || s.includes('対応済') ||
+        s.includes('キャンセル') || s.includes('取消') || s.includes('中止') ||
+        s === 'delivered' || s === 'completed' || s === 'complete' || s === 'done' || s === 'cancelled' || s === 'canceled';
+    }
+
+function isCompletedReservation(order) {
+      if (!order) return false;
+      if (order.isProductionTarget === false) return true;
+      return [order.status, order.productionStatus, order.state, order.progressStatus, order.workflowStatus]
+        .some(isCompletedReservationStatus);
+    }
+
+function isProductionTargetReservation(order) {
+      return !isCompletedReservation(order);
+    }
+
+window.isCompletedReservationStatus = isCompletedReservationStatus;
+window.isCompletedReservation = isCompletedReservation;
+window.isProductionTargetReservation = isProductionTargetReservation;
 
 function renderReservations() {
       if (!els.reservationList) return;
@@ -612,13 +634,13 @@ function getFilteredReservationOrders() {
 
         if (filter === 'all') {
           // OK
-        } else if (filter === 'productionTarget' && order.isProductionTarget === false) {
+        } else if (filter === 'productionTarget' && isCompletedReservation(order)) {
           return false;
         } else if (filter === 'notSent' && productionStatus !== '未送信') {
           return false;
         } else if (filter === 'batched' && productionStatus !== '製造バッチ化済み') {
           return false;
-        } else if (filter === 'delivered' && status !== '納品済み') {
+        } else if (filter === 'delivered' && !isCompletedReservation(order)) {
           return false;
         }
 

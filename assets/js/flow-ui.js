@@ -14,10 +14,10 @@ function isDoneStatus(s){
          x.includes('キャンセル')||x.includes('取消')||x.includes('中止');
 }
 function isDoneReservation(o){
+  if(typeof window.isCompletedReservation==='function')return window.isCompletedReservation(o);
   if(!o)return false;
   if(o.isProductionTarget===false)return true;
-  return [o.status,o.productionStatus,o.state,o.progressStatus,o.workflowStatus]
-    .some(isDoneStatus);
+  return [o.status,o.productionStatus,o.state,o.progressStatus,o.workflowStatus].some(isDoneStatus);
 }
 function armDestructiveButton(btn,armedText,normalText,onConfirm){
   if(!btn)return;
@@ -65,6 +65,7 @@ function cleanupReservations(){
   if(!Array.isArray(db.reservationOrders))db.reservationOrders=[];
   if(!Array.isArray(db.reservationOrderItems))db.reservationOrderItems=[];
   const beforeOrders=db.reservationOrders.length,beforeItems=db.reservationOrderItems.length;
+  const completed=db.reservationOrders.filter(o=>isDoneReservation(o));
   const active=db.reservationOrders.filter(o=>!isDoneReservation(o));
   const keyMap=new Map(), idMap=new Map(), kept=[];
   active.forEach(o=>{
@@ -97,7 +98,7 @@ function cleanupReservations(){
       Object.assign(old,mergeNonEmpty(old,rec),{id:old.id,orderId:oid});
     }
   });
-  db.reservationOrders=kept;
+  db.reservationOrders=[...kept,...completed];
   db.reservationOrderItems=items;
   persist();
   return {removedOrders:beforeOrders-kept.length,removedItems:beforeItems-items.length,orders:kept.length,items:items.length};
@@ -241,9 +242,10 @@ function deleteOrderV10(id){
 /* 予約表示 */
 function resItems(id){return (db.reservationOrderItems||[]).filter(i=>i.orderId===id)}
 function resVisible(o){
-  if(isDoneReservation(o))return false;
-  if(state.resRange==='unsent'&&(o.productionStatus||'未送信')!=='未送信')return false;
-  if(state.resRange==='active'&&o.productionStatus==='製造バッチ化済み')return false;
+  const done=isDoneReservation(o);
+  if(state.resRange==='active'&&done)return false;
+  if(state.resRange==='done'&&!done)return false;
+  if(state.resRange==='unsent'&&(done||(o.productionStatus||'未送信')!=='未送信'))return false;
   if(state.resCat!=='all'&&o.category!==state.resCat)return false;
   const q=norm(state.resQ);
   if(q&&!norm(`${o.customer||''} ${o.venue||''} ${o.category||''} ${o.notes||''} ${resItems(o.id).map(i=>i.productName||'').join(' ')}`).includes(q))return false;
@@ -252,7 +254,7 @@ function resVisible(o){
 function mappingLabel(i){return i.productId?'商品':i.recipeId?'レシピ':'未紐付け'}
 function renderReservationsV10(){
   if(!$('reservationList'))return;
-  const all=(db.reservationOrders||[]).filter(o=>!isDoneReservation(o));
+  const all=(db.reservationOrders||[]);
   const list=all.filter(resVisible).sort((a,b)=>String(a.date||'').localeCompare(String(b.date||'')));
   if($('reservationCountBadge'))$('reservationCountBadge').textContent=`${list.length}件`;
   if($('reservationResultV9'))$('reservationResultV9').textContent=`表示 ${list.length}件 / 保持 ${all.length}件`;
