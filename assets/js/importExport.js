@@ -307,8 +307,6 @@ function importParsedJson(parsed, mode = 'merge') {
         els.recipeBaseWidth.value = recipe.baseWidth || recipe.size?.width || '';
         els.recipeBaseDepth.value = recipe.baseDepth || recipe.size?.depth || '';
 
-        els.targetDiameter.value = '';
-        els.targetHeight.value = '';
 
         toggleRecipeYieldCustomField();
         toggleRecipeBaseSizeFields();

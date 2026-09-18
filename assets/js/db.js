@@ -7,6 +7,9 @@ var db = {
   orders: [],
   orderItems: [],
   productionBatches: [],
+  // 新製造UI用。既存保存キー内へ追加するだけで旧データとの互換性を維持する。
+  productionWorkflowItems: [],
+  productionSheets: [],
   taskMasters: [
     { id: 'task_box_pack', name: '箱詰め', category: '包装', defaultDurationMinutes: 20, equipment: '作業台', canParallel: true, note: '' },
     { id: 'task_finish_cake', name: 'ケーキ仕上げ', category: '仕上げ', defaultDurationMinutes: 30, equipment: '作業台', canParallel: false, note: '' },

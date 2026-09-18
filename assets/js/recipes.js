@@ -20,8 +20,6 @@ function resetRecipeEditor() {
       els.recipeBaseDepth.value = '';
       els.recipeBaseHeight.value = '';
 
-      els.targetDiameter.value = '';
-      els.targetHeight.value = '';
 
       renderReservations();
       closeRecipeMaterialForm();
@@ -110,46 +108,48 @@ function saveRecipeMaster() {
 }
 
 function loadRecipeMaster(id) {
-      const recipe = findRecipe(id);
-      if (!recipe) return;
+  const recipe = findRecipe(id);
+  if (!recipe) return;
 
-      appState.currentRecipeId = recipe.id;
-      els.recipeName.value = recipe.name || '';
-      els.recipeType.value = recipe.type || '試作';
-      els.recipeDate.value = recipe.date || getTodayString();
-      els.recipeOwner.value = recipe.owner || '';
-      els.recipeYieldQuantity.value = recipe.yieldQuantity ?? '';
-      els.recipeMemo.value = recipe.memo || '';
+  appState.currentRecipeId = recipe.id;
+  els.recipeName.value = recipe.name || '';
+  els.recipeType.value = recipe.type || '試作';
+  els.recipeDate.value = recipe.date || getTodayString();
+  els.recipeOwner.value = recipe.owner || '';
+  els.recipeYieldQuantity.value = recipe.yieldQuantity ?? '';
+  els.recipeMemo.value = recipe.memo || '';
 
-      const presetUnits = getRecipeYieldPresetValues();
-      if (presetUnits.includes(recipe.yieldUnit)) {
-        els.recipeYieldUnit.value = recipe.yieldUnit || '個';
-        els.recipeYieldCustomUnit.value = '';
-      } else {
-        els.recipeYieldUnit.value = '自由入力';
-        els.recipeYieldCustomUnit.value = recipe.yieldUnit || '';
-      }
+  const presetUnits = getRecipeYieldPresetValues();
+  if (presetUnits.includes(recipe.yieldUnit)) {
+    els.recipeYieldUnit.value = recipe.yieldUnit || '個';
+    els.recipeYieldCustomUnit.value = '';
+  } else {
+    els.recipeYieldUnit.value = '自由入力';
+    els.recipeYieldCustomUnit.value = recipe.yieldUnit || '';
+  }
 
-      els.recipeBaseDiameter.value = recipe.baseSize?.diameter || '';
-      els.recipeBaseHeight.value = recipe.baseSize?.height || '';
-      els.recipeBaseWidth.value = recipe.baseSize?.width || '';
-      els.recipeBaseDepth.value = recipe.baseSize?.depth || '';
-      els.recipeBaseHeight.value = recipe.baseSize?.height || '';
-      els.targetDiameter.value = '';
-      els.targetHeight.value = '';
+  // 新旧どちらの保存形式でも読めるようにする（保存キー・既存データは変更しない）。
+  const base = recipe.baseSize || {};
+  const shape = recipe.baseShape || base.shape ||
+    ((recipe.baseWidth || base.width || recipe.baseDepth || base.depth) ? 'rectangle' : 'round');
+  els.recipeBaseShape.value = shape;
+  els.recipeBaseDiameter.value = recipe.baseDiameter ?? base.diameter ?? '';
+  els.recipeBaseWidth.value = recipe.baseWidth ?? base.width ?? '';
+  els.recipeBaseDepth.value = recipe.baseDepth ?? base.depth ?? '';
+  els.recipeBaseHeight.value = recipe.baseHeight ?? base.height ?? '';
 
-      toggleRecipeBaseSizeFields();
-      toggleRecipeYieldCustomField();
+  // 材料・工程を先に復元する。旧UI要素が無くてもここで止まらない。
+  appState.currentRecipeMaterials = deepCopy(recipe.materials || []);
+  appState.currentRecipeFlows = deepCopy(recipe.flows || []);
 
-      appState.currentRecipeMaterials = deepCopy(recipe.materials || []);
-      appState.currentRecipeFlows = deepCopy(recipe.flows || []);
-
-      renderRecipeMaterials();
-      renderFlows();
-      updateEditingLabel();
-      updateRecipeCostLabel();
-      activateTab('recipes');
-    }
+  toggleRecipeBaseSizeFields();
+  toggleRecipeYieldCustomField();
+  renderRecipeMaterials();
+  renderFlows();
+  updateEditingLabel();
+  updateRecipeCostLabel();
+  activateTab('recipes');
+}
 
 function deleteRecipeMaster(id) { if (!confirm('このレシピを削除しますか？')) return; db.recipeMasters = db.recipeMasters.filter(x => x.id !== id); if (appState.currentRecipeId === id) resetRecipeEditor(); refreshAll(); }
 
@@ -190,28 +190,6 @@ function calcSizeScale(baseSize, targetSize) {
   return round2((targetDiameter / baseDiameter) ** 2 * (targetH / baseH));
 }
 
-function scaleRecipeBySize() {
-  const baseD = Number(els.recipeBaseDiameter.value);
-  const baseH = Number(els.recipeBaseHeight.value) || 1;
-  const targetD = Number(els.targetDiameter.value);
-  const targetH = Number(els.targetHeight.value) || baseH;
-  if (!baseD || !targetD) {
-    alert('直径を入力してください');
-    return;
-  }
-  const scale = (targetD / baseD) ** 2 * (targetH / baseH);
-  appState.currentRecipeMaterials = appState.currentRecipeMaterials.map(m => ({
-    ...m,
-    amountValue: round2(Number(m.amountValue || 0) * scale)
-  }));
-  els.recipeBaseDiameter.value = targetD || '';
-  els.recipeBaseHeight.value = targetH || '';
-  els.targetDiameter.value = '';
-  els.targetHeight.value = '';
-  renderRecipeMaterials();
-  updateRecipeCostLabel();
-  alert(`倍率 ${scale.toFixed(2)}倍 に変換しました`);
-}
 function relinkAllRecipeMaterials() {
   db.recipeMasters = db.recipeMasters.map(recipe => ({
     ...recipe,
@@ -366,7 +344,7 @@ function getRecipeCalcTargetSize() {
       shape: 'rectangle',
       width: Number(els.recipeCalcTargetWidth.value || 0),
       depth: Number(els.recipeCalcTargetDepth.value || 0),
-      height: Number(els.recipeCalcTargetHeight.value || els.recipeBaseHeight.value || 1)
+      height: Number(els.recipeCalcTargetRectHeight.value || els.recipeBaseHeight.value || 1)
     };
   }
 

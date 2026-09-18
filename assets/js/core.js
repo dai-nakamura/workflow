@@ -5,7 +5,7 @@ var els = window.els;
     [
       'storageStatus', 'currentEditingLabel', 'matName', 'matBaseAmount', 'matBaseUnit', 'matBasePrice', 'matCategory', 'matSupplier', 'matNote', 'materialsMasterList', 'materialsMasterCountBadge',
       'recipeName', 'recipeType', 'recipeDate', 'recipeOwner', 'recipeYieldQuantity', 'recipeYieldUnit', 'recipeYieldCustomField', 'recipeYieldCustomUnit', 'recipeMemo', 'recipeCostLabel', 'recipeMaterialsList', 'recipeMaterialsEmpty', 'recipeMaterialFormCard', 'recipeMaterialFilterCategory', 'recipeMaterialSelect', 'recipeMaterialAmountValue', 'recipeMaterialAmountUnit', 'recipeMaterialNote', 'flowList', 'flowEmpty', 'flowFormCard', 'flowTitle', 'flowDescription', 'flowDurationMinutes', 'flowType', 'flowCanParallel', 'flowEquipment', 'flowChecks', 'recipeMasterList', 'recipeCountBadge', 'recipeBaseDiameter', 'recipeBaseHeight',
-      'recipeBaseShape', 'recipeBaseWidth', 'recipeBaseDepth', 'recipeRoundSizeRow', 'recipeRectangleSizeRow', 'productConponent', 'productConponentShape', 'productConponentWidth', 'productConponentDepth', 'productConponentRoundSizeRow', 'productConponentRectangleSizeRow', 'targetDiameter', 'targetHeight', 'scaleRecipeBtn',
+      'recipeBaseShape', 'recipeBaseWidth', 'recipeBaseDepth', 'recipeRoundSizeRow', 'recipeRectangleSizeRow', 'productConponent', 'productConponentShape', 'productConponentWidth', 'productConponentDepth', 'productConponentRoundSizeRow', 'productConponentRectangleSizeRow',
       'productName', 'productCategory', 'productUnitLabel', 'productNote', 'productComponentsList', 'productComponentsEmpty', 'productComponentFormCard', 'productComponentSourceType', 'productComponentRefSelect', 'productComponentQuantity', 'productComponentUnit', 'productList', 'productCountBadge', 'productComponentDiameter', 'productComponentHeight',
       'orderDate', 'orderProductSelect', 'orderQuantity', 'orderUnit', 'orderCustomer', 'orderMemo', 'orderList', 'orderCountBadge',
       'aggregateRecipeList', 'aggregateTaskList', 'aggregateRecipeCountBadge', 'aggregateTaskCountBadge', 'batchList', 'batchCountBadge', 'batchDetailView',
@@ -155,7 +155,6 @@ function bindEvents() {
       els.assignMode.addEventListener('change', renderAssignMode);
       document.getElementById('confirmAssignBtn').addEventListener('click', confirmAssignToPlanner);
       document.getElementById('cancelAssignBtn').addEventListener('click', closeAssignModal);
-      document.getElementById('scaleRecipeBtn').addEventListener('click', scaleRecipeBySize);
       els.recipeYieldUnit.addEventListener('change', toggleRecipeYieldCustomField);
       document.getElementById('createUnlinkBatchesFromOrderItems');
       els.recipeBaseShape.addEventListener('change', toggleRecipeBaseSizeFields);
