@@ -294,7 +294,10 @@ function applyPicker(id){
     persist();runAggregateV10();renderOrdersV10();
   }else if(t.kind==='reservation'){
     const i=(db.reservationOrderItems||[]).find(x=>x.id===t.id);if(!i)return;
-    if(state.pickerType==='product'){i.productId=id;delete i.recipeId}else{i.recipeId=id;i.productId=''}
+    if(state.pickerType==='product'){
+      i.productId=id;delete i.recipeId;
+      if(typeof window.linkSameNameReservationItems==='function') window.linkSameNameReservationItems(i.id,id);
+    }else{i.recipeId=id;i.productId=''}
     persist();renderReservationsV10();reservationDetail(i.orderId);
   }
   closeSheet('masterPickerV9');
@@ -394,7 +397,6 @@ function createBatchesV10(){
   persist();
   if(typeof renderBatchList==='function')renderBatchList();
   if(made>0){
-    if(typeof activateTab==='function')activateTab('production');
     alert(`製造バッチを ${made}件作成しました。${skip?`\n作成済み ${skip}件は重複作成しませんでした。`:''}${missing?`\nレシピが見つからない項目 ${missing}件は作成できませんでした。`:''}`);
   }else{
     alert(skip?`すべて作成済みです（${skip}件）。`:`製造バッチを作成できませんでした。${missing?` レシピ参照切れ ${missing}件。`:''}`);
@@ -434,7 +436,7 @@ function sendReservationV10(orderId){
       if(typeof createReservationLinkedBatch==='function')createReservationLinkedBatch(order,i);
     }
   });
-  order.productionStatus='製造バッチ化済み';persist();renderReservationsV10();if(typeof renderBatchList==='function')renderBatchList();closeSheet('reservationDetailV9');if(typeof activateTab==='function')activateTab('production');alert('予約から製造バッチを作成しました。');
+  order.productionStatus='製造バッチ化済み';persist();renderReservationsV10();if(typeof renderBatchList==='function')renderBatchList();closeSheet('reservationDetailV9');alert('予約から製造バッチを作成しました。現在の画面に留まります。');
 }
 
 function bind(){

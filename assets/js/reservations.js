@@ -10,6 +10,7 @@ function importReservationData(payload, mode = 'merge') {
         db.reservationOrderItems = mergeById(db.reservationOrderItems, orderItems, 'resitem');
       }
 
+      autoLinkExactReservationItems();
       refreshAll();
       renderReservations();
 
@@ -62,11 +63,64 @@ function handleImportReservationJson(mode = 'merge') {
       }
     }
 
+function normalizeReservationProductName(value) {
+      return String(value || '').normalize('NFKC').trim().toLowerCase().replace(/[\s　]+/g, '');
+    }
+
+function autoLinkExactReservationItems(productId = '') {
+      if (!Array.isArray(db?.reservationOrderItems) || !Array.isArray(db?.productMasters)) return 0;
+      const products = productId ? db.productMasters.filter(p => p.id === productId) : db.productMasters;
+      const byName = new Map();
+      products.forEach(product => {
+        const key = normalizeReservationProductName(product.name);
+        if (key && !byName.has(key)) byName.set(key, product);
+      });
+      let changed = 0;
+      db.reservationOrderItems.forEach(item => {
+        if (item.productId || item.recipeId) return;
+        const key = normalizeReservationProductName(item.productName || item.name);
+        const product = byName.get(key);
+        if (!product) return;
+        item.productId = product.id;
+        item.unit = item.unit || product.unitLabel || '点';
+        changed++;
+      });
+      if (changed && typeof persistDb === 'function') persistDb();
+      return changed;
+    }
+
+function linkSameNameReservationItems(itemId, productId) {
+      const source = db.reservationOrderItems.find(x => x.id === itemId);
+      const product = db.productMasters.find(x => x.id === productId);
+      if (!source || !product) return 0;
+      const sourceKey = normalizeReservationProductName(source.productName || source.name);
+      if (!sourceKey) return 0;
+      let changed = 0;
+      db.reservationOrderItems.forEach(item => {
+        if (normalizeReservationProductName(item.productName || item.name) !== sourceKey) return;
+        if (item.productId === productId && !item.recipeId) return;
+        item.productId = productId;
+        item.recipeId = '';
+        item.unit = item.unit || product.unitLabel || '点';
+        changed++;
+      });
+      if (changed && typeof persistDb === 'function') persistDb();
+      return changed;
+    }
+
+window.autoLinkExactReservationItems = autoLinkExactReservationItems;
+window.linkSameNameReservationItems = linkSameNameReservationItems;
+
 function findProductIdByReservationItem(item) {
       const name = String(item.name || item.productName || '').trim();
       const type = String(item.type || item.category || '').trim();
 
       if (!name && !type) return '';
+
+      const exact = db.productMasters.find(product =>
+        normalizeReservationProductName(product.name) === normalizeReservationProductName(name)
+      );
+      if (exact) return exact.id;
 
       const byAlias = db.productMasters.find(product =>
         (product.aliases || []).some(alias => {
@@ -77,12 +131,6 @@ function findProductIdByReservationItem(item) {
       );
 
       if (byAlias) return byAlias.id;
-
-      const exact = db.productMasters.find(product =>
-        String(product.name || '').trim() === name
-      );
-
-      if (exact) return exact.id;
 
       const loose = db.productMasters.find(product => {
         const productName = String(product.name || '').trim();
@@ -411,6 +459,7 @@ function handleReservationProductLinkChange(e) {
       if (!item) return;
 
       item.productId = productId;
+      if (productId) linkSameNameReservationItems(itemId, productId);
 
       const product = db.productMasters.find(p => p.id === productId);
       if (product) {
@@ -442,8 +491,7 @@ function sendReservationToProduction(orderId) {
       createBatchesFromReservation(order, items);
       order.productionStatus = '製造バッチ化済み';
       refreshAll();
-      activateTab('production');
-      alert('予約から製造バッチを作成しました。');
+      alert('予約から製造バッチを作成しました。現在の画面に留まります。');
     }
 
 function createBatchesFromReservation(order, items) {

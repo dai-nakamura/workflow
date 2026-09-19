@@ -188,8 +188,13 @@ function saveProductMaster() {
   if (idx === -1) db.productMasters.unshift(product);
   else db.productMasters[idx] = product;
   appState.currentProductId = product.id;
+  const linkedCount = typeof window.autoLinkExactReservationItems === 'function'
+    ? window.autoLinkExactReservationItems(product.id)
+    : 0;
   refreshAll();
-  alert('商品を保存しました。');
+  alert(linkedCount
+    ? `商品を保存しました。同名の未紐付け予約 ${linkedCount}件を自動で紐付けました。`
+    : '商品を保存しました。');
 }
 
 function loadProductMaster(id) {
