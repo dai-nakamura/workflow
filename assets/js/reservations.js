@@ -67,21 +67,48 @@ function normalizeReservationProductName(value) {
       return String(value || '').normalize('NFKC').trim().toLowerCase().replace(/[\s　]+/g, '');
     }
 
+// 商品マスターの正式名・別名を同じ規則で索引化する。
+// 同じ呼び名が複数商品に登録されている場合は自動決定しない。
+function buildReservationProductNameIndex() {
+      const index = new Map();
+      (db?.productMasters || []).forEach(product => {
+        const names = [product.name, ...(Array.isArray(product.aliases) ? product.aliases : [])];
+        [...new Set(names.map(normalizeReservationProductName).filter(Boolean))].forEach(key => {
+          if (!index.has(key)) index.set(key, []);
+          index.get(key).push(product);
+        });
+      });
+      return index;
+    }
+
+function findUniqueProductByReservationName(value) {
+      const key = normalizeReservationProductName(value);
+      if (!key) return { product: null, ambiguous: false, candidates: [] };
+      const candidates = buildReservationProductNameIndex().get(key) || [];
+      return {
+        product: candidates.length === 1 ? candidates[0] : null,
+        ambiguous: candidates.length > 1,
+        candidates
+      };
+    }
+
 function autoLinkExactReservationItems(productId = '') {
       if (!Array.isArray(db?.reservationOrderItems) || !Array.isArray(db?.productMasters)) return 0;
-      const products = productId ? db.productMasters.filter(p => p.id === productId) : db.productMasters;
-      const byName = new Map();
-      products.forEach(product => {
-        const key = normalizeReservationProductName(product.name);
-        if (key && !byName.has(key)) byName.set(key, product);
-      });
+      const index = buildReservationProductNameIndex();
       let changed = 0;
       db.reservationOrderItems.forEach(item => {
-        if (item.productId || item.recipeId) return;
+        const links = Array.isArray(item.productionLinks) ? item.productionLinks : [];
+        if (item.productId || item.recipeId || links.length) return;
         const key = normalizeReservationProductName(item.productName || item.name);
-        const product = byName.get(key);
-        if (!product) return;
+        if (!key) return;
+        const candidates = index.get(key) || [];
+        // 正式名/別名が複数商品に重複している場合は誤紐付け防止のため確認待ち。
+        if (candidates.length !== 1) return;
+        const product = candidates[0];
+        if (productId && product.id !== productId) return;
         item.productId = product.id;
+        item.recipeId = '';
+        item.productionLinks = [{ type:'product', refId:product.id, quantity:1 }];
         item.unit = item.unit || product.unitLabel || '点';
         changed++;
       });
@@ -98,9 +125,14 @@ function linkSameNameReservationItems(itemId, productId) {
       let changed = 0;
       db.reservationOrderItems.forEach(item => {
         if (normalizeReservationProductName(item.productName || item.name) !== sourceKey) return;
-        if (item.productId === productId && !item.recipeId) return;
+        const links = Array.isArray(item.productionLinks) ? item.productionLinks : [];
+        if (item.productId === productId && !item.recipeId && links.length === 1 && links[0].type === 'product' && links[0].refId === productId) return;
+        // 手動で同じ予約名を商品へ紐付けた場合は、その予約名の未紐付け分にも一括適用。
+        // 既に複数製造内容を設定済みの予約は上書きしない。
+        if (item.productId || item.recipeId || links.length) return;
         item.productId = productId;
         item.recipeId = '';
+        item.productionLinks = [{ type:'product', refId:productId, quantity:1 }];
         item.unit = item.unit || product.unitLabel || '点';
         changed++;
       });
@@ -108,37 +140,44 @@ function linkSameNameReservationItems(itemId, productId) {
       return changed;
     }
 
+window.normalizeReservationProductName = normalizeReservationProductName;
+window.findUniqueProductByReservationName = findUniqueProductByReservationName;
 window.autoLinkExactReservationItems = autoLinkExactReservationItems;
 window.linkSameNameReservationItems = linkSameNameReservationItems;
 
+
+function getReservationProductionLinks(item) {
+  if (!item) return [];
+  if (!Array.isArray(item.productionLinks)) item.productionLinks = [];
+  if (!item.productionLinks.length) {
+    if (item.productId) item.productionLinks.push({ type:'product', refId:item.productId, quantity:1 });
+    else if (item.recipeId) item.productionLinks.push({ type:'recipe', refId:item.recipeId, quantity:1 });
+  }
+  return item.productionLinks;
+}
+
+function productionLinkName(link) {
+  if (link.type === 'recipe') return db.recipeMasters.find(x=>x.id===link.refId)?.name || 'レシピ参照切れ';
+  return db.productMasters.find(x=>x.id===link.refId)?.name || '商品参照切れ';
+}
+
+function syncLegacyReservationLink(item) {
+  const links=getReservationProductionLinks(item);
+  const firstProduct=links.find(x=>x.type==='product');
+  const firstRecipe=links.find(x=>x.type==='recipe');
+  item.productId=firstProduct?.refId || '';
+  item.recipeId=!firstProduct && firstRecipe ? firstRecipe.refId : '';
+}
+
+function removeReservationProductionLink(itemId,index) {
+  const item=db.reservationOrderItems.find(x=>x.id===itemId); if(!item)return;
+  getReservationProductionLinks(item).splice(Number(index),1); syncLegacyReservationLink(item); persistDb(); renderReservations();
+}
+window.removeReservationProductionLink=removeReservationProductionLink;
 function findProductIdByReservationItem(item) {
       const name = String(item.name || item.productName || '').trim();
-      const type = String(item.type || item.category || '').trim();
-
-      if (!name && !type) return '';
-
-      const exact = db.productMasters.find(product =>
-        normalizeReservationProductName(product.name) === normalizeReservationProductName(name)
-      );
-      if (exact) return exact.id;
-
-      const byAlias = db.productMasters.find(product =>
-        (product.aliases || []).some(alias => {
-          const keyword = String(alias || '').trim();
-          if (!keyword) return false;
-          return name.includes(keyword) || keyword.includes(name) || type.includes(keyword);
-        })
-      );
-
-      if (byAlias) return byAlias.id;
-
-      const loose = db.productMasters.find(product => {
-        const productName = String(product.name || '').trim();
-        if (!productName) return false;
-        return name.includes(productName) || productName.includes(name);
-      });
-
-      return loose ? loose.id : '';
+      const result = findUniqueProductByReservationName(name);
+      return result.product ? result.product.id : '';
     }
 
 function parseSquareSize(text) {
@@ -390,31 +429,18 @@ ${item.sizeMode
             : ' / 未紐付け'}
               </div>
 
-              <label class="field" style="margin-top:10px;">
-                <span class="field-label">
-                  商品マスター紐付け
-                </span>
-
-                <select
-                  class="reservation-product-select"
-                  data-id="${item.id}">
-
-                  <option value="">
-                    未紐付け
-                  </option>
-
-                  ${db.productMasters.map(product => `
-                    <option
-                      value="${product.id}"
-                      ${item.productId === product.id ? 'selected' : ''}>
-
-                      ${escapeHtml(product.name)}
-
-                    </option>
-                  `).join('')}
-
+              <div class="field" style="margin-top:10px;">
+                <span class="field-label">製造内容の紐付け（複数可）</span>
+                <div class="reservation-production-links">
+                  ${getReservationProductionLinks(item).map((link,idx)=>`<span class="reservation-production-link">${escapeHtml(productionLinkName(link))}<button type="button" onclick="event.stopPropagation();removeReservationProductionLink('${item.id}',${idx})" aria-label="削除">×</button></span>`).join('') || '<span class="record-sub">未紐付け</span>'}
+                </div>
+                <select class="reservation-product-select" data-id="${item.id}">
+                  <option value="">＋ 製造内容を追加</option>
+                  <optgroup label="商品マスター">${db.productMasters.map(product => `<option value="product:${product.id}">${escapeHtml(product.name)}</option>`).join('')}</optgroup>
+                  <optgroup label="レシピ">${db.recipeMasters.map(recipe => `<option value="recipe:${recipe.id}">${escapeHtml(recipe.name)}</option>`).join('')}</optgroup>
                 </select>
-              </label>
+                <div class="reservation-link-help">固定商品は商品マスター、特注・AT・ウェルカムフルーツ等は必要な商品/レシピを複数追加できます。</div>
+              </div>
 
             </div>
           `).join('')}
@@ -449,26 +475,16 @@ ${order.productionStatus === '製造バッチ化済み'
     }
 
 function handleReservationProductLinkChange(e) {
-      const select = e.target.closest('.reservation-product-select');
-      if (!select) return;
-
-      const itemId = select.dataset.id;
-      const productId = select.value;
-
-      const item = db.reservationOrderItems.find(x => x.id === itemId);
-      if (!item) return;
-
-      item.productId = productId;
-      if (productId) linkSameNameReservationItems(itemId, productId);
-
-      const product = db.productMasters.find(p => p.id === productId);
-      if (product) {
-        item.productName = item.productName || product.name || '';
-        item.unit = item.unit || product.unitLabel || '点';
-      }
-
-      refreshAll();
-    }
+  const select=e.target.closest('.reservation-product-select'); if(!select)return;
+  const item=db.reservationOrderItems.find(x=>x.id===select.dataset.id); if(!item||!select.value)return;
+  const [type,refId]=select.value.split(':'); if(!refId)return;
+  const links=getReservationProductionLinks(item);
+  if(!links.some(x=>x.type===type&&x.refId===refId)) links.push({type,refId,quantity:1});
+  syncLegacyReservationLink(item);
+  // 商品を1件目として選んだ場合だけ、従来どおり同名予約へ一括紐付け。複数構成は予約固有として勝手に横展開しない。
+  if(type==='product' && links.length===1) linkSameNameReservationItems(item.id,refId);
+  persistDb(); renderReservations();
+}
 
 function sendReservationToProduction(orderId) {
       const order = db.reservationOrders.find(o => o.id === orderId);
@@ -506,11 +522,13 @@ function createBatchesFromReservation(order, items) {
         }
       }
       items.forEach(item => {
-        if (item.productId) {
-          createReservationLinkedBatch(order, item);
-        } else {
-          createReservationTemporaryBatch(order, item);
-        }
+        const links=getReservationProductionLinks(item);
+        if (links.length) {
+          links.forEach(link=>{
+            const linked={...item, quantity:Number(item.quantity||1)*Number(link.quantity||1), productId:link.type==='product'?link.refId:'', recipeId:link.type==='recipe'?link.refId:''};
+            if(linked.productId) createReservationLinkedBatch(order,linked); else createReservationTemporaryBatch(order,linked);
+          });
+        } else createReservationTemporaryBatch(order,item);
       });
     }
 

@@ -73,7 +73,7 @@ function refreshProductComponentRefSelect() {
 
 function openAddProductComponentForm() {
       appState.editingProductComponentIndex = null; els.productComponentSourceType.value = 'recipe'; refreshProductComponentRefSelect(); els.productComponentRefSelect.value = ''; els.productComponentQuantity.value = '1'; els.productComponentUnit.value = ''; els.productComponentFormCard.classList.remove('is-hidden'); els.productComponentDiameter.value = '';
-      els.productComponentHeight.value = '';
+      els.productComponentHeight.value = ''; els.productComponentWidth.value=''; els.productComponentDepth.value=''; els.productComponentShape.value='round'; toggleproductConponentSizeFields();
     }
 
 function closeProductComponentForm() {
@@ -135,10 +135,9 @@ function renderProductComponents() {
       els.productComponentsEmpty.classList.add('is-hidden');
 
       appState.currentProductComponents.forEach((item, index) => {
-        const sizeText =
-          item.size?.diameter
-            ? ` / サイズ: ${item.size.diameter}mm${item.size?.height ? `×${item.size.height}mm` : ''}`
-            : '';
+        const sizeText = item.size?.shape === 'rectangle'
+          ? ((item.size?.width || item.size?.depth) ? ` / サイズ: ${item.size.width || '-'}×${item.size.depth || '-'}mm${item.size?.height ? ` 高さ${item.size.height}mm` : ''}` : '')
+          : (item.size?.diameter ? ` / サイズ: φ${item.size.diameter}mm${item.size?.height ? ` 高さ${item.size.height}mm` : ''}` : '');
 
         const card = document.createElement('article');
         card.className = 'item-card';
@@ -157,14 +156,31 @@ function renderProductComponents() {
     }
 
 function handleProductComponentsListClick(e) {
-      const edit = e.target.closest('.edit-productcomponent-btn'); const del = e.target.closest('.delete-productcomponent-btn'); if (edit) { const idx = Number(edit.dataset.index); const item = appState.currentProductComponents[idx]; if (!item) return; appState.editingProductComponentIndex = idx; els.productComponentSourceType.value = item.sourceType; const editRecipe = e.target.closest('.edit-component-recipe-btn');
-
-if (editRecipe) {
-  editRecipeFromProductComponent(editRecipe.dataset.id);
-  return;
-}refreshProductComponentRefSelect(); els.productComponentRefSelect.value = item.refId || ''; els.productComponentQuantity.value = item.quantity ?? 1; els.productComponentUnit.value = item.unit || ''; els.productComponentFormCard.classList.remove('is-hidden'); } if (del) { appState.currentProductComponents.splice(Number(del.dataset.index), 1); renderProductComponents(); } els.productComponentDiameter.value = item.size?.diameter || '';
-      els.productComponentHeight.value = item.size?.height || '';
-    }
+  const edit = e.target.closest('.edit-productcomponent-btn');
+  const del = e.target.closest('.delete-productcomponent-btn');
+  if (edit) {
+    const idx = Number(edit.dataset.index);
+    const item = appState.currentProductComponents[idx];
+    if (!item) return;
+    appState.editingProductComponentIndex = idx;
+    els.productComponentSourceType.value = item.sourceType || 'recipe';
+    refreshProductComponentRefSelect();
+    els.productComponentRefSelect.value = item.refId || '';
+    els.productComponentQuantity.value = item.quantity ?? 1;
+    els.productComponentUnit.value = item.unit || '';
+    els.productComponentShape.value = item.size?.shape || 'round';
+    els.productComponentDiameter.value = item.size?.diameter || '';
+    els.productComponentWidth.value = item.size?.width || '';
+    els.productComponentDepth.value = item.size?.depth || '';
+    els.productComponentHeight.value = item.size?.height || '';
+    toggleproductConponentSizeFields();
+    els.productComponentFormCard.classList.remove('is-hidden');
+  }
+  if (del) {
+    appState.currentProductComponents.splice(Number(del.dataset.index), 1);
+    renderProductComponents();
+  }
+}
 
 function saveProductMaster() {
   const name = els.productName.value.trim();
@@ -188,12 +204,14 @@ function saveProductMaster() {
   if (idx === -1) db.productMasters.unshift(product);
   else db.productMasters[idx] = product;
   appState.currentProductId = product.id;
+  // 正式名だけでなく登録済みの別名も含めて、既存の未紐付け予約を再判定する。
+  // 呼び名が複数の商品マスターに重複する場合は自動紐付けしない。
   const linkedCount = typeof window.autoLinkExactReservationItems === 'function'
     ? window.autoLinkExactReservationItems(product.id)
     : 0;
   refreshAll();
   alert(linkedCount
-    ? `商品を保存しました。同名の未紐付け予約 ${linkedCount}件を自動で紐付けました。`
+    ? `商品を保存しました。正式名・別名が一致した未紐付け予約 ${linkedCount}件を自動で紐付けました。`
     : '商品を保存しました。');
 }
 
@@ -313,30 +331,123 @@ function duplicateProductToEditor(productId) {
       alert('商品を複製しました。名前を変更して保存してください。');
     }
 
-function calcProductCost(product) {
-      let totalCost = 0;
+function normalizeCostUnit(unit) {
+  const raw = String(unit || '').trim();
+  const lower = raw.toLowerCase();
+  if (lower === 'g' || raw === 'ｇ') return 'g';
+  if (lower === 'kg' || raw === '㎏') return 'kg';
+  if (lower === 'ml' || raw === '㎖') return 'ml';
+  if (lower === 'l' || raw === 'ℓ') return 'l';
+  return raw;
+}
 
-      (product.components || []).forEach(component => {
-        if (component.sourceType !== 'recipe') return;
+function convertCostAmount(amount, fromUnit, toUnit) {
+  const value = Number(amount || 0);
+  const from = normalizeCostUnit(fromUnit);
+  const to = normalizeCostUnit(toUnit);
+  if (!from || !to || from === to) return value;
 
-        const recipe = findRecipe(component.refId);
-        if (!recipe) return;
+  const mass = { g: 1, kg: 1000 };
+  const volume = { ml: 1, l: 1000 };
+  if (mass[from] && mass[to]) return value * mass[from] / mass[to];
+  if (volume[from] && volume[to]) return value * volume[from] / volume[to];
+  return null;
+}
 
-        const recipeCost = calculateRecipeCost(recipe);
-        const quantity = Number(component.quantity || 1);
+function hasComponentSize(size) {
+  if (!size) return false;
+  return Number(size.diameter || 0) > 0 ||
+    (Number(size.width || 0) > 0 && Number(size.depth || 0) > 0);
+}
 
-        totalCost += recipeCost * quantity;
-      });
+function calcProductComponentCost(component, visitedProductIds = new Set()) {
+  const quantity = Number(component?.quantity || 0);
+  if (!component || !component.sourceType) return { cost: 0, scale: 0, note: '構成情報なし' };
 
-      const salePrice = Number(product.salePrice || els.productSalePrice?.value || 0);
+  if (component.sourceType === 'material') {
+    const material = db.materialsMaster.find(m => m.id === component.refId);
+    if (!material) return { cost: 0, scale: 0, note: '材料未登録' };
+    const converted = convertCostAmount(quantity, component.unit, material.baseUnit);
+    if (converted === null) return { cost: 0, scale: 0, note: `単位不一致: ${component.unit || '-'} → ${material.baseUnit || '-'}` };
+    return {
+      cost: unitCostFromMaterial(material) * converted,
+      scale: converted,
+      note: `${round2(converted)}${material.baseUnit || ''}`
+    };
+  }
 
-      return {
-        cost: totalCost,
-        salePrice,
-        costRate: salePrice > 0 ? (totalCost / salePrice) * 100 : 0,
-        profit: salePrice - totalCost
-      };
+  if (component.sourceType === 'recipe') {
+    const recipe = findRecipe(component.refId);
+    if (!recipe) return { cost: 0, scale: 0, note: 'レシピ未登録' };
+
+    const recipeCost = Number(calculateRecipeCost(recipe) || 0);
+    const yieldQuantity = Number(recipe.yieldQuantity || 0);
+    let requiredQuantity = quantity;
+    let unitNote = '';
+
+    if (yieldQuantity > 0 && component.unit && recipe.yieldUnit) {
+      const converted = convertCostAmount(quantity, component.unit, recipe.yieldUnit);
+      if (converted !== null) {
+        requiredQuantity = converted;
+        unitNote = `${round2(converted)}${recipe.yieldUnit}`;
+      } else if (normalizeCostUnit(component.unit) !== normalizeCostUnit(recipe.yieldUnit)) {
+        return { cost: 0, scale: 0, note: `単位不一致: ${component.unit} → ${recipe.yieldUnit}` };
+      }
     }
+
+    const quantityScale = yieldQuantity > 0 ? requiredQuantity / yieldQuantity : requiredQuantity;
+    const sizeScale = hasComponentSize(component.size) && recipe.baseSize
+      ? Number(calcSizeScale(recipe.baseSize, component.size) || 1)
+      : 1;
+    const scale = quantityScale * sizeScale;
+
+    return {
+      cost: recipeCost * scale,
+      scale,
+      note: `${round2(scale)}倍${unitNote ? ` (${unitNote} / 出来高${round2(yieldQuantity)}${recipe.yieldUnit || ''})` : ''}`
+    };
+  }
+
+  if (component.sourceType === 'product') {
+    const nested = findProduct(component.refId);
+    if (!nested || visitedProductIds.has(nested.id)) return { cost: 0, scale: 0, note: '商品参照エラー' };
+    const nextVisited = new Set(visitedProductIds);
+    nextVisited.add(nested.id);
+    const nestedCost = calcProductCost(nested, nextVisited).cost;
+    return { cost: nestedCost * quantity, scale: quantity, note: `${round2(quantity)}倍` };
+  }
+
+  return { cost: 0, scale: quantity, note: '原価対象外' };
+}
+
+function calcProductCost(product, visitedProductIds = new Set()) {
+  const ownVisited = new Set(visitedProductIds);
+  if (product?.id) ownVisited.add(product.id);
+
+  const breakdown = (product.components || []).map(component => {
+    const result = calcProductComponentCost(component, ownVisited);
+    return {
+      name: component.name || resolveComponentName(component.sourceType, component.refId) || '名称未設定',
+      sourceType: component.sourceType || '',
+      quantity: Number(component.quantity || 0),
+      unit: component.unit || '',
+      cost: round2(result.cost || 0),
+      scale: result.scale,
+      note: result.note || ''
+    };
+  });
+
+  const totalCost = round2(breakdown.reduce((sum, item) => sum + Number(item.cost || 0), 0));
+  const salePrice = Number(product.salePrice || 0);
+
+  return {
+    cost: totalCost,
+    salePrice,
+    costRate: salePrice > 0 ? (totalCost / salePrice) * 100 : 0,
+    profit: salePrice - totalCost,
+    breakdown
+  };
+}
 
 function previewCurrentProductCost() {
   const product = {
@@ -344,7 +455,11 @@ function previewCurrentProductCost() {
     components: deepCopy(appState.currentProductComponents)
   };
   const result = calcProductCost(product);
+  const lines = (result.breakdown || []).map(item =>
+    `${item.name}: ${round2(item.cost)}円${item.note ? ` / ${item.note}` : ''}`
+  );
   alert(
+    `${lines.length ? lines.join('\n') + '\n\n' : ''}` +
     `概算原価: ${round2(result.cost)}円\n` +
     `売価: ${round2(result.salePrice)}円\n` +
     `原価率: ${round2(result.costRate)}%\n` +

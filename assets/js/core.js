@@ -220,14 +220,9 @@ function toggleRecipeBaseSizeFields() {
 
 function toggleproductConponentSizeFields() {
       const isRectangle = els.productComponentShape.value === 'rectangle';
-
-      if (els.productComponentSizeRow) {
-        // 今は全体は表示したまま
-      }
-
-      if (els.productComponentRectangleSizeRow) {
-        els.productComponentRectangleSizeRow.classList.toggle('is-hidden', !isRectangle);
-      }
+      const roundRow = document.getElementById('productComponentRoundSizeRow');
+      if (roundRow) roundRow.classList.toggle('is-hidden', isRectangle);
+      if (els.productComponentRectangleSizeRow) els.productComponentRectangleSizeRow.classList.toggle('is-hidden', !isRectangle);
     }
 
 function refreshAll() { renderMaterialsMasterList(); renderRecipeMaterials(); renderFlows(); renderRecipeMasterList(); renderProductComponents(); renderProductList(); renderOrderList(); renderAggregate(); renderBatchList(); renderScheduleCandidates(); renderPlanSteps(); renderPlanList(); renderPlanner(); refreshRecipeMaterialSelect(); refreshProductComponentRefSelect(); refreshOrderProductSelect(); updateRecipeCostLabel(); updateEditingLabel(); toggleRecipeYieldCustomField(); persistDb(); }

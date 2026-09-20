@@ -52,7 +52,11 @@
 .v9-sheet{position:fixed;inset:0;z-index:10050;display:none}.v9-sheet.is-open{display:block}.v9-sheet-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.35)}.v9-sheet-panel{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:12px 14px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -8px 30px rgba(0,0,0,.13)}.v9-sheet-head{display:flex;align-items:center;gap:10px;position:sticky;top:-12px;background:#fff;padding:8px 0 10px;z-index:2}.v9-back{border:0;background:#eef2f7;border-radius:999px;padding:8px 11px;font-weight:800}.v9-detail-block{border:1px solid var(--line,#e5e7eb);border-radius:14px;padding:10px;margin:8px 0}.v9-detail-grid{display:grid;grid-template-columns:78px 1fr;gap:6px 8px;font-size:13px}.v9-detail-grid b{color:var(--muted,#657080)}.v9-item-line{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center;padding:8px 0;border-top:1px solid #eef0f3}.v9-link-btn{border:1px solid var(--line,#d9e0ea);background:#fff;border-radius:10px;padding:7px 9px;font-weight:800}.v9-master-results{margin-top:8px}.v9-master-row{width:100%;text-align:left;border:0;border-bottom:1px solid #eef0f3;background:#fff;padding:11px 4px}.v9-master-row strong{display:block}.v9-master-row small{color:var(--muted,#657080)}
 .aggregate-link-controls{display:none!important}.aggregate-link-row{padding:9px}.aggregate-link-types{display:none!important}.aggregate-link-row::after{content:'タップしてマスターを選択';display:block;margin-top:7px;font-size:12px;font-weight:800;color:#2563eb}.aggregate-link-row{cursor:pointer}
 @media(min-width:760px){.v9-sheet-panel{max-width:620px;left:50%;transform:translateX(-50%)}}
-</style></head>
+</style>
+<style id="v24-product-mobile-ui">
+.product-size-editor{display:grid;gap:14px}.product-size-editor .field{min-width:0}.product-size-editor input,.product-size-editor select{width:100%;min-width:0;box-sizing:border-box}#productComponentRectangleSizeRow{display:grid;grid-template-columns:1fr 1fr;gap:12px}#productComponentRectangleSizeRow.is-hidden,#productComponentRoundSizeRow.is-hidden{display:none!important}.reservation-production-links{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.reservation-production-link{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line,#d9e0ea);border-radius:999px;padding:6px 8px;background:#fff;font-size:12px}.reservation-production-link button{border:0;background:transparent;font-weight:900;font-size:15px;padding:0 2px}.reservation-link-help{font-size:11px;color:var(--muted,#657080);margin:5px 0}@media(max-width:560px){#productComponentRectangleSizeRow{grid-template-columns:1fr}.product-size-editor{gap:12px}.product-size-editor input,.product-size-editor select{min-height:52px;font-size:16px}}
+</style>
+</head>
 <body>
 <div class="app-shell">
 <header class="page-header">
@@ -452,7 +456,7 @@
 </label>
 <label class="field"><span class="field-label">参照先</span><select id="productComponentRefSelect"></select></label>
 <label class="field"><span class="field-label">数量</span><input id="productComponentQuantity" min="0" step="0.01" type="number" value="1"/></label>
-<div class="micro-row">
+<div class="product-size-editor">
 <label class="field">
 <span class="field-label">使用形状</span>
 <select id="productComponentShape">
@@ -460,25 +464,15 @@
 <option value="rectangle">四角</option>
 </select>
 </label>
-<div class="micro-row" id="productComponentSizeRow">
-<label class="field">
-<span class="field-label">使用直径(mm)</span>
-<input id="productComponentDiameter" placeholder="例：150" type="number"/>
-</label>
-<label class="field">
-<span class="field-label">使用高さ(mm)</span>
-<input id="productComponentHeight" placeholder="例：45" type="number"/>
-</label>
-<div class="micro-row is-hidden" id="productComponentRectangleSizeRow">
-<label class="field">
-<span class="field-label">使用横幅</span>
-<input id="productComponentWidth" placeholder="例：３００" type="number"/>
-</label>
-<label class="field">
-<span class="field-label">使用奥行</span>
-<input id="productComponentDepth" placeholder="例：４００" type="number"/>
-</label>
+<div id="productComponentSizeRow">
+<div id="productComponentRoundSizeRow">
+<label class="field"><span class="field-label">使用直径(mm)</span><input id="productComponentDiameter" placeholder="例：150" type="number" inputmode="decimal"/></label>
 </div>
+<div class="is-hidden" id="productComponentRectangleSizeRow">
+<label class="field"><span class="field-label">使用横幅(mm)</span><input id="productComponentWidth" placeholder="例：300" type="number" inputmode="decimal"/></label>
+<label class="field"><span class="field-label">使用奥行(mm)</span><input id="productComponentDepth" placeholder="例：400" type="number" inputmode="decimal"/></label>
+</div>
+<label class="field"><span class="field-label">使用高さ(mm)</span><input id="productComponentHeight" placeholder="例：45" type="number" inputmode="decimal"/></label>
 </div>
 <label class="field"><span class="field-label">単位</span><input id="productComponentUnit" type="text"/></label>
 </div>
