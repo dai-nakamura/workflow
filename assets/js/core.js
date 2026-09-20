@@ -78,7 +78,37 @@ function expandProduct(productId, multiplier = 1, eventDate = '', order = null) 
 
 function unitCostFromMaterial(mat) { const amount = Number(mat.baseAmount || 0), price = Number(mat.basePrice || 0); return amount ? price / amount : 0; }
 
-function calculateRecipeCost(recipe) { let total = 0; (recipe.materials || []).forEach(m => { if (!m.materialId) return; const mat = db.materialsMaster.find(x => x.id === m.materialId); if (mat) total += unitCostFromMaterial(mat) * Number(m.amountValue || 0); }); return round2(total); }
+// 原価計算用の単位換算。材料マスターが kg/L、レシピが g/ml でも同じ基準単位へ直してから計算する。
+function normalizeMaterialCostUnit(unit) {
+  const raw = String(unit || '').normalize('NFKC').trim();
+  const lower = raw.toLowerCase();
+  if (lower === 'g' || raw === 'ｇ') return 'g';
+  if (lower === 'kg' || raw === '㎏') return 'kg';
+  if (lower === 'ml' || raw === 'mL') return 'ml';
+  if (lower === 'l' || raw === 'ℓ') return 'l';
+  return raw;
+}
+function convertMaterialCostAmount(amount, fromUnit, toUnit) {
+  const value = Number(amount || 0), from = normalizeMaterialCostUnit(fromUnit), to = normalizeMaterialCostUnit(toUnit);
+  if (!from || !to || from === to) return value;
+  const mass = { g:1, kg:1000 }, volume = { ml:1, l:1000 };
+  if (mass[from] && mass[to]) return value * mass[from] / mass[to];
+  if (volume[from] && volume[to]) return value * volume[from] / volume[to];
+  return null;
+}
+function calculateRecipeCost(recipe) {
+  let total = 0;
+  (recipe.materials || []).forEach(m => {
+    if (!m.materialId) return;
+    const mat = db.materialsMaster.find(x => x.id === m.materialId);
+    if (!mat) return;
+    const recipeAmount = Number(m.amountValue || 0);
+    const converted = convertMaterialCostAmount(recipeAmount, m.amountUnit || mat.baseUnit, mat.baseUnit);
+    if (converted === null) return;
+    total += unitCostFromMaterial(mat) * converted;
+  });
+  return round2(total);
+}
 
 function mergeById(currentList, importedList, prefix) {
       const map = new Map();
